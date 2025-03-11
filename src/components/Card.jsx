@@ -110,6 +110,8 @@ function Card() {
   };
 
   return (
+      <>
+        <h1>Некоторый текст</h1>
       <div className={styles.mainCard}>
         <div className={styles.card}>
           {db.map((character, index) => (
@@ -160,6 +162,7 @@ function Card() {
             <h2 className='infoText'>Swipe</h2>
         )}
       </div>
+        </>
   );
 }
 

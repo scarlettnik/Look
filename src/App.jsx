@@ -4,16 +4,21 @@ import Card from './components/Card.jsx';
 import ProductPage from './components/ProductPage.jsx';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { WebApp } from '@twa-dev/sdk';
+import { Helmet } from 'react-helmet';
+
 
 function App() {
-    useEffect(() => {
-        WebApp.ready();
-        WebApp.expand();
-    }, []);
+    try {
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+    } catch {}
 
     return (
+
         <Provider store={store}>
+            <Helmet>
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+            </Helmet>
             <Router>
                 <Routes>
                     <Route path="/" element={<Card />} />

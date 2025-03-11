@@ -1,0 +1,10 @@
+#root {
+  margin: 0 auto;
+  overflow: hidden;
+  width: 100vw;
+  background-color: #555555;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}

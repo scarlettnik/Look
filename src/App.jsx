@@ -7,10 +7,10 @@ import { store } from './store';
 import { WebApp } from '@twa-dev/sdk';
 
 function App() {
-    // useEffect(() => {
-    //     WebApp.ready();
-    //     WebApp.expand();
-    // }, []);
+    useEffect(() => {
+        WebApp.ready();
+        WebApp.expand();
+    }, []);
 
     return (
         <Provider store={store}>

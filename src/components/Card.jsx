@@ -1,76 +1,33 @@
-import React, { useState, useMemo, useRef } from 'react'
-import TinderCard from 'react-tinder-card'
+import React, { useMemo, useRef } from 'react';
+import TinderCard from 'react-tinder-card';
 import { Link } from 'react-router-dom';
-import styles from './ui/card.module.css'
-
-
-const db = [
-  {
-    id: 1,
-    name: 'Dinesh Chugtai',
-    position: 'фронт',
-    skills: ['react', 'nextJS', 'brainfuck', 'strawberry'],
-    description: 'Издеваюсь над помидорами',
-    experience: '3 года',
-    links: ['https://qwerty.com', 'https://asdfgh.ru']
-  },
-  {
-    id: 2,
-    name: 'Dinesh Chugtai2',
-    description: 'Издеваюсь над помидорами',
-    skills: ['react', 'nextJS', 'brain'],
-    experience: '3 года',
-    links: ['https://qwerty.com', 'https://asdfgh.ru']
-  },
-  {
-    id: 3,
-    name: 'Dinesh Chugtai43',
-    position: 'фронт',
-    description: 'Издеваюсь над помидорами',
-    experience: '3 года',
-    links: ['https://qwerty.com', 'https://asdfgh.ru']
-  },
-  {
-    id: 4,
-    type: 'own',
-    name: 'Dinesh Chugtai4',
-    skills: ['react', 'nextJS', 'brainfuck', 'strawberry'],
-    position: 'бек',
-    description: 'Издеваюсь над помидорами',
-    experience: '3 года',
-    links: ['https://qwerty.com', 'https://asdfgh.ru']
-  },
-  {
-    type: 'team',
-    members: [
-      { name: 'x', position: 'фронт', experience: '3', skills:['1', '2'] },
-      { name: 'y', position: 'бек', experience: '3', skills:['2', '4'] },
-      { name: 'z', position: 'моб', experience: '3', skills:['3, 5'] }
-    ],
-    name: 'Dinesh Chugtai5',
-    description: 'Издеваюсь над помидорами, очень долго и мучительно изеваюсь над помидорами, совсем долго и мучительно издеваюсь над помидорами',
-    links: ['https://qwerty.com', 'https://asdfgh.ru']
-  }
-]
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setCurrentIndex,
+  setLastDirection,
+  addToDismatch,
+  addToMatch,
+  addToQueryMatch,
+  removeCard,
+} from '../features/cardSlice';
+import styles from './ui/card.module.css';
 
 function Card() {
-  const [currentIndex, setCurrentIndex] = useState(db.length - 1);
-  const [lastDirection, setLastDirection] = useState();
+  const dispatch = useDispatch();
+  const { db, currentIndex, lastDirection } = useSelector((state) => state.card);
+
   const currentIndexRef = useRef(currentIndex);
-  const [dismatch, setDismatch] = useState([]);
-  const [match, setMatch] = useState([]);
-  const [querymatch, setQueryMatch] = useState([]);
 
   const childRefs = useMemo(
       () =>
           Array(db.length)
               .fill(0)
               .map((i) => React.createRef()),
-      []
+      [db.length] // Зависимость от длины db
   );
 
   const updateCurrentIndex = (val) => {
-    setCurrentIndex(val);
+    dispatch(setCurrentIndex(val));
     currentIndexRef.current = val;
   };
 
@@ -79,15 +36,17 @@ function Card() {
   const canSwipe = currentIndex >= 0;
 
   const swiped = (direction, nameToDelete, index) => {
-    setLastDirection(direction);
-    updateCurrentIndex(index - 1);
+    dispatch(setLastDirection(direction));
     const card = db[index];
+    dispatch(removeCard(card.id)); // Удаляем карточку из db
+    updateCurrentIndex(index - 1); // Обновляем currentIndex
+
     if (direction === 'left') {
-      setDismatch((prevDismatch) => [...prevDismatch, card]);
+      dispatch(addToDismatch(card));
     } else if (direction === 'right') {
-      setMatch((prevMatch) => [...prevMatch, card]);
+      dispatch(addToMatch(card));
     } else if (direction === 'down') {
-      setQueryMatch((prevQueryMatch) => [...prevQueryMatch, card]);
+      dispatch(addToQueryMatch(card));
     }
   };
 
@@ -110,14 +69,12 @@ function Card() {
   };
 
   return (
-      <>
-        <h1>Некоторый текст</h1>
       <div className={styles.mainCard}>
         <div className={styles.card}>
           {db.map((character, index) => (
               <TinderCard
                   ref={childRefs[index]}
-                  key={character.name}
+                  key={character.id} // Используем id как ключ
                   className={styles.swipe}
                   onSwipe={(dir) => swiped(dir, character.name, index)}
                   onCardLeftScreen={() => outOfFrame(character.name, index)}
@@ -140,8 +97,8 @@ function Card() {
                   </div>
                   <div className={styles.cardContent}>Описание: {character.description || 'Данные не указаны'}</div>
                   <div>
-                    <Link to={`/product/${character.id}`}> {/* Используем id карточки */}
-                      <button className={styles.linkStyle}>Подробнее</button>
+                    <Link to={`/product/${character.id}`}  className={styles.linkStyle} state={{product: character}}>
+                         Подробнее
                     </Link>
                   </div>
                 </div>
@@ -162,7 +119,6 @@ function Card() {
             <h2 className='infoText'>Swipe</h2>
         )}
       </div>
-        </>
   );
 }
 

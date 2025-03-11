@@ -8,10 +8,10 @@ import { Helmet } from 'react-helmet';
 
 
 function App() {
-    try {
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-    } catch {}
+    // try {
+    //     let tg = window.Telegram.WebApp;
+    //     tg.expand();
+    // } catch {}
 
     return (
 

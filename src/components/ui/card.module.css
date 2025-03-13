@@ -14,7 +14,8 @@
     justify-content: flex-start;
   }
 .swipe {
-    position:absolute
+    position:absolute;
+    transition: transform 0.5s ease-out;
 }
 
 .cardContent {

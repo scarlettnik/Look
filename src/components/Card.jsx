@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useEffect } from 'react';
 import TinderCard from 'react-tinder-card';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setCurrentIndex,
@@ -15,19 +15,37 @@ import styles from './ui/card.module.css';
 function Card() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
-    const handleBackButton = (event) => {
-      event.preventDefault();
-      navigate(-1);
-    };
-    window.addEventListener('popstate', handleBackButton);
-    return () => {
-      window.removeEventListener('popstate', handleBackButton);
-    };
-  }, [navigate]);
+    if (window.Telegram && window.Telegram.WebApp) {
+      const telegram = window.Telegram.WebApp;
+
+      if (location.pathname !== '/') {
+        telegram.BackButton.show();
+      }
+
+      telegram.BackButton.onClick(() => {
+        navigate(-1);
+      });
+
+      const handleBackNavigation = () => {
+        if (location.pathname === '/') {
+          telegram.BackButton.hide();
+        }
+      };
+
+      window.addEventListener('popstate', handleBackNavigation);
+
+      return () => {
+        telegram.BackButton.offClick();
+        telegram.BackButton.hide();
+        window.removeEventListener('popstate', handleBackNavigation);
+      };
+    }
+  }, [navigate, location.pathname]);
 
   const handleDoubleClick = (character) => {
-    window.history.pushState({}, '', `/product/${character.id}`);
     navigate(`/product/${character.id}`, {
       state: { product: character },
     });

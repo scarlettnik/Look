@@ -18,38 +18,39 @@ function Card() {
   const location = useLocation();
 
   useEffect(() => {
-    if (window.Telegram && window.Telegram.WebApp) {
-      const telegram = window.Telegram.WebApp;
+    const telegram = window.Telegram?.WebApp;
+    if (!telegram) return;
 
-      if (location.pathname !== '/') {
-        telegram.BackButton.show();
-      }
-
-      telegram.BackButton.onClick(() => {
+    const handleBack = () => {
+      if (window.history.state && window.history.state.idx > 0) {
         navigate(-1);
-      });
+      } else {
+        telegram.close();
+      }
+    };
 
-      const handleBackNavigation = () => {
-        if (location.pathname === '/') {
-          telegram.BackButton.hide();
-        }
-      };
-
-      window.addEventListener('popstate', handleBackNavigation);
-
-      return () => {
-        telegram.BackButton.offClick();
-        telegram.BackButton.hide();
-        window.removeEventListener('popstate', handleBackNavigation);
-      };
+    if (location.pathname !== '/') {
+      telegram.BackButton.show();
+      telegram.BackButton.onClick(handleBack);
+    } else {
+      telegram.BackButton.hide();
     }
+
+    return () => {
+      telegram.BackButton.offClick(handleBack);
+      telegram.BackButton.hide();
+    };
   }, [navigate, location.pathname]);
+
 
   const handleDoubleClick = (character) => {
     navigate(`/product/${character.id}`, {
       state: { product: character },
     });
   };
+
+
+
 
   const { db, currentIndex, lastDirection } = useSelector((state) => state.card);
 

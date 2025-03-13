@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import TinderCard from 'react-tinder-card';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,24 @@ import styles from './ui/card.module.css';
 function Card() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  useEffect(() => {
+    const handleBackButton = (event) => {
+      event.preventDefault();
+      navigate(-1);
+    };
+
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+      window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [navigate]);
+
+  const handleDoubleClick = (character) => {
+    navigate(`/product/${character.id}`, {
+      state: { product: character, currentIndex },
+    });
+  };
 
   const { db, currentIndex, lastDirection } = useSelector((state) => state.card);
 
@@ -37,8 +55,6 @@ function Card() {
     dispatch(setCurrentIndex(val));
     currentIndexRef.current = val;
   };
-
-  const canGoBack = currentIndex < db.length - 1;
 
   const canSwipe = currentIndex >= 0;
 
@@ -71,12 +87,9 @@ function Card() {
     }
   };
 
-  const handleDoubleClick = (character) => {
-    navigate(`/product/${character.id}`, { state: { product: character, currentIndex } });
-  };
-
   return (
       <div className={styles.mainCard}>
+
         <div className={styles.card}>
           {db.map((character, index) => (
               <TinderCard

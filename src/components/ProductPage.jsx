@@ -21,7 +21,7 @@ const ProductPage = () => {
 
     return (
         <div>
-            <button onClick={handleBack}></button>
+            <button onClick={handleBack}>Назад</button>
             <h1>{product.name}</h1>
             {product.position && <p>Позиция: {product.position}</p>}
             {product.experience && <p>Опыт: {product.experience}</p>}

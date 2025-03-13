@@ -20,17 +20,16 @@ function Card() {
       event.preventDefault();
       navigate(-1);
     };
-
     window.addEventListener('popstate', handleBackButton);
-
     return () => {
       window.removeEventListener('popstate', handleBackButton);
     };
   }, [navigate]);
 
   const handleDoubleClick = (character) => {
+    window.history.pushState({}, '', `/product/${character.id}`);
     navigate(`/product/${character.id}`, {
-      state: { product: character, currentIndex },
+      state: { product: character },
     });
   };
 

@@ -17,6 +17,13 @@ function Card() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleDoubleClick = (character) => {
+    navigate(`/product/${character.id}`, {
+      state: { product: character },
+    });
+  };
+
+
   useEffect(() => {
     const telegram = window.Telegram?.WebApp;
     if (!telegram) return;
@@ -41,15 +48,6 @@ function Card() {
       telegram.BackButton.hide();
     };
   }, [navigate, location.pathname]);
-
-
-  const handleDoubleClick = (character) => {
-    navigate(`/product/${character.id}`, {
-      state: { product: character },
-    });
-  };
-
-
 
 
   const { db, currentIndex, lastDirection } = useSelector((state) => state.card);

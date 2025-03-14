@@ -14,6 +14,7 @@ const ProductPage = () => {
             telegram.close();
         }
     };
+
     useEffect(() => {
         const telegram = window.Telegram?.WebApp;
         if (!telegram) return;
@@ -32,10 +33,21 @@ const ProductPage = () => {
         } else {
             telegram.BackButton.hide();
         }
-    })
+
+        return () => {
+            telegram.BackButton.offClick(handleBack);
+            telegram.BackButton.hide();
+        };
+    }, [navigate, location.pathname]);
+
+
+
     if (!product) {
         return <div>Товар не найден</div>;
     }
+    telegram.onEvent('viewportChanged', () => {
+        telegram.BackButton[location.pathname !== '/' ? 'show' : 'hide']();
+    });
 
     return (
         <div>

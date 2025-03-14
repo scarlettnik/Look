@@ -1,11 +1,10 @@
-import Card from './components/Card.jsx';
-import ProductPage from './components/ProductPage.jsx';
+import { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { store } from './store';
 import { Helmet } from 'react-helmet';
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import store from './store';
+import Card from './components/Card';
+import ProductPage from './components/ProductPage';
 
 function TelegramBackButtonHandler() {
     const navigate = useNavigate();
@@ -13,31 +12,24 @@ function TelegramBackButtonHandler() {
 
     useEffect(() => {
         if (window.Telegram && window.Telegram.WebApp) {
-            const telegram = window.Telegram.WebApp;
-            if (location.pathname !== '/') {
-                telegram.BackButton.show();
-            } else {
-                telegram.BackButton.hide();
-            }
+            const { BackButton } = window.Telegram.WebApp;
 
-            telegram.BackButton.onClick(() => {
-                navigate(-1);
-            });
+           BackButton.show();
 
-            const handleBackNavigation = () => {
-                if (location.pathname === '/') {
-                    telegram.BackButton.hide();
+            const handleBackButtonClick = () => {
+                if (window.history.length > 1) {
+                    navigate(-1);
                 } else {
-                    telegram.BackButton.show();
+                    console.log('Нет истории для возврата');
+                    BackButton.hide();
                 }
             };
 
-            window.addEventListener('popstate', handleBackNavigation);
+            BackButton.onClick(handleBackButtonClick);
 
             return () => {
-                telegram.BackButton.offClick();
-                telegram.BackButton.hide();
-                window.removeEventListener('popstate', handleBackNavigation);
+                BackButton.offClick(handleBackButtonClick);
+                BackButton.hide();
             };
         }
     }, [navigate, location.pathname]);
@@ -45,15 +37,8 @@ function TelegramBackButtonHandler() {
     return null;
 }
 
-
 function App() {
-    try {
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-    } catch {}
-
     return (
-
         <Provider store={store}>
             <Helmet>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />

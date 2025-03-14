@@ -1,6 +1,6 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import TinderCard from 'react-tinder-card';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setCurrentIndex,
@@ -15,40 +15,12 @@ import styles from './ui/card.module.css';
 function Card() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleDoubleClick = (character) => {
     navigate(`/product/${character.id}`, {
       state: { product: character },
     });
   };
-
-
-  useEffect(() => {
-    const telegram = window.Telegram?.WebApp;
-    if (!telegram) return;
-
-    const handleBack = () => {
-      if (window.history.state && window.history.state.idx > 0) {
-        navigate(-1);
-      } else {
-        telegram.close();
-      }
-    };
-
-    if (location.pathname !== '/') {
-      telegram.BackButton.show();
-      telegram.BackButton.onClick(handleBack);
-    } else {
-      telegram.BackButton.hide();
-    }
-
-    return () => {
-      telegram.BackButton.offClick(handleBack);
-      telegram.BackButton.hide();
-    };
-  }, [navigate, location.pathname]);
-
 
   const { db, currentIndex, lastDirection } = useSelector((state) => state.card);
 

@@ -1,5 +1,4 @@
 import {useLocation, useNavigate} from 'react-router-dom';
-import {useEffect} from "react";
 
 const ProductPage = () => {
     const location = useLocation();
@@ -15,39 +14,10 @@ const ProductPage = () => {
         }
     };
 
-    useEffect(() => {
-        const telegram = window.Telegram?.WebApp;
-        if (!telegram) return;
-
-        const handleBack = () => {
-            if (window.history.state && window.history.state.idx > 0) {
-                navigate(-1);
-            } else {
-                telegram.close();
-            }
-        };
-
-        if (location.pathname !== '/') {
-            telegram.BackButton.show();
-            telegram.BackButton.onClick(handleBack);
-        } else {
-            telegram.BackButton.hide();
-        }
-
-        return () => {
-            telegram.BackButton.offClick(handleBack);
-            telegram.BackButton.hide();
-        };
-    }, [navigate, location.pathname]);
-
-
 
     if (!product) {
         return <div>Товар не найден</div>;
     }
-    telegram.onEvent('viewportChanged', () => {
-        telegram.BackButton[location.pathname !== '/' ? 'show' : 'hide']();
-    });
 
     return (
         <div>

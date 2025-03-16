@@ -24,6 +24,7 @@ function ProductPage() {
                     <li key={index}>{skill}</li>
                 ))}
             </ul>
+            <button onClick={() => navigate(-1)}>Back to Main</button>
         </div>
     );
 }

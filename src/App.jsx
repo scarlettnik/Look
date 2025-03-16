@@ -1,56 +1,32 @@
-import { useEffect } from 'react';
-import { Provider } from 'react-redux';
-import { Helmet } from 'react-helmet';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import store from './store';
-import Card from './components/Card';
-import ProductPage from './components/ProductPage';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BackButton, MainButton } from '@twa-dev/sdk/react';
 
-function TelegramBackButtonHandler() {
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    useEffect(() => {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const { BackButton } = window.Telegram.WebApp;
-
-           BackButton.show();
-
-            const handleBackButtonClick = () => {
-                if (window.history.length > 1) {
-                    navigate(-1);
-                } else {
-                    console.log('Нет истории для возврата');
-                    BackButton.hide();
-                }
-            };
-
-            BackButton.onClick(handleBackButtonClick);
-
-            return () => {
-                BackButton.offClick(handleBackButtonClick);
-                BackButton.hide();
-            };
-        }
-    }, [navigate, location.pathname]);
-
-    return null;
-}
+import HomePage from './components/HomePage';
+import SecondPage from './components/SecondPage';
 
 function App() {
     return (
-        <Provider store={store}>
-            <Helmet>
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-            </Helmet>
-            <Router>
-                <TelegramBackButtonHandler />
-                <Routes>
-                    <Route path="/" element={<Card />} />
-                    <Route path="/product/:id" element={<ProductPage />} />
-                </Routes>
-            </Router>
-        </Provider>
+        <Router>
+            <AppContent />
+        </Router>
+    );
+}
+
+function AppContent() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const showBackButton = location.pathname !== '/';
+
+    return (
+        <div>
+            {showBackButton && <BackButton onClick={() => navigate(-1)} />}
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/second" element={<SecondPage />} />
+            </Routes>
+        </div>
     );
 }
 

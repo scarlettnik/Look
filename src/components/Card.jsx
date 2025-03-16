@@ -1,6 +1,6 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef } from 'react';
 import TinderCard from 'react-tinder-card';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setCurrentIndex,
@@ -77,7 +77,6 @@ function Card() {
 
   return (
       <div className={styles.mainCard}>
-
         <div className={styles.card}>
           {db.map((character, index) => (
               <TinderCard
@@ -88,7 +87,7 @@ function Card() {
                   onCardLeftScreen={() => outOfFrame(character.name, index)}
                   swipeThreshold={0.2}
               >
-                <div className={`${styles.card} pressable`} onDoubleClick={() => handleDoubleClick(character)} >
+                <div className={`${styles.card} pressable`} onDoubleClick={() => handleDoubleClick(character)}>
                   <div style={{ display: 'flex' }}>
                     <div>{character.name}</div>
                     <div className={styles.cardContent}>{character?.position}</div>
@@ -119,21 +118,9 @@ function Card() {
           ))}
         </div>
         <div className={styles.buttonlist}>
-          <button
-              onClick={() => swipe('left')}
-          >
-            left
-          </button>
-          <button
-              onClick={() => swipe('down')}
-          >
-            down
-          </button>
-          <button
-              onClick={() => swipe('right')}
-          >
-            right
-          </button>
+          <button onClick={() => swipe('left')}>left</button>
+          <button onClick={() => swipe('down')}>down</button>
+          <button onClick={() => swipe('right')}>right</button>
         </div>
         {lastDirection ? (
             <h2 key={lastDirection}>You swiped {lastDirection}</h2>

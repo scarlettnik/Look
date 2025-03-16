@@ -1,15 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { BackButton, MainButton } from '@twa-dev/sdk/react';
-
-import HomePage from './components/HomePage';
-import SecondPage from './components/SecondPage';
-
+import { Provider } from 'react-redux';
+import Card from './components/Card';
+import ProductPage from './components/ProductPage';
+import {store} from "./store.js";
 function App() {
     return (
-        <Router>
-            <AppContent />
-        </Router>
+        <Provider store={store}>
+            <Router>
+                <AppContent />
+            </Router>
+        </Provider>
     );
 }
 
@@ -21,10 +22,10 @@ function AppContent() {
 
     return (
         <div>
-            {showBackButton && <BackButton onClick={() => navigate(-1)} />}
+            {showBackButton && <button onClick={() => navigate(-1)}>Back</button>}
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/second" element={<SecondPage />} />
+                <Route path="/" element={<Card />} />
+                <Route path="/product/:id" element={<ProductPage />} />
             </Routes>
         </div>
     );

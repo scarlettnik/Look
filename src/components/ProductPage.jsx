@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { BackButton } from '@twa-dev/sdk/react';
 
 function ProductPage() {
     const location = useLocation();
@@ -12,6 +13,7 @@ function ProductPage() {
 
     return (
         <div>
+            <BackButton onClick={() => navigate(-1)} />
             <h1>{product.name}</h1>
             <p>Position: {product.position}</p>
             <p>Experience: {product.experience}</p>
@@ -22,7 +24,6 @@ function ProductPage() {
                     <li key={index}>{skill}</li>
                 ))}
             </ul>
-            <button onClick={() => navigate(-1)}>Back to Main</button>
         </div>
     );
 }

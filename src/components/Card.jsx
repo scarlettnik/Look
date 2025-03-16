@@ -1,7 +1,8 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import TinderCard from 'react-tinder-card';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { MainButton } from '@twa-dev/sdk/react';
 import {
   setCurrentIndex,
   setLastDirection,
@@ -16,13 +17,8 @@ function Card() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleDoubleClick = (character) => {
-    navigate(`/product/${character.id}`, {
-      state: { product: character },
-    });
-  };
-
   const { db, currentIndex, lastDirection } = useSelector((state) => state.card);
+  const user = useSelector((state) => state.card.user); // Предположим, что данные пользователя хранятся в Redux
 
   const currentIndexRef = useRef(currentIndex);
 
@@ -75,8 +71,18 @@ function Card() {
     }
   };
 
+  const handleCardClick = (character) => {
+    navigate(`/product/${character.id}`, {
+      state: { product: character },
+    });
+  };
+
   return (
       <div className={styles.mainCard}>
+        <div className={styles.userInfo}>
+          <h2>Пользователь: {user?.name}</h2>
+          <p>Email: {user?.email}</p>
+        </div>
         <div className={styles.card}>
           {db.map((character, index) => (
               <TinderCard
@@ -87,7 +93,10 @@ function Card() {
                   onCardLeftScreen={() => outOfFrame(character.name, index)}
                   swipeThreshold={0.2}
               >
-                <div className={`${styles.card} pressable`} onDoubleClick={() => handleDoubleClick(character)}>
+                <div
+                    className={`${styles.card} pressable`}
+                    onClick={() => handleCardClick(character)}
+                >
                   <div style={{ display: 'flex' }}>
                     <div>{character.name}</div>
                     <div className={styles.cardContent}>{character?.position}</div>
@@ -104,15 +113,6 @@ function Card() {
                     </div>
                   </div>
                   <div className={styles.cardContent}>Описание: {character.description || 'Данные не указаны'}</div>
-                  <div>
-                    <Link
-                        to={`/product/${character.id}`}
-                        state={{ product: character, currentIndex }}
-                        className={`${styles.linkStyle} pressable`}
-                    >
-                      Подробнее
-                    </Link>
-                  </div>
                 </div>
               </TinderCard>
           ))}
@@ -127,6 +127,11 @@ function Card() {
         ) : (
             <h2 className='infoText'>Swipe</h2>
         )}
+        <MainButton
+            text="Перейти к продукту"
+            onClick={() => handleCardClick(db[currentIndex])}
+            disabled={!db.length}
+        />
       </div>
   );
 }

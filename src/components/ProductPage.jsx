@@ -1,9 +1,7 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { BackButton } from '@twa-dev/sdk/react';
+import { useNavigate } from 'react-router-dom';
+import {MainButton} from "@twa-dev/sdk/react";
 
 function ProductPage() {
-    const location = useLocation();
     const navigate = useNavigate();
     const { product } = location.state || {};
 
@@ -13,7 +11,6 @@ function ProductPage() {
 
     return (
         <div>
-            <BackButton onClick={() => navigate(-1)} />
             <h1>{product.name}</h1>
             <p>Position: {product.position}</p>
             <p>Experience: {product.experience}</p>
@@ -24,7 +21,7 @@ function ProductPage() {
                     <li key={index}>{skill}</li>
                 ))}
             </ul>
-            <button onClick={() => navigate(-1)}>Back to Main</button>
+            <MainButton text="Go Back to Home" onClick={() => navigate('/')} />
         </div>
     );
 }

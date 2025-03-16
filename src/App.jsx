@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { BackButton } from '@twa-dev/sdk/react';
+import { BackButton, MainButton } from '@twa-dev/sdk/react';
 import Card from './components/Card';
 import ProductPage from './components/ProductPage';
 import {store} from "./store.js";

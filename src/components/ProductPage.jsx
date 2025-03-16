@@ -1,8 +1,7 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {MainButton} from "@twa-dev/sdk/react";
 
 function ProductPage() {
-    const location = useLocation();
     const navigate = useNavigate();
     const { product } = location.state || {};
 

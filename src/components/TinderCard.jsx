@@ -4,6 +4,7 @@ import './ui/TinderCards.css';
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.15;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.15;
+const VELOCITY_THRESHOLD = 0.3;
 
 const TinderCards = () => {
     const [cards, setCards] = useState([
@@ -47,7 +48,10 @@ const TinderCards = () => {
         const { innerWidth, innerHeight } = window;
         const rotation = direction === 'right' ? 25 : -25;
 
-        card.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+        card.style.transition = `
+            transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+            opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1)
+        `;
 
         switch(direction) {
             case 'left':
@@ -157,10 +161,12 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
     const [isDragging, setIsDragging] = useState(false);
     const animationFrame = useRef(null);
     const cardRef = useRef(null);
+    const startTime = useRef(0); // Добавляем отслеживание времени
 
     const handleStart = (clientX, clientY) => {
         setStartPos({ x: clientX, y: clientY });
         setIsDragging(true);
+        startTime.current = Date.now(); // Фиксируем время начала движения
         if (cardRef.current) {
             cardRef.current.style.transition = 'none';
         }
@@ -186,8 +192,16 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         cancelAnimationFrame(animationFrame.current);
 
         const { innerWidth, innerHeight } = window;
-        const isHorizontal = Math.abs(position.x) > innerWidth * 0.1;
-        const isVertical = Math.abs(position.y) > innerHeight * 0.1;
+        const deltaTime = Date.now() - startTime.current;
+
+        const velocityX = Math.abs(position.x) / (deltaTime || 1);
+        const velocityY = Math.abs(position.y) / (deltaTime || 1);
+
+        const isHorizontalFast = velocityX > VELOCITY_THRESHOLD;
+        const isVerticalFast = velocityY > VELOCITY_THRESHOLD;
+
+        const isHorizontal = Math.abs(position.x) > innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO || isHorizontalFast;
+        const isVertical = Math.abs(position.y) > innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO || isVerticalFast;
 
         if (isVertical && position.y < 0) {
             onSwipe('up', card);
@@ -200,7 +214,9 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
 
     const resetPosition = () => {
         if (cardRef.current) {
-            cardRef.current.style.transition = 'all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+            cardRef.current.style.transition = `
+                all 0.5s cubic-bezier(0.23, 1, 0.32, 1)
+            `;
             setPosition({ x: 0, y: 0, rotate: 0 });
             updateSwipeFeedback(0, 0);
         }

@@ -229,7 +229,13 @@
     animation: fadeIn 0.5s ease;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -40%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
+.tinder--card {
+    will-change: transform, opacity;
+    transition:
+            transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+            opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.tinder--card.moving {
+    transition: none;
 }

@@ -5,6 +5,7 @@ import { BackButton } from '@twa-dev/sdk/react';
 import Card from './components/Card';
 import ProductPage from './components/ProductPage';
 import {store} from "./store.js";
+import TinderCards from "./components/TinderCard.jsx";
 
 
 function App() {
@@ -27,7 +28,7 @@ function AppContent() {
         <div>
             {showBackButton && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
-                <Route path="/" element={<Card />} />
+                <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />
             </Routes>
         </div>

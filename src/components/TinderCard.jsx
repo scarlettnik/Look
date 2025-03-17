@@ -218,9 +218,16 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
             onSwipe(direction, card);
         }, 50);
     };
+
     const resetPosition = () => {
         if (cardRef.current) {
-            cardRef.current.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+            const cardElement = cardRef.current;
+
+            cardElement.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+
+            cardElement.style.transform = 'translate(0, 0) rotate(0deg)';
+            cardElement.style.opacity = '1';
+
             setPosition({ x: 0, y: 0, rotate: 0 });
             updateSwipeFeedback(0, 0);
 

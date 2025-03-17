@@ -120,4 +120,116 @@
     text-align: center;
     color: #666;
 }
+.tinder--status i {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
+.tinder--status .visible {
+    opacity: 0.8 !important;
+    transform: scale(1.2) translateY(-20px) !important;
+}
+
+.tinder--card {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tinder--card.moving {
+    transition: none;
+}
+
+.fa-shopping-basket {
+    color: #4CAF50;
+}
+
+.empty-state {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -40%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.tinder--card {
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tinder_love .fa-heart,
+.tinder_nope .fa-remove,
+.tinder_up .fa-shopping-basket {
+    opacity: 0.9 !important;
+    transform: scale(1.3) translateY(-30px) !important;
+}
+.tinder--status {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    pointer-events: none;
+    width: 500px;
+    height: 500px;
+}
+
+.status-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+
+}
+
+.status-icon.visible {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.status-icon.nope { color: #ff4444; }
+.status-icon.love { color: #ff387e; }
+.status-icon.basket { color: #4c84af; }
+
+.tinder--buttons {
+    flex: 0 0 100px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 2;
+}
+
+.tinder--buttons button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.tinder--buttons button:active {
+    transform: scale(0.95);
+}
+
+.tinder--buttons .icon {
+    width: 30px;
+    height: 30px;
+}
+
+.empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #666;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -40%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}

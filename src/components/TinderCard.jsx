@@ -155,6 +155,37 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         });
     };
 
+    const resetPosition = (duration = ANIMATION_DURATION) => {
+        if (cardRef.current) {
+            const cardElement = cardRef.current;
+
+            const currentTransform = cardElement.style.transform;
+            const currentOpacity = cardElement.style.opacity;
+
+            cardElement.style.transition = `all ${duration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+
+            cardElement.style.transform = 'translate(0, 0) rotate(0deg)';
+            cardElement.style.opacity = '1';
+
+            const onTransitionEnd = () => {
+                cardElement.removeEventListener('transitionend', onTransitionEnd);
+                setPosition({ x: 0, y: 0, rotate: 0 });
+                updateSwipeFeedback(0, 0);
+                cardElement.style.transition = '';
+            };
+
+            cardElement.addEventListener('transitionend', onTransitionEnd);
+
+            return () => {
+                cardElement.removeEventListener('transitionend', onTransitionEnd);
+                cardElement.style.transition = '';
+                cardElement.style.transform = currentTransform;
+                cardElement.style.opacity = currentOpacity;
+            };
+        }
+    };
+
+
     const handleEnd = () => {
         if (!isDragging) return;
         setIsDragging(false);
@@ -217,26 +248,6 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         setTimeout(() => {
             onSwipe(direction, card);
         }, 50);
-    };
-
-    const resetPosition = () => {
-        if (cardRef.current) {
-            const cardElement = cardRef.current;
-
-            cardElement.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
-
-            cardElement.style.transform = 'translate(0, 0) rotate(0deg)';
-            cardElement.style.opacity = '1';
-
-            setPosition({ x: 0, y: 0, rotate: 0 });
-            updateSwipeFeedback(0, 0);
-
-            setTimeout(() => {
-                if (cardRef.current) {
-                    cardRef.current.style.transition = '';
-                }
-            }, ANIMATION_DURATION);
-        }
     };
 
     useEffect(() => {

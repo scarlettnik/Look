@@ -4,42 +4,20 @@ import './ui/TinderCards.css';
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.15;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.15;
-const VELOCITY_THRESHOLD = 0.3;
+const VELOCITY_THRESHOLD = 0.4;
+const ANIMATION_DURATION = 500;
 
 const TinderCards = () => {
     const [cards, setCards] = useState([
-        {
-            id: 1,
-            title: 'Demo card 1',
-            text: 'This is a demo for Tinder like swipe cards',
-        },
-        {
-            id: 2,
-            title: 'Demo card 2',
-            text: 'This is a demo for Tinder like swipe cards',
-        },
-        {
-            id: 3,
-            title: 'Demo card 3',
-            text: 'This is a demo for Tinder like swipe cards',
-        },
-        {
-            id: 4,
-            title: 'Demo card 4',
-            text: 'This is a demo for Tinder like swipe cards',
-        },
-        {
-            id: 5,
-            title: 'Demo card 5',
-            text: 'This is a demo for Tinder like swipe cards',
-        }
+        { id: 1, title: 'Demo card 1', text: 'This is a demo for Tinder like swipe cards' },
+        { id: 2, title: 'Demo card 2', text: 'This is a demo for Tinder like swipe cards' },
+        { id: 3, title: 'Demo card 3', text: 'This is a demo for Tinder like swipe cards' },
+        { id: 4, title: 'Demo card 4', text: 'This is a demo for Tinder like swipe cards' },
+        { id: 5, title: 'Demo card 5', text: 'This is a demo for Tinder like swipe cards' }
     ]);
 
     const [basket, setBasket] = useState([]);
-    const [swipeProgress, setSwipeProgress] = useState({
-        direction: null,
-        opacity: 0
-    });
+    const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
 
     const animateSwipe = useCallback((direction, cardId) => {
         const card = document.getElementById(cardId);
@@ -48,10 +26,7 @@ const TinderCards = () => {
         const { innerWidth, innerHeight } = window;
         const rotation = direction === 'right' ? 25 : -25;
 
-        card.style.transition = `
-            transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-            opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1)
-        `;
+        card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
 
         switch(direction) {
             case 'left':
@@ -75,7 +50,7 @@ const TinderCards = () => {
         setTimeout(() => {
             setCards(prev => prev.filter(c => c.id !== card.id));
             if(direction === 'up') setBasket(prev => [...prev, card]);
-        }, 600);
+        }, ANIMATION_DURATION);
     }, [animateSwipe]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
@@ -96,30 +71,23 @@ const TinderCards = () => {
         setSwipeProgress({ direction, opacity });
     }, []);
 
+    const handleButtonSwipe = (direction) => {
+        if (!cards[0]) return;
+
+        const card = cards[0];
+        const cardElement = document.getElementById(card.id);
+        if (cardElement) {
+            cardElement.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+        }
+        handleSwipe(direction, card);
+    };
+
     return (
         <div className="tinder">
             <div className="tinder--status">
-                <HeartOff
-                    className="status-icon nope"
-                    style={{
-                        opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0,
-                        transform: `scale(${0.8 + (swipeProgress.direction === 'left' ? swipeProgress.opacity * 0.7 : 0)})`
-                    }}
-                />
-                <Heart
-                    className="status-icon love"
-                    style={{
-                        opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0,
-                        transform: `scale(${0.8 + (swipeProgress.direction === 'right' ? swipeProgress.opacity * 0.7 : 0)})`
-                    }}
-                />
-                <Save
-                    className="status-icon basket"
-                    style={{
-                        opacity: swipeProgress.direction === 'up' ? swipeProgress.opacity : 0,
-                        transform: `scale(${0.8 + (swipeProgress.direction === 'up' ? swipeProgress.opacity * 0.7 : 0)})`
-                    }}
-                />
+                <HeartOff className="status-icon nope" style={getIconStyle('left', swipeProgress)} />
+                <Heart className="status-icon love" style={getIconStyle('right', swipeProgress)} />
+                <Save className="status-icon basket" style={getIconStyle('up', swipeProgress)} />
             </div>
 
             <div className="tinder--cards">
@@ -141,13 +109,13 @@ const TinderCards = () => {
             </div>
 
             <div className="tinder--buttons">
-                <button onClick={() => cards[0] && handleSwipe('left', cards[0])}>
+                <button onClick={() => handleButtonSwipe('left')}>
                     <HeartOff className="icon" size={24} />
                 </button>
-                <button onClick={() => cards[0] && handleSwipe('up', cards[0])}>
+                <button onClick={() => handleButtonSwipe('up')}>
                     <Save className="icon" size={24} />
                 </button>
-                <button onClick={() => cards[0] && handleSwipe('right', cards[0])}>
+                <button onClick={() => handleButtonSwipe('right')}>
                     <Heart className="icon" size={24} />
                 </button>
             </div>
@@ -161,12 +129,12 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
     const [isDragging, setIsDragging] = useState(false);
     const animationFrame = useRef(null);
     const cardRef = useRef(null);
-    const startTime = useRef(0); // Добавляем отслеживание времени
+    const startTime = useRef(0);
 
     const handleStart = (clientX, clientY) => {
         setStartPos({ x: clientX, y: clientY });
         setIsDragging(true);
-        startTime.current = Date.now(); // Фиксируем время начала движения
+        startTime.current = Date.now();
         if (cardRef.current) {
             cardRef.current.style.transition = 'none';
         }
@@ -194,16 +162,18 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         const { innerWidth, innerHeight } = window;
         const deltaTime = Date.now() - startTime.current;
 
-        const velocityX = Math.abs(position.x) / (deltaTime || 1);
-        const velocityY = Math.abs(position.y) / (deltaTime || 1);
+        const velocityX = position.x / (deltaTime || 1);
+        const velocityY = position.y / (deltaTime || 1);
 
-        const isHorizontalFast = velocityX > VELOCITY_THRESHOLD;
-        const isVerticalFast = velocityY > VELOCITY_THRESHOLD;
+        const isHorizontal =
+            Math.abs(position.x) > innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO ||
+            Math.abs(velocityX) > VELOCITY_THRESHOLD;
 
-        const isHorizontal = Math.abs(position.x) > innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO || isHorizontalFast;
-        const isVertical = Math.abs(position.y) > innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO || isVerticalFast;
+        const isVerticalUp =
+            position.y < -innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO ||
+            velocityY < -VELOCITY_THRESHOLD;
 
-        if (isVertical && position.y < 0) {
+        if (isVerticalUp) {
             onSwipe('up', card);
         } else if (isHorizontal) {
             onSwipe(position.x > 0 ? 'right' : 'left', card);
@@ -214,11 +184,15 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
 
     const resetPosition = () => {
         if (cardRef.current) {
-            cardRef.current.style.transition = `
-                all 0.5s cubic-bezier(0.23, 1, 0.32, 1)
-            `;
+            cardRef.current.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
             setPosition({ x: 0, y: 0, rotate: 0 });
             updateSwipeFeedback(0, 0);
+
+            setTimeout(() => {
+                if (cardRef.current) {
+                    cardRef.current.style.transition = '';
+                }
+            }, ANIMATION_DURATION);
         }
     };
 
@@ -237,7 +211,6 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         `;
         cardElement.style.opacity = 1 - offset * 0.15;
         cardElement.style.zIndex = zIndex;
-
     }, [position, zIndex, offset]);
 
     return (
@@ -245,18 +218,9 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
             ref={cardRef}
             id={card.id}
             className={`tinder--card ${isDragging ? 'moving' : ''}`}
-            onTouchStart={(e) => {
-                e.preventDefault();
-                handleStart(e.touches[0].clientX, e.touches[0].clientY);
-            }}
-            onTouchMove={(e) => {
-                e.preventDefault();
-                handleMove(e.touches[0].clientX, e.touches[0].clientY);
-            }}
-            onTouchEnd={(e) => {
-                e.preventDefault();
-                handleEnd();
-            }}
+            onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchEnd={handleEnd}
             onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
             onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
             onMouseUp={handleEnd}
@@ -269,5 +233,11 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         </div>
     );
 };
+
+const getIconStyle = (direction, swipeProgress) => ({
+    opacity: swipeProgress.direction === direction ? swipeProgress.opacity : 0,
+    transform: `scale(${0.8 + (swipeProgress.direction === direction ? swipeProgress.opacity * 0.7 : 0)})`,
+    transition: 'all 0.2s ease-out'
+});
 
 export default TinderCards;

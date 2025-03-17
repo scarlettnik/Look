@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
 
-const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.15;
-const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.15;
-const VELOCITY_THRESHOLD = 0.4;
-const ANIMATION_DURATION = 500;
+const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
+const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
+const VELOCITY_THRESHOLD = 0.5;
+const ANIMATION_DURATION = 800;
+const SWIPE_POWER = 0.6;
 
 const TinderCards = () => {
     const [cards, setCards] = useState([
@@ -26,7 +27,7 @@ const TinderCards = () => {
         const { innerWidth, innerHeight } = window;
         const rotation = direction === 'right' ? 25 : -25;
 
-        card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+        card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
 
         switch(direction) {
             case 'left':
@@ -162,26 +163,61 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         const { innerWidth, innerHeight } = window;
         const deltaTime = Date.now() - startTime.current;
 
-        const velocityX = position.x / (deltaTime || 1);
-        const velocityY = position.y / (deltaTime || 1);
+        const velocity = {
+            x: (position.x / (deltaTime || 1)) * SWIPE_POWER,
+            y: (position.y / (deltaTime || 1)) * SWIPE_POWER
+        };
+
+        const projectedPosition = {
+            x: position.x + velocity.x * 150,
+            y: position.y + velocity.y * 150
+        };
 
         const isHorizontal =
-            Math.abs(position.x) > innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO ||
-            Math.abs(velocityX) > VELOCITY_THRESHOLD;
+            Math.abs(projectedPosition.x) > innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO ||
+            Math.abs(velocity.x) > VELOCITY_THRESHOLD;
 
         const isVerticalUp =
-            position.y < -innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO ||
-            velocityY < -VELOCITY_THRESHOLD;
+            projectedPosition.y < -innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO ||
+            velocity.y < -VELOCITY_THRESHOLD;
+
+        const dynamicDuration = Math.min(
+            ANIMATION_DURATION,
+            ANIMATION_DURATION / (Math.abs(velocity.x) + Math.abs(velocity.y) + 0.1)
+        );
 
         if (isVerticalUp) {
-            onSwipe('up', card);
+            animateWithVelocity('up', dynamicDuration);
         } else if (isHorizontal) {
-            onSwipe(position.x > 0 ? 'right' : 'left', card);
+            animateWithVelocity(velocity.x > 0 ? 'right' : 'left', dynamicDuration);
         } else {
-            resetPosition();
+            resetPosition(dynamicDuration);
         }
     };
 
+    const animateWithVelocity = (direction, duration) => {
+        if (cardRef.current) {
+            const targetX = direction === 'right'
+                ? window.innerWidth * 2
+                : direction === 'left'
+                    ? -window.innerWidth * 2
+                    : 0;
+
+            const targetY = direction === 'up' ? -window.innerHeight * 2 : 0;
+            const rotation = direction === 'right' ? 25 : direction === 'left' ? -25 : 0;
+
+            cardRef.current.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+            cardRef.current.style.transform = `
+                translate(${targetX}px, ${targetY}px)
+                rotate(${rotation}deg)
+            `;
+            cardRef.current.style.opacity = '0';
+        }
+
+        setTimeout(() => {
+            onSwipe(direction, card);
+        }, 50);
+    };
     const resetPosition = () => {
         if (cardRef.current) {
             cardRef.current.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.23, 1, 0.32, 1)`;

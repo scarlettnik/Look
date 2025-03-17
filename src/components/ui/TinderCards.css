@@ -5,161 +5,10 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    background: #CCFBFE;
+    background: #f0f4f8;
+    touch-action: none;
 }
 
-.tinder--status {
-    position: absolute;
-    top: 50%;
-    margin-top: -30px;
-    z-index: 2;
-    width: 100%;
-    text-align: center;
-    pointer-events: none;
-}
-
-.tinder--status i {
-    font-size: 100px;
-    opacity: 0;
-    transform: scale(0.3);
-    transition: all 0.2s ease-in-out;
-    position: absolute;
-    width: 100px;
-    margin-left: -50px;
-}
-
-.tinder--cards {
-    flex-grow: 1;
-    padding-top: 40px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    z-index: 1;
-}
-
-.tinder--card {
-    display: inline-block;
-    width: 90vw;
-    max-width: 400px;
-    height: 70vh;
-    background: green;
-    padding-bottom: 40px;
-    border-radius: 8px;
-    overflow: hidden;
-    position: absolute;
-    will-change: transform;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    cursor: grab;
-}
-
-.tinder--card.moving {
-    transition: none;
-    cursor: grabbing;
-}
-
-.tinder--card img {
-    width: 100%;
-    height: 60%;
-    object-fit: cover;
-    pointer-events: none;
-}
-
-.tinder--card h3 {
-    margin-top: 32px;
-    font-size: 32px;
-    padding: 0 16px;
-}
-
-.tinder--card p {
-    margin-top: 24px;
-    font-size: 20px;
-    padding: 0 16px;
-    color: #666;
-}
-
-.tinder--buttons {
-    flex: 0 0 100px;
-    text-align: center;
-    padding-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    z-index: 2;
-}
-
-.tinder--buttons button {
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    border: none;
-    background: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.tinder--buttons button:active {
-    transform: scale(0.95);
-}
-
-.tinder--buttons i {
-    font-size: 24px;
-}
-
-.fa-heart { color: #FF387E; }
-.fa-remove { color: #666; }
-.fa-shopping-basket { color: #4CAF50; }
-
-.empty-state {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #666;
-}
-.tinder--status i {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.tinder--status .visible {
-    opacity: 0.8 !important;
-    transform: scale(1.2) translateY(-20px) !important;
-}
-
-.tinder--card {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.tinder--card.moving {
-    transition: none;
-}
-
-.fa-shopping-basket {
-    color: #4CAF50;
-}
-
-.empty-state {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -40%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
-}
-
-.tinder--card {
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.tinder_love .fa-heart,
-.tinder_nope .fa-remove,
-.tinder_up .fa-shopping-basket {
-    opacity: 0.9 !important;
-    transform: scale(1.3) translateY(-30px) !important;
-}
 .tinder--status {
     position: fixed;
     top: 50%;
@@ -167,56 +16,106 @@
     transform: translate(-50%, -50%);
     z-index: 1000;
     pointer-events: none;
-    width: 500px;
-    height: 500px;
+    width: 100px;
+    height: 100px;
 }
 
 .status-icon {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.8);
     opacity: 0;
-    transition: all 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-
-}
-
-.status-icon.visible {
-    opacity: 0.9;
-    transform: translate(-50%, -50%) scale(1);
+    transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    color: #fff;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    will-change: transform, opacity;
 }
 
 .status-icon.nope { color: #ff4444; }
 .status-icon.love { color: #ff387e; }
-.status-icon.basket { color: #4c84af; }
+.status-icon.basket { color: #4CAF50; }
+
+.tinder--cards {
+    flex-grow: 1;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 1;
+}
+
+.tinder--card {
+    width: 85vw;
+    max-width: 380px;
+    height: 65vh;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    position: absolute;
+    transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transform-origin: center bottom;
+    overflow: hidden;
+    cursor: grab;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    touch-action: none;
+    will-change: transform, opacity;
+}
+
+.tinder--card.moving {
+    transition: none !important;
+    cursor: grabbing;
+}
+
+.card-image {
+    width: 100%;
+    height: 60%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.card-content {
+    padding: 25px;
+    text-align: center;
+}
+
+.card-content h3 {
+    font-size: 24px;
+    color: #2d3748;
+    margin-bottom: 12px;
+}
+
+.card-content p {
+    font-size: 16px;
+    color: #718096;
+    line-height: 1.5;
+}
 
 .tinder--buttons {
-    flex: 0 0 100px;
     padding: 20px;
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     z-index: 2;
 }
 
 .tinder--buttons button {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: none;
     background: white;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tinder--buttons button:active {
-    transform: scale(0.95);
-}
-
-.tinder--buttons .icon {
-    width: 30px;
-    height: 30px;
+    transform: scale(0.92);
 }
 
 .empty-state {
@@ -225,11 +124,22 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: #666;
-    animation: fadeIn 0.5s ease;
+    color: #a0aec0;
+    font-size: 18px;
+    animation: fadeIn 0.6s ease;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translate(-50%, -40%); }
     to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@media (max-width: 768px) {
+    .tinder--card {
+        transition-duration: 0.5s !important;
+    }
+
+    .status-icon {
+        transition-duration: 0.25s !important;
+    }
 }

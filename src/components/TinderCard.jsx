@@ -61,7 +61,7 @@ const TinderCards = () => {
 
         card.style.transform = transform;
         card.style.opacity = '0';
-        card.style.transition = 'all 0.8s ease-out';
+        card.style.transition = 'all 0.5s ease-out';
     }, []);
 
     const handleSwipe = useCallback((direction, card) => {

@@ -186,7 +186,7 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         cancelAnimationFrame(animationFrame.current);
 
         const { innerWidth, innerHeight } = window;
-        const isHorizontal = Math.abs(position.x) > innerWidth * 0.1;
+        const isHorizontal = Math.abs(position.x) > innerWidth * 0.2;
         const isVertical = Math.abs(position.y) > innerHeight * 0.1;
 
         if (isVertical && position.y < 0) {

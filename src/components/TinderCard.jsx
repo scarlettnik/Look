@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
 
-const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.1;
-const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.1;
+const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.02;
+const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.02;
 
 const TinderCards = () => {
     const [cards, setCards] = useState([
@@ -61,7 +61,7 @@ const TinderCards = () => {
 
         card.style.transform = transform;
         card.style.opacity = '0';
-        card.style.transition = 'all 0.6s ease-out';
+        card.style.transition = 'all 0.8s ease-out';
     }, []);
 
     const handleSwipe = useCallback((direction, card) => {
@@ -71,7 +71,7 @@ const TinderCards = () => {
         setTimeout(() => {
             setCards(prev => prev.filter(c => c.id !== card.id));
             if(direction === 'up') setBasket(prev => [...prev, card]);
-        }, 300);
+        }, 600);
     }, [animateSwipe]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
@@ -181,7 +181,7 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
         if (!isDragging) return;
         setIsDragging(false);
 
-        const SWIPE_THRESHOLD = window.innerWidth * 0.25;
+        const SWIPE_THRESHOLD = window.innerWidth * 0.2;
         const isHorizontal = Math.abs(position.x) > SWIPE_THRESHOLD;
         const isVerticalUp = position.y < -window.innerHeight * 0.25;
 

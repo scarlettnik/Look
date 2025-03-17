@@ -61,7 +61,7 @@ const TinderCards = () => {
 
         card.style.transform = transform;
         card.style.opacity = '0';
-        card.style.transition = 'all 0.5s ease-out';
+        card.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
     }, []);
 
     const handleSwipe = useCallback((direction, card) => {
@@ -71,7 +71,7 @@ const TinderCards = () => {
         setTimeout(() => {
             setCards(prev => prev.filter(c => c.id !== card.id));
             if(direction === 'up') setBasket(prev => [...prev, card]);
-        }, 600);
+        }, 300);
     }, [animateSwipe]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {

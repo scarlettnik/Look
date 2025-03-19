@@ -2,7 +2,8 @@
   margin: 0 auto;
   overflow: hidden;
   width: 100vw;
-  background-color: #555555;
+  background-color: white;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;

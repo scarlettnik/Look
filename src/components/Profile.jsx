@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Sidebar from "./Sidebar.jsx";
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
@@ -11,30 +12,42 @@ const Profile = () => {
     }, []);
 
     if (!userData) {
-        return <div>Loading user data...</div>;
+        return (
+            <>
+                <div>Loading user data...</div>
+                <Sidebar/>
+            </>
+
+        );
     }
 
     return (
-        <div style={styles.profileContainer}>
-            <div style={styles.avatarContainer}>
-                {userData.photo_url ? (
-                    <img
-                        src={userData.photo_url}
-                        alt="User Avatar"
-                        style={styles.avatar}
-                    />
-                ) : (
-                    <div style={styles.avatarPlaceholder}>
-                        {(userData.first_name && userData.first_name[0]) || ''}
-                        {(userData.last_name && userData.last_name[0]) || ''}
-                    </div>
-                )}
-            </div>
+        <>
+            <div style={styles.profileContainer}>
+                <div style={styles.avatarContainer}>
+                    {userData.photo_url ? (
+                        <img
+                            src={userData.photo_url}
+                            alt="User Avatar"
+                            style={styles.avatar}
+                        />
+                    ) : (
+                        <div style={styles.avatarPlaceholder}>
+                            {(userData.first_name && userData.first_name[0]) || ''}
+                            {(userData.last_name && userData.last_name[0]) || ''}
+                        </div>
+                    )}
+                </div>
 
-            <div style={styles.username}>
-                @{userData.username || 'undefined_username'}
+                <div style={styles.username}>
+                    @{userData.username || 'undefined_username'}
+                    {(userData.first_name && userData.first_name[0]) || ''}
+                    {(userData.last_name && userData.last_name[0]) || ''}
+                </div>
             </div>
-        </div>
+            <Sidebar/>
+        </>
+
     );
 };
 

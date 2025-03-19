@@ -7,7 +7,9 @@ import ProductPage from './components/ProductPage';
 import {store} from "./store.js";
 import TinderCards from "./components/TinderCard.jsx";
 import Profile from "./components/Profile.jsx";
-
+import Comparing from "./components/Comparing.jsx";
+import Save from "./components/Save.jsx";
+import ShoppingCard from "./components/ShoppingCard.jsx";
 
 function App() {
     return (
@@ -32,6 +34,9 @@ function AppContent() {
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path='/save' element={<Save />} />
+                <Route path='/shoppingcard' element={<ShoppingCard />} />
+                <Route path='/compare' element={<Comparing />} />
             </Routes>
         </div>
     );

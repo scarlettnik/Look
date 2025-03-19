@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
 import {useNavigate} from "react-router-dom";
+import Sidebar from './Sidebar';
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const VELOCITY_THRESHOLD = 0.5;
 const ANIMATION_DURATION = 800;
 const SWIPE_POWER = 0.6;
-
+const ANIMATE_SCROLL = 100;
 const TinderCards = () => {
     const [cards, setCards] = useState([
         { id: 1, title: 'Demo card 1', text: 'This is a demo for Tinder like swipe cards' },
@@ -52,7 +53,7 @@ const TinderCards = () => {
         setTimeout(() => {
             setCards(prev => prev.filter(c => c.id !== card.id));
             if(direction === 'up') setBasket(prev => [...prev, card]);
-        }, ANIMATION_DURATION);
+        }, ANIMATE_SCROLL);
     }, [animateSwipe]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
@@ -121,7 +122,7 @@ const TinderCards = () => {
                     <Heart className="icon" size={24} />
                 </button>
             </div>
-            <button onClick={() => navigate('/profile')}>Перейти в профиль</button>
+            <Sidebar/>
         </div>
     );
 };
@@ -265,7 +266,6 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
             scale(${scale})
             translateY(${translateY}px)
         `;
-        cardElement.style.opacity = 1 - offset * 0.15;
         cardElement.style.zIndex = zIndex;
     }, [position, zIndex, offset]);
 
@@ -292,7 +292,7 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
 
 const getIconStyle = (direction, swipeProgress) => ({
     opacity: swipeProgress.direction === direction ? swipeProgress.opacity : 0,
-    transform: `scale(${0.8 + (swipeProgress.direction === direction ? swipeProgress.opacity * 0.7 : 0)})`,
+    transform: `scale(${0.8 + (swipeProgress.direction === direction ? swipeProgress.opacity * 0.9 : 0)})`,
     transition: 'all 0.2s ease-out'
 });
 

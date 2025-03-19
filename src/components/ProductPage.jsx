@@ -1,29 +1,44 @@
-import { useNavigate } from 'react-router-dom';
-import {MainButton} from "@twa-dev/sdk/react";
+import React from 'react'
+import Sidebar from './Sidebar';
+import {useLocation, useNavigate} from 'react-router-dom';
 
-function ProductPage() {
+
+const Compilation = () => {
+    const { state } = useLocation();
     const navigate = useNavigate();
-    const { product } = location.state || {};
+    const item = state?.item;
+    console.log(item);
 
-    if (!product) {
-        return <div>Product not found</div>;
-    }
+    const handleBack = () => {
+        navigate(-1);
+    };
 
-    return (
-        <div>
-            <h1>{product.name}</h1>
-            <p>Position: {product.position}</p>
-            <p>Experience: {product.experience}</p>
-            <p>Description: {product.description || 'Данные не указаны'}</p>
-            <h2>Skills:</h2>
-            <ul>
-                {product.skills.map((skill, index) => (
-                    <li key={index}>{skill}</li>
-                ))}
-            </ul>
-            <MainButton text="Go Back to Home" onClick={() => navigate('/')} />
+    if (!item) return (
+        <div className="page-container">
+            <button onClick={handleBack}>
+                Назад
+            </button>
+            <div className="content">
+                <h1>Ошибка</h1>
+                <p>Данные коллекции не найдены. Перейдите через список сохранений.</p>
+            </div>
+            <Sidebar/>
         </div>
     );
-}
 
-export default ProductPage;
+    return (
+        <div className="page-container">
+            <button onClick={handleBack}>
+                Назад
+            </button>
+            <div className="content">
+                <h1>{item?.name}</h1>
+                <h2>{item?.size}</h2>
+            </div>
+            <Sidebar/>
+        </div>
+    );
+};
+
+
+export default Compilation;

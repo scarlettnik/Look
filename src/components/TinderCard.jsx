@@ -121,7 +121,7 @@ const TinderCards = () => {
                     <Heart className="icon" size={24} />
                 </button>
             </div>
-            <button onClick={() => navigate('/profile')}></button>
+            <button onClick={() => navigate('/profile')}>Перейти в профиль</button>
         </div>
     );
 };

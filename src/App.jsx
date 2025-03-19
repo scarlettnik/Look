@@ -6,6 +6,7 @@ import Card from './components/Card';
 import ProductPage from './components/ProductPage';
 import {store} from "./store.js";
 import TinderCards from "./components/TinderCard.jsx";
+import Profile from "./components/Profile.jsx";
 
 
 function App() {
@@ -30,6 +31,7 @@ function AppContent() {
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />
+                <Route path="/profile" element={<Profile />} />
             </Routes>
         </div>
     );

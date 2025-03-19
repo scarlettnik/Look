@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
-import {useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import Sidebar from './Sidebar';
+import axios from 'axios';
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -11,17 +12,29 @@ const ANIMATION_DURATION = 800;
 const SWIPE_POWER = 0.6;
 const ANIMATE_SCROLL = 100;
 const TinderCards = () => {
-    const [cards, setCards] = useState([
-        { id: 1, title: 'Demo card 1', text: 'This is a demo for Tinder like swipe cards' },
-        { id: 2, title: 'Demo card 2', text: 'This is a demo for Tinder like swipe cards' },
-        { id: 3, title: 'Demo card 3', text: 'This is a demo for Tinder like swipe cards' },
-        { id: 4, title: 'Demo card 4', text: 'This is a demo for Tinder like swipe cards' },
-        { id: 5, title: 'Demo card 5', text: 'This is a demo for Tinder like swipe cards' }
-    ]);
-    const navigate = useNavigate();
+    const [cards, setCards] = useState([]);
     const [basket, setBasket] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
 
+    const fetchCards = useCallback(async () => {
+        try {
+            const response = await axios.get('https://89.19.177.86:8001/v1/catalog/feed');
+            setCards(response.data);
+            setLoading(false);
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchCards();
+    }, [fetchCards]);
+
+
+    console.log(cards)
     const animateSwipe = useCallback((direction, cardId) => {
         const card = document.getElementById(cardId);
         if (!card) return;
@@ -283,8 +296,18 @@ const TinderCard = ({ card, onSwipe, updateSwipeFeedback, zIndex, offset }) => {
             onMouseLeave={handleEnd}
         >
             <div className="card-content">
+
                 <h3>{card.title}</h3>
-                <p>{card.text}</p>
+                <h3 style={{color:'red'}}>{card.id}</h3>
+                <p>{card.name}</p>
+                <Link
+                    to={`product/${card.id}`}
+                    key={card.id}
+                    state={{card}}
+                    className="item-card"
+                >
+                    <div>Подробнее</div>
+                </Link>
             </div>
         </div>
     );

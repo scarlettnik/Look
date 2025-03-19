@@ -37,7 +37,7 @@ function AppContent() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/save" element={<Save />} />
                 <Route path="/save/:id" element={<Compilation />} />
-                {/*<Route path="/save/:id/product/:id" element={<ProductPage />} />*/}
+                <Route path="/save/:id/product/:id" element={<ProductPage />} />
                 <Route path='/shoppingcard' element={<ShoppingCard />} />
                 <Route path='/compare' element={<Comparing />} />
             </Routes>

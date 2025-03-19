@@ -1,45 +1,63 @@
-import React from "react";
-import {Bookmark, GitBranch, House, ShoppingCart, User} from 'lucide-react'
-import './ui/Sidebar.css'
-import {useNavigate, useLocation} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
+import './ui/Sidebar.css';
+import { useNavigate, useLocation, matchPath } from "react-router-dom";
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Функция для проверки активного пути
-    const isActive = (path) => location.pathname === path;
+    const sidebarConfig = [
+        { path: '/', exact: true },
+        { path: '/save', matchPattern: '/save/*' },
+        { path: '/compare', exact: true },
+        { path: '/shoppingcard', exact: true },
+        { path: '/profile', exact: true }
+    ];
+
+    const [activePath, setActivePath] = useState('/');
+
+    useEffect(() => {
+        const currentPath = sidebarConfig.find(({ path, matchPattern, exact }) => {
+            return matchPattern
+                ? matchPath(matchPattern, location.pathname)
+                : exact
+                    ? location.pathname === path
+                    : location.pathname.startsWith(path);
+        })?.path;
+
+        if(currentPath) setActivePath(currentPath);
+    }, [location.pathname]);
 
     return (
         <div className="sidebar">
             <button
-                onClick={() => navigate('/')}
-                className={`sidebarbutton ${isActive('/') ? 'active' : ''}`}
-            >
+                className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}
+                onClick={() => navigate('/')}>
                 <House/>
             </button>
+
             <button
-                onClick={() => navigate('/save')}
-                className={`sidebarbutton ${isActive('/save') ? 'active' : ''}`}
-            >
+                className={`sidebarbutton ${activePath === '/save' ? 'active' : ''}`}
+                onClick={() => navigate('/save')}>
                 <Bookmark/>
             </button>
+
             <button
-                onClick={() => navigate('/compare')}
-                className={`sidebarbutton ${isActive('/comoare') ? 'active' : ''}`}
-            >
+                className={`sidebarbutton ${activePath === '/compare' ? 'active' : ''}`}
+                onClick={() => navigate('/compare')}>
                 <GitBranch/>
             </button>
+
             <button
-                onClick={() => navigate('/shoppingcard')}
-                className={`sidebarbutton ${isActive('/shoppingcard') ? 'active' : ''}`}
-            >
+                className={`sidebarbutton ${activePath === '/shoppingcard' ? 'active' : ''}`}
+                onClick={() => navigate('/shoppingcard')}>
                 <ShoppingCart/>
             </button>
+
             <button
-                onClick={() => navigate('/profile')}
-                className={`sidebarbutton ${isActive('/profile') ? 'active' : ''}`}
-            >
+                className={`sidebarbutton ${activePath === '/profile' ? 'active' : ''}`}
+                onClick={() => navigate('/profile')}>
                 <User/>
             </button>
         </div>

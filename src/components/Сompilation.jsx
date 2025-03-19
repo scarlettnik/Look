@@ -33,12 +33,9 @@ const Compilation = () => {
                 <div className="items-list">
                     {save.items.map(item => (
                         <Link
-                            to={`/product/${item.id}`}
+                            to={`/save/${save.id}/product/${item.id}`}
                             key={item.id}
-                            state={{
-                                item
-
-                            }}
+                            state={{item}}
                             className="item-card"
                         >
                             {/*<img src={item.img} alt={item.name} />*/}

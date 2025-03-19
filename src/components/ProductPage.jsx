@@ -6,7 +6,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 const Compilation = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const item = state?.item;
+    const item = state?.item || state?.card;
     console.log(item);
 
     const handleBack = () => {
@@ -32,7 +32,7 @@ const Compilation = () => {
                 Назад
             </button>
             <div className="content">
-                <h1>{item?.name}</h1>
+                <h1>{item?.name || item?.title}</h1>
                 <h2>{item?.size}</h2>
             </div>
             <Sidebar/>

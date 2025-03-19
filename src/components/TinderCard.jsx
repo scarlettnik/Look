@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
+import {useNavigate} from "react-router-dom";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -16,7 +17,7 @@ const TinderCards = () => {
         { id: 4, title: 'Demo card 4', text: 'This is a demo for Tinder like swipe cards' },
         { id: 5, title: 'Demo card 5', text: 'This is a demo for Tinder like swipe cards' }
     ]);
-
+    const navigate = useNavigate();
     const [basket, setBasket] = useState([]);
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
 
@@ -120,6 +121,7 @@ const TinderCards = () => {
                     <Heart className="icon" size={24} />
                 </button>
             </div>
+            <button onClick={() => navigate('/profile')}></button>
         </div>
     );
 };

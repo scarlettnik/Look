@@ -98,6 +98,9 @@ const TinderCards = () => {
         handleSwipe(direction, card);
     };
 
+    if (loading) return <div className="loading">Загрузка карточек...</div>;
+    if (error) return <div className="error">Ошибка: {error}</div>;
+
     return (
         <div className="tinder">
             <div className="tinder--status">

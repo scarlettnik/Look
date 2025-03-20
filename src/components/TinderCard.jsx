@@ -20,8 +20,14 @@ const TinderCards = () => {
 
     const fetchCards = useCallback(async () => {
         try {
-            const response = await axios.get('https://89.19.177.86:8001/v1/catalog/feed');
-            setCards(response.data);
+            const response = await fetch('https://89.19.177.86:8001/v1/catalog/feed');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setCards(data);
             setLoading(false);
         } catch (err) {
             setError(err.message);

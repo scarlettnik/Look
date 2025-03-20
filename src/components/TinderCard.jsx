@@ -20,7 +20,7 @@ const TinderCards = () => {
 
     const fetchCards = useCallback(async () => {
         try {
-            const response = await fetch('https://89.19.177.86:8001/v1/catalog/feed');
+            const response = await fetch('https://kruase.serveo.net/v1/catalog/feed');
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

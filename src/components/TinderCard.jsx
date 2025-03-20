@@ -3,8 +3,6 @@ import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
 import {Link} from "react-router-dom";
 import Sidebar from './Sidebar';
-import axios from 'axios';
-
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const VELOCITY_THRESHOLD = 0.5;
@@ -104,8 +102,8 @@ const TinderCards = () => {
         handleSwipe(direction, card);
     };
 
-    if (loading) return <div className="loading">Загрузка карточек...</div>;
-    if (error) return <div className="error">Ошибка: {error}</div>;
+    // if (loading) return <div className="loading">Загрузка карточек...</div>;
+    // if (error) return <div className="error">Ошибка: {error}</div>;
 
     return (
         <div className="tinder">

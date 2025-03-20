@@ -3,11 +3,18 @@ import Sidebar from "./Sidebar.jsx";
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
+    const [initialData, setInitialData] = useState(null);
 
     useEffect(() => {
         if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
             setUserData(user);
+        }
+    }, []);
+    useEffect(() => {
+        if (window.Telegram?.WebApp?.initData) {
+            const init = window.Telegram.WebApp.initData;
+            setInitialData(init);
         }
     }, []);
 
@@ -43,6 +50,7 @@ const Profile = () => {
                     @{userData.username || 'undefined_username'}
                     {(userData.first_name && userData.first_name[0]) || ''}
                     {(userData.last_name && userData.last_name[0]) || ''}
+                    {initialData}
                 </div>
             </div>
             <Sidebar/>

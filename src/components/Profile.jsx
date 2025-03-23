@@ -1,24 +1,17 @@
 import { useState, useEffect } from 'react';
 import Sidebar from "./Sidebar.jsx";
+import { useAuth } from "../provider/AuthProvider.jsx";
+
 
 const Profile = () => {
-    const [userData, setUserData] = useState(null);
-    const [initialData, setInitialData] = useState(null);
+    const { data, loading, error } = useAuth();
 
-    useEffect(() => {
-        if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
-            setUserData(user);
-        }
-    }, []);
-    useEffect(() => {
-        if (window.Telegram?.WebApp?.initData) {
-            const init = window.Telegram.WebApp.initData;
-            setInitialData(init);
-        }
-    }, []);
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
 
-    if (!userData) {
+    console.log(data)
+
+    if (!data) {
         return (
             <>
                 <div>Loading user data...</div>
@@ -32,25 +25,23 @@ const Profile = () => {
         <>
             <div style={styles.profileContainer}>
                 <div style={styles.avatarContainer}>
-                    {userData.photo_url ? (
+                    {data.photo_url ? (
                         <img
-                            src={userData.photo_url}
+                            src={data.photo_url}
                             alt="User Avatar"
                             style={styles.avatar}
                         />
                     ) : (
                         <div style={styles.avatarPlaceholder}>
-                            {(userData.first_name && userData.first_name[0]) || ''}
-                            {(userData.last_name && userData.last_name[0]) || ''}
+                            {(data.first_name && data.first_name[0]) || ''}
+                            {(data.last_name && data.last_name[0]) || ''}
                         </div>
                     )}
                 </div>
 
                 <div style={styles.username}>
-                    @{userData.username || 'undefined_username'}
-                    {(userData.first_name && userData.first_name[0]) || ''}
-                    {(userData.last_name && userData.last_name[0]) || ''}
-                    {initialData}
+
+                    {data.first_name} {" "} {data.last_name || ''}
                 </div>
             </div>
             <Sidebar/>

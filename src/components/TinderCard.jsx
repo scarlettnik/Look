@@ -9,6 +9,7 @@ const VELOCITY_THRESHOLD = 0.5;
 const ANIMATION_DURATION = 800;
 const SWIPE_POWER = 0.6;
 const ANIMATE_SCROLL = 100;
+
 const TinderCards = () => {
     const [cards, setCards] = useState([]);
     const [basket, setBasket] = useState([]);
@@ -18,13 +19,21 @@ const TinderCards = () => {
 
     const fetchCards = useCallback(async () => {
         try {
-            const response = await fetch('https://kruase.serveo.net/v1/catalog/feed');
+            const response = await fetch('https://marlin-darling-pipefish.ngrok-free.app/v1/catalog/feed',
+                {
+                    method: 'GET',
+                    headers: new Headers({
+                        "ngrok-skip-browser-warning": true,
+                    }),
+                    credentials: 'include'
+                });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log(data)
             setCards(data);
             setLoading(false);
         } catch (err) {
@@ -37,6 +46,7 @@ const TinderCards = () => {
         fetchCards();
     }, [fetchCards]);
 
+    console.log(cards)
 
     console.log(cards)
     const animateSwipe = useCallback((direction, cardId) => {

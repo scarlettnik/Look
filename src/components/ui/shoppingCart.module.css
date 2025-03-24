@@ -94,7 +94,8 @@
     background: violet;
     border: none;
     height: 4vh;
-    padding: 2.5vw 5vw;
+    padding-left: 5vw;
+    padding-right: 5vw;
     border-radius: 5vw;
     cursor: pointer;
     position: absolute;
@@ -102,9 +103,10 @@
     margin-right: 3vw;
     bottom: 0;
     margin-bottom: 2.5vw;
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
 .actionContainer {
     display: flex;
     margin-top: 0;

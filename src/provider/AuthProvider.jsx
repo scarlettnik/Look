@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `tma ${authToken}`
                 },
-
+                credentials: 'include'
             });
 
             if (!response.ok) {

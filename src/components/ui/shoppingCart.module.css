@@ -1,0 +1,136 @@
+.container {
+    display: flex;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 8vh;
+}
+
+.itemsList {
+    flex-grow: 1;
+}
+
+.cartItem {
+    display: flex;
+    padding: 3vw;
+    margin-bottom: 15px;
+    background: #ccc6c6;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-width: 10px;
+    width: 88vw;
+    height: 19vh;
+    position: relative;
+
+}
+
+.productImage {
+    height: 15vh;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-right: 3vw;
+}
+
+.brand {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.productName {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: clip;
+    line-height: 1;
+    max-height: calc(2em);
+}
+
+.quantityControls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    bottom: 0;
+    height: 4vh;
+    margin-bottom: 2.5vw;
+    background-color: violet;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    border-radius: 4vw;
+    left: 42vw;
+
+}
+
+.but {
+    background: none;
+    border: none;
+    color: #ae001f;
+}
+
+.priceContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.oldPrice {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.newPrice {
+    font-size: 18px;
+    font-weight: 700;
+    color: black;
+}
+
+.currentPrice {
+    font-size: 18px;
+    font-weight: 700;
+}
+.orderButton {
+    background: violet;
+    border: none;
+    height: 4vh;
+    padding: 2.5vw 5vw;
+    border-radius: 5vw;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    margin-right: 3vw;
+    bottom: 0;
+    margin-bottom: 2.5vw;
+
+}
+
+.actionContainer {
+    display: flex;
+    margin-top: 0;
+    justify-content: space-between;
+
+}
+
+.del {
+    color: violet;
+    position: absolute;
+    bottom: 3vw;
+    left: 6vw;
+    margin-bottom: -1vw;
+}
+
+.share {
+    color: violet;
+    position: absolute;
+    bottom: 3vw;
+    left: 15vw;
+    margin-bottom: -1vw;
+}
+.bookmark {
+    color: violet;
+    position: absolute;
+    bottom: 3vw;
+    left: 24vw;
+    margin-bottom: -1vw;
+}

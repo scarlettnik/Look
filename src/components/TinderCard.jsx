@@ -3,6 +3,8 @@ import { Heart, HeartOff, Save } from 'lucide-react';
 import './ui/TinderCards.css';
 import {Link} from "react-router-dom";
 import Sidebar from './Sidebar';
+import {useAuth} from "../provider/AuthProvider.jsx";
+
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const VELOCITY_THRESHOLD = 0.5;
@@ -16,6 +18,7 @@ const TinderCards = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
+    const { data } = useAuth()
 
     const fetchCards = useCallback(async () => {
         try {
@@ -43,8 +46,10 @@ const TinderCards = () => {
     }, []);
 
     useEffect(() => {
-        fetchCards();
-    }, [fetchCards]);
+        if (data) {
+            fetchCards();
+        }
+    }, [data, fetchCards]);
 
     console.log(cards)
 

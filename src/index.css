@@ -10,7 +10,6 @@
 }
 
 body {
-  overflow: hidden;
   background-color: white;
   color: #1a1a1a;
 }
@@ -44,6 +43,8 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  outline: none !important;
+  box-shadow: none !important;
 }
 button:hover {
   border-color: #646cff;
@@ -64,4 +65,10 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+*{
+  -ms-overflow-style: none;
+}
+::-webkit-scrollbar {
+  display: none;
 }

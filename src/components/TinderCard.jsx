@@ -33,13 +33,14 @@ const TinderCards = () => {
 
         try {
             setIsFetching(true);
-            const response = await fetch(`https://marlin-darling-pipefish.ngrok-free.app/v1/catalog/feed?page=${page}`, {
+            const response = await fetch(`https://marlin-darling-pipefish.ngrok-free.app/v1/catalog/feed`, {
                 method: 'GET',
                 headers: {
+                    "ngrok-skip-browser-warning": true,
                     'Content-Type': 'application/json',
                     'Authorization': `tma ${authToken}`
                 },
-                credentials: 'include'
+
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

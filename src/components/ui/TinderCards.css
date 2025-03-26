@@ -4,7 +4,7 @@
     --color-basket: #4c84af;
     --card-width: 90vw;
     --card-max-width: 400px;
-    --card-height: 70vh;
+    --card-height: 65vh;
     --button-size: 60px;
     --shadow-normal: 0 4px 12px rgba(0,0,0,0.1);
     --shadow-card: 0 12px 24px rgba(0,0,0,0.1);
@@ -17,7 +17,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    background: #CCFBFE;
+    background: #bcbcbc;
 }
 
 .tinder--status {
@@ -27,8 +27,8 @@
     transform: translate(-50%, -50%);
     z-index: 1000;
     pointer-events: none;
-    width: 500px;
-    height: 500px;
+    width: 90vw;
+    height: 40vh;
 }
 
 .status-icon {
@@ -91,7 +91,7 @@
 }
 
 .tinder--buttons {
-    flex: 0 0 100px;
+    flex: 0 0 70px;
     padding: 20px;
     display: flex;
     justify-content: center;
@@ -133,4 +133,81 @@
         opacity: 1;
         transform: translate(-50%, -50%);
     }
+}
+
+.tinder--card.expanded {
+    width: 100vw;
+    height: 90vh !important;
+    max-width: none !important;
+    overflow-y: auto;
+    cursor: default;
+    transform: none !important;
+}
+
+.tinder--card.expanded .card-content {
+    transition: height 0.3s ease;
+}
+
+.detailed-content {
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease 0.2s;
+    position: relative;
+}
+
+.tinder--card.expanded .detailed-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    z-index: 100;
+    padding: 5px 10px;
+}
+
+.details-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #2196F3;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.details-link:hover {
+    color: #1976D2;
+}
+
+
+.tinder--card.expanded {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+    max-width: none !important;
+    background: white;
+    border-radius: 0;
+    z-index: 1000;
+}
+
+.tinder--card {
+    transition:
+            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.3s ease,
+            width 0.3s ease,
+            height 0.3s ease,
+            z-index 0.3s ease;
 }

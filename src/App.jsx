@@ -23,13 +23,10 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const showBackButton = location.pathname !== '/';
 
     return (
         <div>
-            {showBackButton && <BackButton onClick={() => navigate(-1)} />}
+            {<BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

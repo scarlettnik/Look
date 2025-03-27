@@ -63,7 +63,6 @@
     border-radius: 8px;
     overflow: hidden;
     position: absolute;
-    box-shadow: var(--shadow-card);
     cursor: grab;
     transition:
             transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
@@ -213,20 +212,4 @@
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
-}
-.tinder-card {
-    transition:
-            transform 500ms ease,
-            opacity 500ms ease;
-    will-change: transform, opacity;
-
-    /* Анимация для новых карточек */
-    &.new-card {
-        display: none;
-    }
-
-    &.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }

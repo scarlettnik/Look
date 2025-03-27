@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
-import TinderCards from "./components/TinderCard.jsx";
+import TinderCards from "./components/TinderCards.jsx";
 import Profile from "./components/Profile.jsx";
 import Comparing from "./components/Comparing.jsx";
 import Save from "./components/Save.jsx";

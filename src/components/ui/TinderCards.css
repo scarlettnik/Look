@@ -165,15 +165,13 @@
 
 .close-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
     color: #666;
-    z-index: 100;
-    padding: 5px 10px;
+    top: 0;
+    left: 0;
 }
 
 .details-link {
@@ -215,4 +213,20 @@
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
+}
+.tinder-card {
+    transition:
+            transform 500ms ease,
+            opacity 500ms ease;
+    will-change: transform, opacity;
+
+    /* Анимация для новых карточек */
+    &.new-card {
+        display: none;
+    }
+
+    &.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

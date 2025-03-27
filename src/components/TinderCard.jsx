@@ -243,8 +243,9 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
     const location = useLocation();
 
     useEffect(() => {
-        setIsExpanded(location.state?.expandedCard === card.id);
-    }, [location.state, card.id]);
+        const isTopCard = offset === 0;
+        setIsExpanded(isTopCard && location.state?.expandedCard === card.id);
+    }, [location.state, card.id, offset]);
 
     const handleStart = (clientX, clientY) => {
         setStartPos({ x: clientX, y: clientY });

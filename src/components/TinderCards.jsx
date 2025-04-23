@@ -7,7 +7,7 @@ import TinderCard from "./TinderCard.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO = 0.08; // Новый порог для свайпа вниз
+const VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO = 0.1;
 const ANIMATION_DURATION = 800;
 const ANIMATE_SCROLL = 100;
 const authToken = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
@@ -31,7 +31,7 @@ const TinderCards = () => {
 
         try {
             setIsFetching(true);
-            const response = await fetch(`https://marlin-darling-pipefish.ngrok-free.app/v1/catalog/feed`, {
+            const response = await fetch(`https://api.lookvogue.ru/v1/catalog/feed`, {
                 method: 'GET',
                 headers: {
                     "ngrok-skip-browser-warning": true,
@@ -52,7 +52,6 @@ const TinderCards = () => {
                 return;
             }
 
-            // Добавляем карточки с флагом pending и уникальным ключом
             const pendingCards = filtered.map(card => ({
                 ...card,
                 _pending: true,
@@ -61,7 +60,6 @@ const TinderCards = () => {
 
             setCards(prev => [...prev, ...pendingCards]);
 
-            // Через короткую паузу снимаем флаг pending
             setTimeout(() => {
                 setCards(prev => prev.map(c =>
                     c._pending ? {...c, _pending: false} : c
@@ -76,9 +74,6 @@ const TinderCards = () => {
             setLoading(false);
         }
     }, [hasMore, isFetching]);
-
-
-
 
     useEffect(() => {
         if (data) fetchCards();
@@ -137,12 +132,10 @@ const TinderCards = () => {
         // Возвращаем карточку в начало списка
         setCards(prev => [lastAction.card, ...prev]);
 
-        // Убираем из корзины если нужно
         if (lastAction.direction === 'up') {
             setBasket(prev => prev.filter(c => c.id !== lastAction.card.id));
         }
 
-        // Анимация возврата
         animateReturn(lastAction.card.id);
     }, [swipeHistory, animateReturn]);
 

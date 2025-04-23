@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
         setError(null);
 
         try {
-            const response = await fetch('https://marlin-darling-pipefish.ngrok-free.app/v1/auth/init-data', {
+            const response = await fetch('https://api.lookvogue.ru/v1/auth/init-data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

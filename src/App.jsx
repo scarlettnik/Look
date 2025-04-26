@@ -10,6 +10,7 @@ import Preferences from "./components/Preferences.jsx";
 import ShoppingCard from "./components/ShoppingCard.jsx";
 import Compilation from "./components/Сompilation.jsx";
 import { AuthProvider } from "./provider/AuthProvider.jsx";
+import Measurment from "./components/Measurment.jsx";
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function AppContent() {
                 <Route path='/shoppingcard' element={<ShoppingCard />} />
                 <Route path='/pref' element={<Preferences />} />
                 <Route path='/compare' element={<Comparing />} />
+                <Route path='/measur' element={<Measurment/>} />
             </Routes>
         </div>
     );

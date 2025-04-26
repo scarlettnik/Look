@@ -21,8 +21,22 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
     const contentRef = useRef(null);
     const startTime = useRef(0);
 
-    const navigate = useNavigate()
     const location = useLocation();
+
+    useEffect(() => {
+        const isTopCard = offset === 0;
+        const isCurrentlyExpanded = location.state?.expandedCard === card.id;
+
+        // Запретить развертывание карточки, если она уже развернута
+        if (isCurrentlyExpanded && !isExpanded) {
+            setIsExpanded(false); // Не позволяйте открывать карточку на полный экран
+        } else if (isTopCard && isCurrentlyExpanded) {
+            setIsExpanded(true);
+        } else {
+            setIsExpanded(false);
+        }
+    }, [location.state, card.id, offset, isExpanded]);
+
 
     useEffect(() => {
         const isTopCard = offset === 0;
@@ -38,55 +52,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
         }
     };
 
-    const handleExpandCard = useCallback(() => {
-        onExpand();
-        navigate(location.pathname, {
-            state: { expandedCard: card.id },
-            replace: false
-        });
-        if (contentRef.current) {
-            setContentHeight(contentRef.current.scrollHeight);
-        }
-        const cardElement = cardRef.current;
-        if (cardElement) {
-            const rect = cardElement.getBoundingClientRect();
-            cardElement.style.transform = `
-                translate(${window.innerWidth/2 - rect.left - rect.width/2}px, 
-                        ${window.innerHeight/2 - rect.top - rect.height/2}px)
-                scale(${window.innerWidth / rect.width * 0.95})
-            `;
-            cardElement.style.zIndex = 1000;
-        }
-    }, [onExpand, navigate, card.id, location.pathname]);
-
-    const handleCollapseCard = useCallback(() => {
-        onCollapse();
-        setIsExpanded(false);
-        const cardElement = cardRef.current;
-        if (cardElement) {
-            cardElement.style.transform = 'translate(0, 0) scale(1)';
-            cardElement.style.zIndex = zIndex;
-        }
-        console.log('tap')
-    }, [onCollapse, navigate, zIndex]);
-
-    const handleClose = useCallback(() => {
-        handleCollapseCard();
-        setIsExpanded(false);
-    }, [handleCollapseCard]);
-
-    useEffect(() => {
-        if (!isExpanded) return;
-
-        const handlePopState = (event) => {
-            if (!event.state?.expandedCard) {
-                handleClose();
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [isExpanded, handleClose]);
 
     const cardRef = useRef(null);
 
@@ -99,7 +64,7 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
             cardRef.current.style.opacity = '0';
             cardRef.current.style.transform = 'translateY(20px)';
 
-            // Запуск анимации после подготовки
+// Запуск анимации после подготовки
             requestAnimationFrame(() => {
                 cardRef.current.style.transition = `
                     opacity 300ms ease-out,
@@ -181,19 +146,16 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
             projectedPosition.y < -innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO ||
             velocity.y < -VELOCITY_THRESHOLD;
 
-        const isVerticalDown =
-            projectedPosition.y > innerHeight * VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO ||
-            velocity.y > VELOCITY_THRESHOLD;
+        // Disable downward swipes
+        const isVerticalDown = projectedPosition.y > innerHeight * VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO || velocity.y > VELOCITY_THRESHOLD;
 
         const dynamicDuration = Math.min(
             ANIMATION_DURATION,
             ANIMATION_DURATION / (Math.abs(velocity.x) + Math.abs(velocity.y) + 0.1)
         );
 
-        if (isVerticalDown) {
-            handleExpandCard();
-            resetPosition(dynamicDuration);
-        } else if (isVerticalUp) {
+        // Handle only up and horizontal swipes
+        if (isVerticalUp) {
             animateWithVelocity('up', dynamicDuration);
         } else if (isHorizontal) {
             animateWithVelocity(velocity.x > 0 ? 'right' : 'left', dynamicDuration);
@@ -243,17 +205,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
     }, [position, zIndex, offset]);
 
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (isExpanded && cardRef.current && !cardRef.current.contains(e.target)) {
-                handleCollapseCard();
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isExpanded, handleCollapseCard]);
-
     return (
         <div
             ref={cardRef}
@@ -272,7 +223,9 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
-                    opacity: 0
+                    opacity: 0,
+                zIndex: zIndex,
+                transform: `translate(${offset * 2}px, ${offset * 1}px) ${card.style?.transform || ''}`
                 }}
         >
 

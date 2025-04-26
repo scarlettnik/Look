@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {CornerUpLeft, Heart, HeartOff, Save} from 'lucide-react';
 import './ui/TinderCards.css';
 import Sidebar from './Sidebar';
@@ -7,7 +7,6 @@ import TinderCard from "./TinderCard.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO = 0.1;
 const ANIMATION_DURATION = 800;
 const ANIMATE_SCROLL = 100;
 const authToken = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
@@ -21,7 +20,6 @@ const TinderCards = () => {
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
     const [expandedCardId, setExpandedCardId] = useState(null);
     const [swipeHistory, setSwipeHistory] = useState([]);
-    const [page, setPage] = useState(1);
     const [isFetching, setIsFetching] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const { data } = useAuth();
@@ -107,8 +105,7 @@ const TinderCards = () => {
                 card.style.transform = `translate(0, -${innerHeight * 2}px) rotate(0deg)`;
                 break;
             case 'down':
-                card.style.transform = `translate(0, ${innerHeight * 2}px) rotate(0deg)`;
-                break;
+                return;
         }
 
         card.style.opacity = '0';
@@ -127,19 +124,63 @@ const TinderCards = () => {
         if (swipeHistory.length === 0) return;
 
         const lastAction = swipeHistory[0];
+        const { direction, card } = lastAction;
+
+        // Создаем копию карточки с новым ключом и флагом pending
+        const restoredCard = {
+            ...card,
+            _pending: true,
+            _key: Math.random().toString(36).substr(2, 9)
+        };
+
+        // 1. Добавляем карточку в начало списка с начальными стилями
+        setCards(prev => [{
+            ...restoredCard,
+            // Начальные стили для анимации
+            style: {
+                transform: getInitialTransform(direction),
+                opacity: 0,
+                zIndex: 1000 // Убедимся, что карточка поверх других
+            }
+        }, ...prev]);
+
+        // 2. Запускаем анимацию после обновления DOM
+        setTimeout(() => {
+            setCards(prev => prev.map(c =>
+                c.id === restoredCard.id ? {
+                    ...c,
+                    _pending: false,
+                    style: { // Конечные стили
+                        transform: 'translate(0, 0) rotate(0deg)',
+                        opacity: 1,
+                        transition: `all ${ANIMATION_DURATION}ms ease-out`
+                    }
+                } : c
+            ));
+        }, 50);
+
+        // 3. Обновляем историю и корзину
         setSwipeHistory(prev => prev.slice(1));
-
-        // Возвращаем карточку в начало списка
-        setCards(prev => [lastAction.card, ...prev]);
-
-        if (lastAction.direction === 'up') {
-            setBasket(prev => prev.filter(c => c.id !== lastAction.card.id));
+        if (direction === 'up') {
+            setBasket(prev => prev.filter(c => c.id !== card.id));
         }
+    }, [swipeHistory]);
 
-        animateReturn(lastAction.card.id);
-    }, [swipeHistory, animateReturn]);
+// Функция для определения начальной позиции
+    const getInitialTransform = (direction) => {
+        const { innerWidth, innerHeight } = window;
+        switch(direction) {
+            case 'left': return `translate(-${innerWidth * 2}px, 0) rotate(-25deg)`;
+            case 'right': return `translate(${innerWidth * 2}px, 0) rotate(25deg)`;
+            case 'up': return `translate(0, -${innerHeight * 2}px) rotate(0deg)`;
+            default: return 'translate(0, 0)';
+        }
+    };
 
     const handleSwipe = useCallback((direction, card) => {
+        // Prevent swiping down
+        if (direction === 'down') return;
+
         animateSwipe(direction, card.id);
         setSwipeProgress({ direction: null, opacity: 0 });
         setSwipeHistory(prev => [{ direction, card }, ...prev]);
@@ -153,7 +194,6 @@ const TinderCards = () => {
     const updateSwipeFeedback = useCallback((dx, dy) => {
         const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
         const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
-        const verticalDownThreshold = window.innerHeight * VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO;
 
         let direction = null;
         let opacity = 0;
@@ -164,24 +204,11 @@ const TinderCards = () => {
         } else if (dy < -verticalThreshold) {
             direction = 'up';
             opacity = Math.min(Math.abs(dy) / verticalThreshold, 1);
-        } else if (dy > verticalDownThreshold) {
-            direction = 'down';
-            opacity = Math.min(dy / verticalDownThreshold, 1);
         }
 
         setSwipeProgress({ direction, opacity });
     }, []);
 
-    const handleButtonSwipe = (direction) => {
-        if (!cards[0]) return;
-
-        const card = cards[0];
-        const cardElement = document.getElementById(card.id);
-        if (cardElement) {
-            cardElement.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-        }
-        handleSwipe(direction, card);
-    };
 
     if (loading) return <div className="loading">Загрузка карточек...</div>;
     // if (error) return <div className="error">Ошибка: {error}</div>;
@@ -221,18 +248,6 @@ const TinderCards = () => {
                         <h2>No more cards!</h2>
                     </div>
                 )}
-            </div>
-
-            <div className="tinder--buttons" style={{display: expandedCardId ? 'none' : 'flex'}}>
-                <button onClick={() => handleButtonSwipe('left')}>
-                    <HeartOff className="icon" size={24}/>
-                </button>
-                <button onClick={() => handleButtonSwipe('up')}>
-                    <Save className="icon" size={24}/>
-                </button>
-                <button onClick={() => handleButtonSwipe('right')}>
-                    <Heart className="icon" size={24}/>
-                </button>
             </div>
             <Sidebar/>
         </div>

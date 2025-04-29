@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import {ChevronDown, CornerUpLeft, Heart, HeartOff, Save, SlidersHorizontal, Undo2} from 'lucide-react';
-import './ui/TinderCards.css';
-import Sidebar from './Sidebar';
-import {useAuth} from "../provider/AuthProvider.jsx";
-import TinderCard from "./TinderCard.jsx";
+import {Bookmark, ChevronDown, Undo2, SlidersHorizontal, HeartOff, Heart, Save} from "lucide-react";
 import styles from './ui/product.module.css';
-
+import Sidebar from "./Sidebar.jsx";
+import TinderCard from "./TinderCard.jsx";
+import {useCallback, useEffect, useState} from "react";
+import {useAuth} from "../provider/AuthProvider.jsx";
+import './ui/TinderCards.css';
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -14,7 +13,7 @@ const ANIMATE_SCROLL = 100;
 const authToken = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
 
 
-const TinderCards = () => {
+const Product = () => {
     const [cards, setCards] = useState([]);
     const [basket, setBasket] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -128,45 +127,55 @@ const TinderCards = () => {
         const lastAction = swipeHistory[0];
         const { direction, card } = lastAction;
 
-        // Создаем копию карточки с новым ключом и флагом pending
+        const { innerWidth, innerHeight } = window;
+
+        // 1. Добавляем карточку в стек с начальными стилями вне экрана
+        const initialTransform = getInitialTransform(direction);
+
         const restoredCard = {
             ...card,
             _pending: true,
-            _key: Math.random().toString(36).substr(2, 9)
+            _key: Math.random().toString(36).substr(2, 9),
+            style: {
+                transform: initialTransform,
+                opacity: 0,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                margin: 'auto'
+            }
         };
 
-        // 1. Добавляем карточку в начало списка с начальными стилями
-        setCards(prev => [{
-            ...restoredCard,
-            // Начальные стили для анимации
-            style: {
-                transform: getInitialTransform(direction),
-                opacity: 0,
-                zIndex: 1000 // Убедимся, что карточка поверх других
-            }
-        }, ...prev]);
+        setCards(prev => [restoredCard, ...prev]);
 
-        // 2. Запускаем анимацию после обновления DOM
+        // 2. После короткой задержки - анимируем в центр
         setTimeout(() => {
             setCards(prev => prev.map(c =>
                 c.id === restoredCard.id ? {
                     ...c,
                     _pending: false,
-                    style: { // Конечные стили
+                    style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all ${ANIMATION_DURATION}ms ease-out`
+                        transition: `all ${ANIMATION_DURATION}ms ease-out`,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        margin: 'auto'
                     }
                 } : c
             ));
         }, 50);
 
-        // 3. Обновляем историю и корзину
         setSwipeHistory(prev => prev.slice(1));
+
         if (direction === 'up') {
             setBasket(prev => prev.filter(c => c.id !== card.id));
         }
     }, [swipeHistory]);
+
 
     const getInitialTransform = (direction) => {
         const { innerWidth, innerHeight } = window;
@@ -211,12 +220,11 @@ const TinderCards = () => {
 
 
     if (loading) return <div className="loading">Загрузка карточек...</div>;
-
     return (
-        <div className="tinder">
+        <div className={styles.container}>
+            {/* Search Header */}
             <div className={styles.searchHeader}>
-                <button onClick={undoSwipe} disabled={swipeHistory.length === 0} className={styles.backButton}><Undo2/>
-                </button>
+                <button onClick={undoSwipe} disabled={swipeHistory.length === 0} className={styles.backButton}><Undo2/></button>
                 <input
                     type="text"
                     placeholder="Looking for something specific?"
@@ -227,38 +235,43 @@ const TinderCards = () => {
             <div className={styles.filterBar}>
                 <button className={styles.filterButton}><SlidersHorizontal size={18}/></button>
                 <button className={styles.filterButton}>Sale</button>
-                <button className={styles.filterButton}>Brand <ChevronDown size={18}/></button>
-                <button className={styles.filterButton}>Product <ChevronDown size={18}/></button>
-                <button className={styles.filterButton}>Color <ChevronDown size={18}/></button>
+                <button className={styles.filterButton}>Brand <ChevronDown size={18}/> </button>
+                <button className={styles.filterButton}>Product <ChevronDown size={18}/> </button>
+                <button className={styles.filterButton}>Color <ChevronDown size={18}/> </button>
             </div>
 
-            <div className="tinder--status">
-                <HeartOff className="status-icon nope" style={getIconStyle('left', swipeProgress)}/>
-                <Heart className="status-icon love" style={getIconStyle('right', swipeProgress)}/>
-                <Save className="status-icon basket" style={getIconStyle('up', swipeProgress)}/>
-            </div>
-
-            <div className="tinder--cards">
-                {cards.map((card, index) => (
-                    <TinderCard
-                        key={card._key}
-                        card={card}
-                        onSwipe={handleSwipe}
-                        updateSwipeFeedback={updateSwipeFeedback}
-                        zIndex={cards.length - index}
-                        offset={index}
-                        isExpanded={expandedCardId === card.id}
-                        onExpand={() => setExpandedCardId(card.id)}
-                        onCollapse={() => setExpandedCardId(null)}
-                        isPending={card._pending}
-                    />
-                ))}
-                {cards.length === 0 && (
-                    <div className="empty-state">
-                        <h2>No more cards!</h2>
+                <div className="tinder" style={{alignItems:'center', marginTop:"7vh"}}>
+                    <div className="tinder--status">
+                        <HeartOff className="status-icon nope" style={getIconStyle('left', swipeProgress)}/>
+                        <Heart className="status-icon love" style={getIconStyle('right', swipeProgress)}/>
+                        <Save className="status-icon basket" style={getIconStyle('up', swipeProgress)}/>
                     </div>
-                )}
-            </div>
+
+                    <div className="tinder--cards">
+                        {cards.map((card, index) => (
+                            <TinderCard
+                                key={card.id}
+                                card={card}
+                                onSwipe={handleSwipe}
+                                updateSwipeFeedback={updateSwipeFeedback}
+                                zIndex={cards.length - index}
+                                offset={index}
+                                isExpanded={expandedCardId === card.id}
+                                onExpand={() => setExpandedCardId(card.id)}
+                                onCollapse={() => setExpandedCardId(null)}
+                                isPending={card._pending}
+                            />
+                        ))}
+                        {cards.length === 0 && (
+                            <div className="empty-state">
+                                <h2>No more cards!</h2>
+                            </div>
+                        )}
+                    </div>
+                    <Sidebar/>
+                </div>
+
+
             <Sidebar/>
         </div>
     );
@@ -270,4 +283,4 @@ const getIconStyle = (direction, swipeProgress) => ({
     transition: 'all 0.2s ease-out'
 });
 
-export default TinderCards;
+export default Product;

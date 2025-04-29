@@ -1,0 +1,108 @@
+.container {
+    width: 100vw;
+    height: 94vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    align-items: center;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 16px 0;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    width: 94%;
+    margin-bottom: 16px;
+}
+
+.input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.buttons {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.circleButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.cards {
+    width: 96%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.card {
+    position: relative;
+    flex: 0 0 48%;
+    height: 140px;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 46vw;
+}
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    display: flex;
+    align-items: flex-end;
+}
+
+.cardTitle {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.bottomNav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navButton {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}

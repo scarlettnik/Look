@@ -1,0 +1,141 @@
+.container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    font-family: sans-serif;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 70px; /* место под нижнюю навигацию */
+
+}
+
+.statusBar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.rightStatus {
+    display: flex;
+    gap: 8px;
+}
+
+.searchHeader {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    position: relative;
+}
+
+.searchInput {
+    flex-grow: 1;
+    padding: 10px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    height: 2.2vh;
+}
+
+.logo {
+    font-weight: bold;
+    margin-left: 8px;
+    font-size: 18px;
+}
+
+.filterBar {
+    display: flex;
+    gap: 8px;
+    padding: 0 12px;
+    overflow-x: auto; /* <-- горизонтальная прокрутка */
+    -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
+    scrollbar-width: none; /* скрыть скроллбар на Firefox */
+}
+
+/* скрываем скроллбар на Chrome/Safari */
+.filterBar::-webkit-scrollbar {
+    display: none;
+}
+
+
+.filterButton {
+    display: flex;
+    align-items: center; /* <-- выравниваем текст и иконку по центру */
+    gap: 4px; /* небольшой отступ между текстом и иконкой */
+    background: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.backButton {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 8px;
+    color: #333;
+    background: white;
+    margin-right: 10px;
+
+
+}
+.productCard {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px;
+    position: relative;
+    z-index: 1000;
+}
+
+.productImage {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.productInfo {
+    padding: 12px;
+}
+
+.productTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.productBrand {
+    font-size: 14px;
+    color: gray;
+    margin-bottom: 8px;
+}
+
+.productPrice {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.bookmark {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-size: 20px;
+}
+
+.bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+}

@@ -26,48 +26,58 @@ function App() {
 function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [historyIndex, setHistoryIndex] = useState(window.history.state?.idx || 0);
+    const [historyDepth, setHistoryDepth] = useState(0);
 
     const isHomePage = location.pathname === '/';
-    const hasHistory = historyIndex > 0;
 
     useEffect(() => {
-        const handlePopState = (event) => {
-            setHistoryIndex(event.state?.idx || 0);
+        const updateHistoryDepth = () => {
+            setHistoryDepth(window.history.state?.idx || 0);
         };
 
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, []);
+        window.addEventListener('popstate', updateHistoryDepth);
 
-    useEffect(() => {
-        setHistoryIndex(window.history.state?.idx || 0);
-    }, [location]);
+        // Инициализация глубины истории
+        updateHistoryDepth();
+
+        return () => {
+            window.removeEventListener('popstate', updateHistoryDepth);
+        };
+    }, []);
 
     useEffect(() => {
         if (!window.Telegram?.WebApp?.BackButton) return;
 
         const tb = window.Telegram.WebApp.BackButton;
-        const shouldShow = !isHomePage || hasHistory;
+        const shouldShow = !isHomePage || historyDepth > 0;
+
+        const handleBack = () => {
+            if (historyDepth === 0 && isHomePage) {
+                window.Telegram.WebApp.close();
+            } else {
+                navigate(-1, {
+                    replace: historyDepth === 0,
+                    state: { preventHistoryUpdate: true }
+                });
+            }
+        };
 
         if (shouldShow) {
             tb.show();
-            tb.onClick(() => {
-                if (isHomePage && !hasHistory) {
-                    window.Telegram.WebApp.close();
-                } else {
-                    navigate(-1);
-                }
-            });
+            tb.onClick(handleBack);
         } else {
             tb.hide();
         }
 
         return () => {
-            tb.offClick();
+            tb.offClick(handleBack);
             tb.hide();
         };
-    }, [isHomePage, hasHistory, navigate]);
+    }, [isHomePage, historyDepth, navigate]);
+
+    useEffect(() => {
+        setHistoryDepth(window.history.state?.idx || 0);
+    }, [location.key]);
 
     console.log(window.history.state?.idx)
 

@@ -26,45 +26,50 @@ function App() {
 function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showBackButton, setShowBackButton] = useState(false);
+    const [historyIndex, setHistoryIndex] = useState(window.history.state?.idx || 0);
 
-    const hasHistory = window.history.length > 1;
-
-    useEffect(() => {
-        const isHomePage = location.pathname === '/';
-
-        setShowBackButton(!isHomePage || hasHistory);
-
-        if (window.Telegram?.WebApp?.BackButton) {
-            const tb = window.Telegram.WebApp.BackButton;
-
-            if (showBackButton) {
-                tb.show();
-                tb.onClick(() => {
-                    if (isHomePage && !hasHistory) {
-                        window.Telegram.WebApp.close();
-                    } else {
-                        navigate(-1);
-                    }
-                });
-            } else {
-                tb.hide();
-            }
-
-            return () => tb.offClick();
-        }
-    }, [location, navigate, hasHistory, showBackButton]);
+    const isHomePage = location.pathname === '/';
+    const hasHistory = historyIndex > 0;
 
     useEffect(() => {
-        const handlePopState = () => {
-            setShowBackButton(window.history.length > 1);
+        const handlePopState = (event) => {
+            setHistoryIndex(event.state?.idx || 0);
         };
 
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    console.log(window.history.length)
+    useEffect(() => {
+        setHistoryIndex(window.history.state?.idx || 0);
+    }, [location]);
+
+    useEffect(() => {
+        if (!window.Telegram?.WebApp?.BackButton) return;
+
+        const tb = window.Telegram.WebApp.BackButton;
+        const shouldShow = !isHomePage || hasHistory;
+
+        if (shouldShow) {
+            tb.show();
+            tb.onClick(() => {
+                if (isHomePage && !hasHistory) {
+                    window.Telegram.WebApp.close();
+                } else {
+                    navigate(-1);
+                }
+            });
+        } else {
+            tb.hide();
+        }
+
+        return () => {
+            tb.offClick();
+            tb.hide();
+        };
+    }, [isHomePage, hasHistory, navigate]);
+
+    console.log(window.history.state?.idx)
 
     return (
         <div>

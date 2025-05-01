@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
@@ -26,24 +26,26 @@ function App() {
 function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [historyDepth, setHistoryDepth] = useState(0);
+    const [isBackHandlerActive, setIsBackHandlerActive] = useState(true);
 
     const isHomePage = location.pathname === '/';
+    const historyState = window.history.state || {};
+    const historyDepth = historyState.idx || 0;
 
-    useEffect(() => {
-        const updateHistoryDepth = () => {
-            setHistoryDepth(window.history.state?.idx || 0);
-        };
+    const handleBack = useCallback(() => {
+        if (!isBackHandlerActive) return;
 
-        window.addEventListener('popstate', updateHistoryDepth);
+        setIsBackHandlerActive(false);
 
-        // Инициализация глубины истории
-        updateHistoryDepth();
+        if (historyDepth === 0 && isHomePage) {
+            window.Telegram.WebApp.close();
+        } else {
+            navigate(-1);
+        }
 
-        return () => {
-            window.removeEventListener('popstate', updateHistoryDepth);
-        };
-    }, []);
+        // Восстанавливаем обработчик через короткий таймаут
+        setTimeout(() => setIsBackHandlerActive(true), 300);
+    }, [navigate, historyDepth, isHomePage, isBackHandlerActive]);
 
     useEffect(() => {
         if (!window.Telegram?.WebApp?.BackButton) return;
@@ -51,16 +53,8 @@ function AppContent() {
         const tb = window.Telegram.WebApp.BackButton;
         const shouldShow = !isHomePage || historyDepth > 0;
 
-        const handleBack = () => {
-            if (historyDepth === 0 && isHomePage) {
-                window.Telegram.WebApp.close();
-            } else {
-                navigate(-1, {
-                    replace: historyDepth === 0,
-                    state: { preventHistoryUpdate: true }
-                });
-            }
-        };
+        // Очищаем предыдущие обработчики
+        tb.offClick(handleBack);
 
         if (shouldShow) {
             tb.show();
@@ -73,11 +67,17 @@ function AppContent() {
             tb.offClick(handleBack);
             tb.hide();
         };
-    }, [isHomePage, historyDepth, navigate]);
+    }, [isHomePage, historyDepth, handleBack]);
 
     useEffect(() => {
-        setHistoryDepth(window.history.state?.idx || 0);
-    }, [location.key]);
+        const handlePopState = () => {
+            const newDepth = window.history.state?.idx || 0;
+            if (newDepth === historyDepth) return;
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [historyDepth]);
 
     console.log(window.history.state?.idx)
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
@@ -25,10 +25,23 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [showBackButton, setShowBackButton] = useState(false);
+
+    useEffect(() => {
+        setShowBackButton(location.key !== 'default');
+
+        if (window.Telegram?.WebApp?.BackButton) {
+            window.Telegram.WebApp.BackButton.onClick(() => navigate(-1));
+            setShowBackButton(window.history.length > 1);
+        }
+    }, [location, navigate]);
 
     return (
         <div>
-            {<BackButton onClick={() => navigate(-1)} />}
+            {showBackButton && (
+                <BackButton onClick={() => navigate(-1)} />
+            )}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

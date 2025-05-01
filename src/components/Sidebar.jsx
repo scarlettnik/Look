@@ -9,7 +9,6 @@ const Sidebar = () => {
     const sidebarRef = useRef(null);
     const [keyboardActive, setKeyboardActive] = useState(false);
 
-    // Детектим мобильные устройства
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     useEffect(() => {
@@ -18,7 +17,6 @@ const Sidebar = () => {
         const handleFocus = () => setKeyboardActive(true);
         const handleBlur = () => setKeyboardActive(false);
 
-        // Отслеживаем все поля ввода
         const inputs = document.querySelectorAll('input, textarea, [contenteditable]');
         inputs.forEach(input => {
             input.addEventListener('focus', handleFocus);
@@ -33,7 +31,6 @@ const Sidebar = () => {
         };
     }, [isMobile]);
 
-    // Остальной код компонента остается без изменений
     const sidebarConfig = [
         { path: '/', exact: true },
         { path: '/save', matchPattern: '/save/*' },

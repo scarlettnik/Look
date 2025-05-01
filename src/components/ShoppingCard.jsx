@@ -26,7 +26,7 @@ const ShoppingCard = () => {
                             <button>-</button>
                             <span>1</span>
                             <button>+</button>
-                            <Trash2 className={styles.trashIcon}/>
+                            <Trash2 size={20} className={styles.trashIcon}/>
                         </div>
                         <div className={styles.estimated}>Estimated arrival 19 Sep - 24 Sep</div>
                         <div className={styles.price}>$35</div>
@@ -45,8 +45,7 @@ const ShoppingCard = () => {
                             <button>-</button>
                             <span>1</span>
                             <button>+</button>
-                            <Trash2 className={styles.trashIcon}/>
-                        </div>
+                            <Trash2 size={20} className={styles.trashIcon}/>                        </div>
                         <div className={styles.estimated}>Estimated arrival 21 Sep - 25 Sep</div>
                         <div className={styles.price}>$95</div>
                     </div>
@@ -63,7 +62,7 @@ const ShoppingCard = () => {
                             <button>-</button>
                             <span>1</span>
                             <button>+</button>
-                            <Trash2 className={styles.trashIcon}/>
+                            <Trash2 size={20} className={styles.trashIcon}/>
                         </div>
                         <div className={styles.estimated}>Estimated arrival 21 Sep - 25 Sep</div>
                         <div className={styles.price}>$95</div>

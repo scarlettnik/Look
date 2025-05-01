@@ -14,15 +14,12 @@
     transition: transform 0.3s ease;
 }
 
-/* Для iOS с учетом безопасной зоны */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .sidebar {
         padding-bottom: env(safe-area-inset-bottom);
-        height: calc(60px + env(safe-area-inset-bottom));
     }
 }
 
-/* Состояние при активной клавиатуре */
 .sidebar.keyboard-active {
     transform: translateY(0);
     position: absolute;

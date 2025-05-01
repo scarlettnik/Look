@@ -93,7 +93,7 @@ const Save = () => {
                     <Link to={`/save/${save.id}`} key={save.id} state={{save}}>
                         <div className={styles.card}>
                             <img
-                                src="https://avatars.mds.yandex.net/i?id=daa613f83d28069a128d737b9fc9c58b_l-7054696-images-thumbs&n=13"
+                                src='https://salehard.артстена.рф/storage/categories-created/abstrakciya/fotooboi-abstraktsiya-22285540_-_id___20730.jpg'
                                 alt="All Saved"
                                 className={styles.image}
                             />

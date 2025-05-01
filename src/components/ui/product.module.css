@@ -29,6 +29,7 @@
 }
 
 .searchInput {
+    position: sticky;
     flex-grow: 1;
     padding: 10px 12px;
     border-radius: 20px;

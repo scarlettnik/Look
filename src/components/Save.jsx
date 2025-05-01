@@ -19,6 +19,14 @@ const savesData = [
         items: [
             { id: 3, name: "Куртка", size: "XL", img: "jacket.jpg" }
         ]
+    },
+    {
+        id: 3,
+        name: "Зимний набор",
+        img: "winter.jpg",
+        items: [
+            { id: 3, name: "Куртка", size: "XL", img: "jacket.jpg" }
+        ]
     }
 ];
 

@@ -8,6 +8,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+*:focus {
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+}
 
 body {
   background-color: white;
@@ -40,19 +45,24 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
   outline: none !important;
   box-shadow: none !important;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-button:hover {
-  border-color: #646cff;
-}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+button:focus,
+button:active,
+button:visited {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {

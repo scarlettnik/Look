@@ -1,0 +1,127 @@
+.container {
+    width: 100vw;
+    height: 94vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.scrollWrapper {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.banner {
+    position: relative;
+    height: 25vh;
+    width: 100%;
+}
+
+.banner::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    background: linear-gradient(to bottom, transparent, black);
+    pointer-events: none;
+}
+
+.bannerImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bannerText {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    z-index: 1;
+}
+
+.editButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.filterBar {
+    display: flex;
+    height: 3vh;
+    gap: 8px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    background-color: #fff;
+    z-index: 1;
+    position: sticky;
+    top: 0;
+    scrollbar-width: none;
+}
+
+.filterBar::-webkit-scrollbar {
+    display: none;
+}
+
+.filterButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.itemsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+
+.itemImage {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.navbar {
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.navButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+
+.navButtonActive {
+    color: #000;
+}

@@ -24,6 +24,8 @@
     "react-helmet": "^6.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.3.0",
+    "react-share": "^5.2.2",
+    "react-swipeable": "^7.0.2",
     "react-tinder-card": "^1.6.4",
     "swiper": "^6.8.4"
   },

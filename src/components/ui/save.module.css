@@ -49,20 +49,20 @@
 }
 
 .cards {
-    width: 96%;
+    width: 94vw;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     justify-content: space-between;
+
 }
 
 .card {
     position: relative;
-    flex: 0 0 48%;
-    height: 140px;
+    height: 15vh;
     border-radius: 12px;
     overflow: hidden;
-    width: 46vw;
+    width: 45vw;
 }
 .image {
     width: 100%;
@@ -87,22 +87,3 @@
     margin: 0;
 }
 
-.bottomNav {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: white;
-    border-top: 1px solid #ddd;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.navButton {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}

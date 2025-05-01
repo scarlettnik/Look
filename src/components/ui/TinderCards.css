@@ -4,7 +4,7 @@
     --color-basket: #4c84af;
     --card-width: 92vw;
     --card-max-width: 600px;
-    --card-height: 74vh;
+    --card-height: 76vh;
     --button-size: 60px;
     --shadow-normal: 0 4px 12px rgba(0,0,0,0.1);
     --shadow-card: 0 12px 24px rgba(0,0,0,0.1);
@@ -46,7 +46,7 @@
 
 .tinder--cards {
     flex-grow: 1;
-    padding-top: 1vh;
+    padding-top: 2vh;
     text-align: center;
     display: flex;
     justify-content: center;

@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
 import './ui/Sidebar.css';
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
+import {useKeyboardHeight} from "../hooks/useKyeboardHeight.js";
+
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const keyboardHeight = useKeyboardHeight();
 
     const sidebarConfig = [
         { path: '/', exact: true },
@@ -30,7 +33,13 @@ const Sidebar = () => {
     }, [location.pathname]);
 
     return (
-        <div className="sidebar">
+        <div
+            className="sidebar"
+            style={{
+                bottom: keyboardHeight > 0 ? keyboardHeight + 'px' : '0',
+                zIndex: 1 // Чтобы клавиатура перекрывала sidebar
+            }}
+        >
             <button
                 className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}
                 onClick={() => navigate('/')}>

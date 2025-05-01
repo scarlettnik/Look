@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
@@ -24,34 +24,28 @@ function App() {
 }
 
 function AppContent() {
+
     const navigate = useNavigate();
     const location = useLocation();
 
+    const handleBack = useCallback(() => {
+        navigate(-1);
+    }, [navigate]);
+
     useEffect(() => {
+        if (!window.Telegram?.WebApp?.BackButton) return;
+
+        const tb = window.Telegram.WebApp.BackButton;
         const isInitialPage = location.pathname === '/';
 
-        if (window.Telegram?.WebApp?.BackButton) {
-            const handleBack = () => {
-                if (isInitialPage) {
-                    window.Telegram.WebApp.close();
-                } else {
-                    navigate(-1);
-                }
-            };
+        isInitialPage ? tb.hide() : tb.show();
 
-            window.Telegram.WebApp.BackButton.onClick(handleBack);
+        tb.onClick(handleBack);
 
-            if (!isInitialPage) {
-                window.Telegram.WebApp.BackButton.show();
-            } else {
-                window.Telegram.WebApp.BackButton.hide();
-            }
-
-            return () => {
-                window.Telegram.WebApp.BackButton.offClick(handleBack);
-            };
-        }
-    }, [location, navigate]);
+        return () => {
+            tb.offClick(handleBack);
+        };
+    }, [location.pathname, handleBack]);
 
     return (
         <div>

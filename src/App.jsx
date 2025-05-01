@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
@@ -24,31 +24,51 @@ function App() {
 }
 
 function AppContent() {
-
     const navigate = useNavigate();
     const location = useLocation();
+    const [showBackButton, setShowBackButton] = useState(false);
 
-    const handleBack = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const hasHistory = window.history.length > 1;
 
     useEffect(() => {
-        if (!window.Telegram?.WebApp?.BackButton) return;
+        const isHomePage = location.pathname === '/';
 
-        const tb = window.Telegram.WebApp.BackButton;
-        const isInitialPage = location.pathname === '/';
+        setShowBackButton(!isHomePage || hasHistory);
 
-        isInitialPage ? tb.hide() : tb.show();
+        if (window.Telegram?.WebApp?.BackButton) {
+            const tb = window.Telegram.WebApp.BackButton;
 
-        tb.onClick(handleBack);
+            if (showBackButton) {
+                tb.show();
+                tb.onClick(() => {
+                    if (isHomePage && !hasHistory) {
+                        window.Telegram.WebApp.close();
+                    } else {
+                        navigate(-1);
+                    }
+                });
+            } else {
+                tb.hide();
+            }
 
-        return () => {
-            tb.offClick(handleBack);
+            return () => tb.offClick();
+        }
+    }, [location, navigate, hasHistory, showBackButton]);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            setShowBackButton(window.history.length > 1);
         };
-    }, [location.pathname, handleBack]);
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    console.log(window.history.length)
 
     return (
         <div>
+            {<BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

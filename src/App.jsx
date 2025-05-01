@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
 import Profile from "./components/Profile.jsx";
@@ -23,6 +22,40 @@ function App() {
     );
 }
 
+
+const NavigationControls = () => {
+    const location = useLocation();
+
+    useEffect(() => {
+        if (!window.Telegram?.WebApp) return;
+
+        const isStartPage = location.pathname === '/'; // Укажите ваш путь стартовой страницы
+        const backButton = window.Telegram.WebApp.BackButton;
+
+        if (isStartPage) {
+            backButton.hide();
+            window.Telegram.WebApp.MainButton.show();
+            window.Telegram.WebApp.MainButton.setParams({
+                text: 'Закрыть',
+                color: '#FF3B30',
+            });
+        } else {
+            backButton.show();
+            window.Telegram.WebApp.MainButton.hide();
+        }
+
+        const handleClose = () => window.Telegram.WebApp.close();
+        window.Telegram.WebApp.MainButton.onClick(handleClose);
+
+        return () => {
+            window.Telegram.WebApp.MainButton.offClick(handleClose);
+        };
+    }, [location.pathname]);
+
+    return null;
+};
+
+
 function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -39,9 +72,7 @@ function AppContent() {
 
     return (
         <div>
-            {showBackButton && (
-                <BackButton onClick={() => navigate(-1)} />
-            )}
+            <NavigationControls/>
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

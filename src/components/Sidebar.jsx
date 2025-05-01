@@ -1,14 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
-import './ui/Sidebar.css';
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import {useKeyboardStatus} from "../hooks/isKeyboardStatus.js";
-
+import './ui/Sidebar.css';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const isKeyboardOpen = useKeyboardStatus();
+    const sidebarRef = useRef(null);
+    const [keyboardActive, setKeyboardActive] = useState(false);
+
+    // Детектим мобильные устройства
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    useEffect(() => {
+        if (!isMobile) return;
+
+        const handleFocus = () => setKeyboardActive(true);
+        const handleBlur = () => setKeyboardActive(false);
+
+        // Отслеживаем все поля ввода
+        const inputs = document.querySelectorAll('input, textarea, [contenteditable]');
+        inputs.forEach(input => {
+            input.addEventListener('focus', handleFocus);
+            input.addEventListener('blur', handleBlur);
+        });
+
+        return () => {
+            inputs.forEach(input => {
+                input.removeEventListener('focus', handleFocus);
+                input.removeEventListener('blur', handleBlur);
+            });
+        };
+    }, [isMobile]);
+
+    // Остальной код компонента остается без изменений
     const sidebarConfig = [
         { path: '/', exact: true },
         { path: '/save', matchPattern: '/save/*' },
@@ -31,12 +56,10 @@ const Sidebar = () => {
         if(currentPath) setActivePath(currentPath);
     }, [location.pathname]);
 
-
     return (
-        <>
-            {!isKeyboardOpen && (
         <div
-            className="sidebar"
+            className={`sidebar ${keyboardActive ? 'keyboard-active' : ''}`}
+            ref={sidebarRef}
         >
             <button
                 className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}
@@ -68,8 +91,6 @@ const Sidebar = () => {
                 <User/>
             </button>
         </div>
-            )}
-        </>
     );
 };
 

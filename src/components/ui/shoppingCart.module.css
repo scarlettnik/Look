@@ -1,138 +1,127 @@
 .container {
+    width: 100vw;
+    height: 88vh;
+    overflow: hidden;
     display: flex;
-    margin: 0 auto;
+    flex-direction: column;
     position: relative;
-    padding-bottom: 8vh;
+    z-index: 1;
+    align-items: center;
+    overflow-y: auto;
+
+}
+.header {
+    width: 92%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 16px;
 }
 
-.itemsList {
-    flex-grow: 1;
+
+.clear,
+.faqs {
+    font-weight: normal;
+    text-decoration-line: underline;
+}
+
+.subtotal {
+    font-size: 18px;
+    margin-bottom: 12px;
+    left: 0;
+}
+
+.subtotal span {
+    font-weight: bold;
 }
 
 .cartItem {
     display: flex;
-    padding: 3vw;
-    margin-bottom: 15px;
-    background: #ccc6c6;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 16px;
+}
+
+.itemImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-width: 10px;
-    width: 88vw;
-    height: 19vh;
-    position: relative;
-
+    margin-right: 12px;
 }
 
-.productImage {
-    height: 15vh;
-    object-fit: contain;
-    border-radius: 4px;
-    margin-right: 3vw;
+.itemDetails {
+    flex-grow: 1;
 }
 
-.brand {
-    font-size: 14px;
+.itemTitle {
+    font-size: 16px;
+    font-weight: bold;
     margin-bottom: 4px;
 }
 
-.productName {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: clip;
-    line-height: 1;
-    max-height: calc(2em);
-}
-
-.quantityControls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: absolute;
-    bottom: 0;
-    height: 4vh;
-    margin-bottom: 2.5vw;
-    background-color: violet;
-    padding-left: 2vw;
-    padding-right: 2vw;
-    border-radius: 4vw;
-    left: 42vw;
-
-}
-
-.but {
-    background: none;
-    border: none;
-    color: #ae001f;
-}
-
-.priceContainer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.oldPrice {
+.itemBrand {
     font-size: 14px;
-    color: #999;
-    text-decoration: line-through;
+    color: #555;
+    margin-bottom: 4px;
 }
 
-.newPrice {
-    font-size: 18px;
-    font-weight: 700;
-    color: black;
+.sizeSelect {
+    margin: 6px 0 12px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
-.currentPrice {
-    font-size: 18px;
-    font-weight: 700;
-}
-.orderButton {
-    background: violet;
-    border: none;
-    height: 4vh;
-    padding-left: 5vw;
-    padding-right: 5vw;
-    border-radius: 5vw;
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    margin-right: 3vw;
-    bottom: 0;
-    margin-bottom: 2.5vw;
+.quantityRow {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-.actionContainer {
-    display: flex;
-    margin-top: 0;
-    justify-content: space-between;
-
+    gap: 10px;
+    margin-bottom: 6px;
 }
 
-.del {
-    color: violet;
-    position: absolute;
-    bottom: 3vw;
-    left: 6vw;
-    margin-bottom: -1vw;
+.quantityRow button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background-color: #eee;
+    font-size: 16px;
+    font-weight: bold;
 }
 
-.share {
-    color: violet;
-    position: absolute;
-    bottom: 3vw;
-    left: 15vw;
-    margin-bottom: -1vw;
+.trashIcon {
+    color: #d00;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: auto;
 }
-.bookmark {
-    color: violet;
+
+.estimated {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.price {
+    font-weight: bold;
     position: absolute;
-    bottom: 3vw;
-    left: 24vw;
-    margin-bottom: -1vw;
+    right: 16px;
+    top: 0;
+    font-size: 16px;
+}
+
+.dealButton {
+    background-color: #000;
+    color: #fff;
+    padding: 14px;
+    width: 80%;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    position: fixed;
+    bottom: calc(7vh);
+
 }

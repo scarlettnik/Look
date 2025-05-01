@@ -4,7 +4,7 @@
     --color-basket: #4c84af;
     --card-width: 92vw;
     --card-max-width: 600px;
-    --card-height: 76vh;
+    --card-height: 76%;
     --button-size: 60px;
     --shadow-normal: 0 4px 12px rgba(0,0,0,0.1);
     --shadow-card: 0 12px 24px rgba(0,0,0,0.1);
@@ -12,7 +12,6 @@
 
 .tinder {
     width: 100vw;
-    height: 94vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -28,7 +27,7 @@
     z-index: 1000;
     pointer-events: none;
     width: 90vw;
-    height: 40vh;
+    height: 40%;
 }
 
 .status-icon {
@@ -136,7 +135,7 @@
 
 .tinder--card.expanded {
     width: 100vw;
-    height: 90vh !important;
+    height: 90% !important;
     max-width: none !important;
     overflow-y: auto;
     cursor: default;
@@ -172,21 +171,6 @@
     top: 0;
     left: 0;
 }
-
-.details-link {
-    display: inline-block;
-    margin-top: 15px;
-    color: #2196F3;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-.details-link:hover {
-    color: #1976D2;
-}
-
-
 .tinder--card.expanded {
     position: fixed !important;
     top: 0 !important;

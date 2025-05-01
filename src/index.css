@@ -83,3 +83,13 @@ button:visited {
 ::-webkit-scrollbar {
   display: none;
 }
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .container {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

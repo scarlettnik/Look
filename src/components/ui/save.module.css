@@ -1,18 +1,20 @@
 .container {
-    width: 100vw;
-    height: 94vh;
-    overflow: hidden;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    position: relative;
-    z-index: 1;
     align-items: center;
+    -webkit-overflow-scrolling: touch; /* Для плавного скролла на iOS */
 }
 
 .title {
     font-size: 24px;
     font-weight: bold;
     margin: 16px 0;
+    width: 94%;
 }
 
 .searchBar {
@@ -20,6 +22,11 @@
     align-items: center;
     width: 94%;
     margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    padding: 8px 0;
 }
 
 .input {
@@ -59,7 +66,7 @@
 
 .card {
     position: relative;
-    height: 15vh;
+    height: 100%;
     border-radius: 12px;
     overflow: hidden;
     width: 45vw;

@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
 import './ui/Sidebar.css';
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import {useKeyboardHeight} from "../hooks/useKyeboardHeight.js";
+import {useKeyboardStatus} from "../hooks/isKeyboardStatus.js";
 
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const keyboardHeight = useKeyboardHeight();
-
+    const isKeyboardOpen = useKeyboardStatus();
     const sidebarConfig = [
         { path: '/', exact: true },
         { path: '/save', matchPattern: '/save/*' },
@@ -32,13 +31,12 @@ const Sidebar = () => {
         if(currentPath) setActivePath(currentPath);
     }, [location.pathname]);
 
+
     return (
+        <>
+            {!isKeyboardOpen && (
         <div
             className="sidebar"
-            style={{
-                bottom: keyboardHeight > 0 ? keyboardHeight + 'px' : '0',
-                zIndex: 1 // Чтобы клавиатура перекрывала sidebar
-            }}
         >
             <button
                 className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}
@@ -70,6 +68,8 @@ const Sidebar = () => {
                 <User/>
             </button>
         </div>
+            )}
+        </>
     );
 };
 

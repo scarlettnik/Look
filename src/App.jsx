@@ -26,25 +26,35 @@ function App() {
 function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showBackButton, setShowBackButton] = useState(false);
 
     useEffect(() => {
-        const isInitialPage = location.pathname === '/' && location.key === 'default';
-        setShowBackButton(!isInitialPage);
+        const isInitialPage = location.pathname === '/';
 
         if (window.Telegram?.WebApp?.BackButton) {
-            window.Telegram.WebApp.BackButton.onClick(() => navigate(-1));
-            if (showBackButton) {
+            const handleBack = () => {
+                if (isInitialPage) {
+                    window.Telegram.WebApp.close();
+                } else {
+                    navigate(-1);
+                }
+            };
+
+            window.Telegram.WebApp.BackButton.onClick(handleBack);
+
+            if (!isInitialPage) {
                 window.Telegram.WebApp.BackButton.show();
             } else {
                 window.Telegram.WebApp.BackButton.hide();
             }
+
+            return () => {
+                window.Telegram.WebApp.BackButton.offClick(handleBack);
+            };
         }
-    }, [location, navigate, showBackButton]);
+    }, [location, navigate]);
 
     return (
         <div>
-            {showBackButton && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

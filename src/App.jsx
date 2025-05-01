@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
@@ -25,61 +25,6 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const [isBackHandlerActive, setIsBackHandlerActive] = useState(true);
-
-    const isHomePage = location.pathname === '/';
-    const historyState = window.history.state || {};
-    const historyDepth = historyState.idx || 0;
-
-    const handleBack = useCallback(() => {
-        if (!isBackHandlerActive) return;
-
-        setIsBackHandlerActive(false);
-
-        if (historyDepth === 0 && isHomePage) {
-            window.Telegram.WebApp.close();
-        } else {
-            navigate(-1);
-        }
-
-        // Восстанавливаем обработчик через короткий таймаут
-        setTimeout(() => setIsBackHandlerActive(true), 300);
-    }, [navigate, historyDepth, isHomePage, isBackHandlerActive]);
-
-    useEffect(() => {
-        if (!window.Telegram?.WebApp?.BackButton) return;
-
-        const tb = window.Telegram.WebApp.BackButton;
-        const shouldShow = !isHomePage || historyDepth > 0;
-
-        // Очищаем предыдущие обработчики
-        tb.offClick(handleBack);
-
-        if (shouldShow) {
-            tb.show();
-            tb.onClick(handleBack);
-        } else {
-            tb.hide();
-        }
-
-        return () => {
-            tb.offClick(handleBack);
-            tb.hide();
-        };
-    }, [isHomePage, historyDepth, handleBack]);
-
-    useEffect(() => {
-        const handlePopState = () => {
-            const newDepth = window.history.state?.idx || 0;
-            if (newDepth === historyDepth) return;
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [historyDepth]);
-
-    console.log(window.history.state?.idx)
 
     return (
         <div>

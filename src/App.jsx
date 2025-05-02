@@ -1,5 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
@@ -28,7 +27,7 @@ function AppContent() {
 
     return (
         <div>
-            {window.history.state?.idx > 1 && <BackButton onClick={() => navigate(-1)} />}
+            {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

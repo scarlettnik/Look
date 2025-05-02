@@ -25,26 +25,10 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
-    const [historyDepth, setHistoryDepth] = useState(0);
-
-    useEffect(() => {
-        const updateHistoryDepth = () => {
-            setHistoryDepth(window.history.state?.idx || 0);
-        };
-
-        window.addEventListener('popstate', updateHistoryDepth);        
-        updateHistoryDepth();
-
-        return () => {
-            window.removeEventListener('popstate', updateHistoryDepth);
-        };
-    }, []);
-
-    console.log(historyDepth)
 
     return (
         <div>
-            {historyDepth > 0 && <BackButton onClick={() => navigate(-1)} />}
+            {window.history.state?.idx > 1 && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />

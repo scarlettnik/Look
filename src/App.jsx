@@ -12,6 +12,7 @@ import { AuthProvider } from "./provider/AuthProvider.jsx";
 import Measurment from "./components/Measurment.jsx";
 import Product from "./components/Product.jsx";
 import AddList from "./components/AddList.jsx";
+import AddToCloset from "./components/AddToCloset.jsx";
 
 function App() {
     return (
@@ -42,6 +43,7 @@ function AppContent() {
                 <Route path='/compare' element={<Comparing />} />
                 <Route path='/measur' element={<Measurment/>} />
                 <Route path='/prod' element={<Product/>} />
+                <Route path='/cloth' element={<AddToCloset/>} />
             </Routes>
         </div>
     );

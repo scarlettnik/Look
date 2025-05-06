@@ -65,6 +65,42 @@ const Save = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const handleResize = () => {
+            const sidebar = document.querySelector('.sidebar');
+            const visualViewport = window.visualViewport;
+
+            if (visualViewport) {
+                // Вычисляем положение относительно видимой области
+                const viewportBottom = visualViewport.height + visualViewport.offsetTop;
+                const windowHeight = window.innerHeight;
+
+                // Если клавиатура открыта (видимая область меньше окна)
+                if (viewportBottom < windowHeight * 0.9) {
+                    sidebar.style.transform = `translateY(${windowHeight - viewportBottom}px)`;
+                } else {
+                    sidebar.style.transform = 'translateY(0)';
+                }
+            }
+        };
+
+        // Для устройств с visualViewport API
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleResize);
+        } else {
+            // Фолбэк для других устройств
+            window.addEventListener('resize', handleResize);
+        }
+
+        return () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', handleResize);
+            } else {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
+
     return (
         <div
             ref={containerRef}

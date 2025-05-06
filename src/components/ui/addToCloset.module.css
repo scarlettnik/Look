@@ -1,0 +1,95 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.closeBtn {
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.search {
+    margin: 16px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.closetList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.closetItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.closetItem img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.closetItem input[type="radio"] {
+    margin-left: auto;
+    accent-color: #000;
+}
+
+.note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: gray;
+}
+
+.newClosetBtn {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-top: 20px;
+    border: none;
+    background: none;
+    color: black;
+    cursor: pointer;
+}
+
+.doneBtn {
+    margin-top: auto;
+    background-color: #3b5bff;
+    color: white;
+    font-size: 18px;
+    padding: 14px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}

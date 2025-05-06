@@ -102,57 +102,61 @@ const Save = () => {
     }, []);
 
     return (
-        <div
-            ref={containerRef}
-            className={styles.container}
-            style={{
-                height: `${window.innerHeight}px`,
-                paddingBottom: '60px' // Высота Sidebar
-            }}
-        >
-            <h1 className={styles.title}>Your Closets</h1>
+        <>
+            <div
+                ref={containerRef}
+                className={styles.container}
+                style={{
+                    height: `${window.innerHeight}px`,
+                    paddingBottom: '60px' // Высота Sidebar
+                }}
+            >
+                <h1 className={styles.title}>Your Closets</h1>
 
-            <div className={styles.searchBar}>
-                <input
-                    type="text"
-                    placeholder="Search for a wishlist..."
-                    className={styles.input}
-                />
-                <div className={styles.buttons}>
-                    <button className={styles.circleButton}>+</button>
-                    <button className={styles.circleButton}>-</button>
+                <div className={styles.searchBar}>
+                    <input
+                        type="text"
+                        placeholder="Search for a wishlist..."
+                        className={styles.input}
+                    />
+                    <div className={styles.buttons}>
+                        <button className={styles.circleButton}>+</button>
+                        <button className={styles.circleButton}>-</button>
+                    </div>
+                </div>
+
+                <div className={styles.cards}>
+                    {savesData.map(save => (
+                        <Link to={`/save/${save.id}`} key={save.id} state={{save}}>
+                            <div className={styles.card}>
+                                <img
+                                    src='https://salehard.артстена.рф/storage/categories-created/abstrakciya/fotooboi-abstraktsiya-22285540_-_id___20730.jpg'
+                                    alt="All Saved"
+                                    className={styles.image}
+                                />
+                                <div className={styles.overlay}>
+                                    <h3 className={styles.cardTitle}>All Saved</h3>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+
+                <div style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    transform: `translateY(-${keyboardHeight}px)`,
+                    transition: 'transform 0.3s ease',
+                    zIndex: 1000
+                }}>
+
                 </div>
             </div>
+            <Sidebar/>
+        </>
 
-            <div className={styles.cards}>
-                {savesData.map(save => (
-                    <Link to={`/save/${save.id}`} key={save.id} state={{save}}>
-                        <div className={styles.card}>
-                            <img
-                                src='https://salehard.артстена.рф/storage/categories-created/abstrakciya/fotooboi-abstraktsiya-22285540_-_id___20730.jpg'
-                                alt="All Saved"
-                                className={styles.image}
-                            />
-                            <div className={styles.overlay}>
-                                <h3 className={styles.cardTitle}>All Saved</h3>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
-
-            <div style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                transform: `translateY(-${keyboardHeight}px)`,
-                transition: 'transform 0.3s ease',
-                zIndex: 1000
-            }}>
-                <Sidebar />
-            </div>
-        </div>
     );
 };
 

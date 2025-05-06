@@ -13,6 +13,20 @@
     -webkit-overflow-scrolling: touch;
 }
 
+.flexSpacer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 0;
+}
+
+.note {
+    font-size: 12px;
+    color: gray;
+    text-align: center;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -31,9 +45,17 @@
     cursor: pointer;
 }
 
-
+.search {
+    position: sticky;
+    padding: 10px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    height: 2.2vh;
+}
 
 .closetList {
+    padding-top: 2vh;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -52,22 +74,50 @@
     border-radius: 8px;
 }
 
-.closetItem input[type="radio"] {
+.radioInput {
+    display: none;
+}
+
+.customRadio {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-left: auto;
-    accent-color: #000;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    background-color: #535bf2;
+}
+
+.customRadio:hover {
+    border-color: #444;
+}
+
+.checkmark {
+    color: white;
+    font-size: 20px;
+    line-height: 1;
+    font-weight: bold;
 }
 
 .note {
-    margin-top: 12px;
+    margin-top: 20px;
     font-size: 12px;
     color: gray;
 }
 
 .newClosetBtn {
+    font-size: 150%;
+    font-weight: bold;
     display: flex;
     align-items: center;
-    font-size: 16px;
-    margin-top: 20px;
+    justify-content: flex-start;
+    margin: 0 0 16px 0;
     border: none;
     background: none;
     color: black;
@@ -75,7 +125,6 @@
 }
 
 .doneBtn {
-    margin-top: auto;
     background-color: #3b5bff;
     color: white;
     font-size: 18px;

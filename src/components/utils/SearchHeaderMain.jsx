@@ -5,7 +5,6 @@ export const SearchHeader = ({ onUndo, undoDisabled }) => {
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Временные данные для примера
     const searchHistory = ['Платья', 'Кроссовки', 'Джинсы'];
     const popularSearches = ['Куртки', 'Сумки', 'Аксессуары', 'Юбки'];
 

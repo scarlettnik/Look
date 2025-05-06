@@ -31,15 +31,7 @@
     cursor: pointer;
 }
 
-.search {
-    margin: 16px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
-}
+
 
 .closetList {
     display: flex;

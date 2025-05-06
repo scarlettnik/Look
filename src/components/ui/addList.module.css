@@ -3,12 +3,13 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px 12px;
+    padding: 2%;
     box-sizing: border-box;
+
 }
 .content {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
 }
 .header {
     display: flex;
@@ -52,7 +53,6 @@
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 16px;
     height: 25vh;
     width: 100%;
     object-fit: cover;
@@ -75,10 +75,12 @@
 }
 
 .coverGrid {
+    padding-top: 3vh;
+    height: 55vw;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    margin-bottom: 12px;
+    overflow-y: auto;
 }
 
 .coverThumb {
@@ -94,8 +96,7 @@
     border-color: #000;
 }
 .buttons {
-    width: 96%;
-    position: sticky;
+    width: 100%;
     display: block;
     font-weight: bold;
     bottom: 2%;
@@ -107,6 +108,8 @@
     padding: 12px;
     border-radius: 12px;
     margin-bottom: 2vh;
+    height: 6vh;
+
 }
 
 .create {
@@ -116,4 +119,5 @@
     border: none;
     padding: 12px;
     border-radius: 12px;
+    height: 6vh;
 }

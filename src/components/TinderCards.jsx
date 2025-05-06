@@ -204,7 +204,7 @@ const TinderCards = () => {
                         onExpand={() => setExpandedCardId(card.id)}
                         onCollapse={() => setExpandedCardId(null)}
                         isPending={card._pending}
-                        swipeProgress={swipeProgress}
+                        swipeProgress={index === 0 ? swipeProgress : { direction: null, opacity: 0 }}
                     />
                 ))}
                 {cards.length === 0 && (

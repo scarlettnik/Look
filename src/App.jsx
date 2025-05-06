@@ -11,6 +11,7 @@ import Compilation from "./components/Сompilation.jsx";
 import { AuthProvider } from "./provider/AuthProvider.jsx";
 import Measurment from "./components/Measurment.jsx";
 import Product from "./components/Product.jsx";
+import AddList from "./components/AddList.jsx";
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function AppContent() {
         <div>
             {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
+                <Route path="/add" element={<AddList/>} />
                 <Route path="/" element={<TinderCards />} />
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/profile" element={<Profile />} />

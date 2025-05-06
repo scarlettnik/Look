@@ -1,10 +1,10 @@
 import {useState, useEffect, useCallback, useRef} from 'react';
-import {ChevronDown, Heart, HeartOff, Save, SlidersHorizontal, Undo2} from 'lucide-react';
 import './ui/TinderCards.css';
 import Sidebar from './Sidebar';
 import {useAuth} from "../provider/AuthProvider.jsx";
 import TinderCard from "./TinderCard.jsx";
-import styles from './ui/product.module.css';
+import {SearchHeader} from "./utils/SearchHeaderMain.jsx";
+import {FilterBar} from "./utils/FilterBar.jsx";
 
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -26,39 +26,7 @@ const TinderCards = () => {
     const [hasMore, setHasMore] = useState(true);
     const { data } = useAuth();
 
-    const [keyboardHeight, setKeyboardHeight] = useState(0);
     const containerRef = useRef(null);
-
-    useEffect(() => {
-        if (!window.visualViewport) return;
-
-        const handleResize = () => {
-            const newHeight = window.visualViewport.height;
-            const keyboardHeight = window.innerHeight - newHeight;
-            setKeyboardHeight(keyboardHeight > 100 ? keyboardHeight : 0);
-
-            if (containerRef.current) {
-                containerRef.current.style.height = `${newHeight}px`;
-            }
-        };
-
-        const handleScroll = () => {
-            // Прокручиваем input в видимую область
-            const activeElement = document.activeElement;
-            if (activeElement?.tagName === 'INPUT') {
-                activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        };
-
-        window.visualViewport.addEventListener('resize', handleResize);
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.visualViewport?.removeEventListener('resize', handleResize);
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
     const fetchCards = useCallback(async () => {
         if (!hasMore || isFetching) return;
 
@@ -146,22 +114,12 @@ const TinderCards = () => {
         card.style.opacity = '0';
     }, []);
 
-    // const animateReturn = useCallback((cardId) => {
-    //     const card = document.getElementById(cardId);
-    //     if (!card) return;
-    //
-    //     card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-    //     card.style.transform = 'translate(0, 0) rotate(0deg)';
-    //     card.style.opacity = '1';
-    // }, []);
-
     const undoSwipe = useCallback(() => {
         if (swipeHistory.length === 0) return;
 
         const lastAction = swipeHistory[0];
         const { direction, card } = lastAction;
 
-        // Создаем копию карточки с новым ключом и флагом pending
         const restoredCard = {
             ...card,
             _pending: true,
@@ -171,7 +129,6 @@ const TinderCards = () => {
         setCards(prev => [{
             ...restoredCard,
             style: {
-                transform: getInitialTransform(direction),
                 opacity: 0,
                 zIndex: 1001
             }
@@ -181,7 +138,7 @@ const TinderCards = () => {
                 c.id === restoredCard.id ? {
                     ...c,
                     _pending: false,
-                    style: { // Конечные стили
+                    style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
                         transition: `all ${ANIMATION_DURATION}ms ease-out`
@@ -190,22 +147,12 @@ const TinderCards = () => {
             ));
         }, 50);
 
-        // 3. Обновляем историю и корзину
         setSwipeHistory(prev => prev.slice(1));
         if (direction === 'up') {
             setBasket(prev => prev.filter(c => c.id !== card.id));
         }
     }, [swipeHistory]);
 
-    const getInitialTransform = (direction) => {
-        const { innerWidth, innerHeight } = window;
-        switch(direction) {
-            case 'left': return `translate(-${innerWidth * 2}px, 0) rotate(-25deg)`;
-            case 'right': return `translate(${innerWidth * 2}px, 0) rotate(25deg)`;
-            case 'up': return `translate(0, -${innerHeight * 2}px) rotate(0deg)`;
-            default: return 'translate(0, 0)';
-        }
-    };
 
     const handleSwipe = useCallback((direction, card) => {
         if (direction === 'down') return;
@@ -239,39 +186,10 @@ const TinderCards = () => {
     }, []);
 
 
-    if (loading) return <div className="loading">Загрузка карточек...</div>;
-
     return (
-        <div
-            className="tinder"
-            ref={containerRef}
-            style={{
-                height: `${window.innerHeight}px`,
-            }}
-        >
-            <div className={styles.searchHeader}>
-                <button onClick={undoSwipe} disabled={swipeHistory.length === 0} className={styles.backButton}><Undo2/>
-                </button>
-                <input
-                    type="text"
-                    placeholder="Looking for something specific?"
-                    className={styles.searchInput}
-                />
-                <div className={styles.logo}>styl.</div>
-            </div>
-            <div className={styles.filterBar}>
-                <button className={styles.filterButton}><SlidersHorizontal size={18}/></button>
-                <button className={styles.filterButton}>Sale</button>
-                <button className={styles.filterButton}>Brand <ChevronDown size={18}/></button>
-                <button className={styles.filterButton}>Product <ChevronDown size={18}/></button>
-                <button className={styles.filterButton}>Color <ChevronDown size={18}/></button>
-            </div>
-
-            <div className="tinder--status">
-                <HeartOff className="status-icon nope" style={getIconStyle('left', swipeProgress)}/>
-                <Heart className="status-icon love" style={getIconStyle('right', swipeProgress)}/>
-                <Save className="status-icon basket" style={getIconStyle('up', swipeProgress)}/>
-            </div>
+        <div className="tinder" ref={containerRef} style={{height: `${window.innerHeight}px`}}>
+            <SearchHeader onUndo={undoSwipe} undoDisabled={swipeHistory.length === 0}/>
+            <FilterBar/>
 
             <div className="tinder--cards">
                 {cards.map((card, index) => (
@@ -286,6 +204,7 @@ const TinderCards = () => {
                         onExpand={() => setExpandedCardId(card.id)}
                         onCollapse={() => setExpandedCardId(null)}
                         isPending={card._pending}
+                        swipeProgress={swipeProgress}
                     />
                 ))}
                 {cards.length === 0 && (
@@ -299,10 +218,5 @@ const TinderCards = () => {
     );
 };
 
-const getIconStyle = (direction, swipeProgress) => ({
-    opacity: swipeProgress.direction === direction ? swipeProgress.opacity : 0,
-    transform: `scale(${0.8 + (swipeProgress.direction === direction ? swipeProgress.opacity * 0.9 : 0)})`,
-    transition: 'all 0.2s ease-out'
-});
 
 export default TinderCards;

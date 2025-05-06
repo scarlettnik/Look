@@ -1,19 +1,17 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
+import {StatusIcons} from "./utils/StatusIcons.jsx";
 
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO = 0.08; // Новый порог для свайпа вниз
 const ANIMATION_DURATION = 800;
 
 
-const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, zIndex, offset, isPending}) => {
+const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPending, swipeProgress}) => {
     const [isVisible, setIsVisible] = useState(false);
-
     const [isExpanded, setIsExpanded] = useState(false);
-    const [contentHeight, setContentHeight] = useState(0);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -26,8 +24,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
     useEffect(() => {
         const isTopCard = offset === 0;
         const isCurrentlyExpanded = location.state?.expandedCard === card.id;
-
-        // Запретить развертывание карточки, если она уже развернута
         if (isCurrentlyExpanded && !isExpanded) {
             setIsExpanded(false); // Не позволяйте открывать карточку на полный экран
         } else if (isTopCard && isCurrentlyExpanded) {
@@ -36,7 +32,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
             setIsExpanded(false);
         }
     }, [location.state, card.id, offset, isExpanded]);
-
 
     useEffect(() => {
         const isTopCard = offset === 0;
@@ -59,12 +54,10 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
         if (!cardRef.current) return;
 
         if (isPending) {
-            // Инициализация анимации
             cardRef.current.style.transition = 'none';
             cardRef.current.style.opacity = '0';
             cardRef.current.style.transform = 'translateY(20px)';
 
-// Запуск анимации после подготовки
             requestAnimationFrame(() => {
                 cardRef.current.style.transition = `
                     opacity 300ms ease-out,
@@ -146,9 +139,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
             projectedPosition.y < -innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO ||
             velocity.y < -VELOCITY_THRESHOLD;
 
-        // Disable downward swipes
-        const isVerticalDown = projectedPosition.y > innerHeight * VERTICAL_SWIPE_DOWN_THRESHOLD_RATIO || velocity.y > VELOCITY_THRESHOLD;
-
         const dynamicDuration = Math.min(
             ANIMATION_DURATION,
             ANIMATION_DURATION / (Math.abs(velocity.x) + Math.abs(velocity.y) + 0.1)
@@ -217,7 +207,6 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
             onMouseMove={(e) => !isExpanded && handleMove(e.clientX, e.clientY)}
             onMouseUp={!isExpanded ? handleEnd : undefined}
             onMouseLeave={!isExpanded ? handleEnd : undefined}
-
             style={{
                     backgroundImage: `url(${card.image_urls[0]})`,
                     backgroundSize: 'cover',
@@ -228,16 +217,9 @@ const TinderCard = ({card, onExpand, onCollapse, onSwipe, updateSwipeFeedback, z
                 transform: `translate(${offset * 2}px, ${offset * 1}px) ${card.style?.transform || ''}`
                 }}
         >
-
-            <div
-                className="card-content"
-                ref={contentRef}
-
-            >
-
-
+            <StatusIcons swipeProgress={swipeProgress}/>
+            <div className="card-content" ref={contentRef}>
             </div>
-
         </div>
     );
 };

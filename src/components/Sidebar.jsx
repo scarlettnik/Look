@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
 import './ui/Sidebar.css';
@@ -6,30 +6,6 @@ import './ui/Sidebar.css';
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const sidebarRef = useRef(null);
-    const [keyboardActive, setKeyboardActive] = useState(false);
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    useEffect(() => {
-        if (!isMobile) return;
-
-        const handleFocus = () => setKeyboardActive(true);
-        const handleBlur = () => setKeyboardActive(false);
-
-        const inputs = document.querySelectorAll('input, textarea, [contenteditable]');
-        inputs.forEach(input => {
-            input.addEventListener('focus', handleFocus);
-            input.addEventListener('blur', handleBlur);
-        });
-
-        return () => {
-            inputs.forEach(input => {
-                input.removeEventListener('focus', handleFocus);
-                input.removeEventListener('blur', handleBlur);
-            });
-        };
-    }, [isMobile]);
 
     const sidebarConfig = [
         { path: '/', exact: true },
@@ -55,8 +31,7 @@ const Sidebar = () => {
 
     return (
         <div
-            className={`sidebar ${keyboardActive ? 'keyboard-active' : ''}`}
-            ref={sidebarRef}
+            className='sidebar'
         >
             <button
                 className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}

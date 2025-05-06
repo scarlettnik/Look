@@ -1,7 +1,4 @@
 :root {
-    --color-love: #FF387E;
-    --color-nope: #ff4444;
-    --color-basket: #4c84af;
     --card-width: 92vw;
     --card-max-width: 600px;
     --card-height: 76%;
@@ -34,14 +31,9 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
     opacity: 0;
-    transition: all 0.2s ease-out;
 }
 
-.status-icon.nope { color: var(--color-nope); }
-.status-icon.love { color: var(--color-love); }
-.status-icon.basket { color: var(--color-basket); }
 
 .tinder--cards {
     flex-grow: 1;
@@ -197,4 +189,14 @@
     backface-visibility: hidden;
     transform: translateZ(0);
 }
+.tinder--card.exiting .card-status-icons {
+    transition: opacity 0.2s ease-out;
+    opacity: 0 !important;
+}
 
+.tinder--card.exiting {
+    transition:
+            transform 800ms cubic-bezier(0.23, 1, 0.32, 1),
+            opacity 800ms ease;
+    opacity: 0;
+}

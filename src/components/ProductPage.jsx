@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ui/productPage.module.css';
 import Share from "./utils/Share.jsx";
+import Modal from "./utils/Modal.jsx";
 
 const Compilation = () => {
     const { state } = useLocation();
@@ -90,7 +91,9 @@ const Compilation = () => {
                 <div className={styles.description}>
                     <h3>Description</h3>
                     <button className={styles.bookmark} onClick={handleShare}>📤</button>
-                    <Share isOpen={isShareOpen} onClose={handleCloseShare} url={window.location.href}/>
+                    <Modal isOpen={isShareOpen} onClose={handleCloseShare}>
+                       <Share url={window.location.href}/>
+                    </Modal>
                     <p>
                         Pretty in pink! Go for sunset cocktails in this stunning pink mesh mini dress.
                         Whether it’s a special occasion or a night out, this dress is the perfect pick!

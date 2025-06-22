@@ -1,30 +1,12 @@
 import React, { useState } from 'react';
 import styles from './ui/addList.module.css';
+import ButtonWrapper from "./ButtonWrapper.jsx";
+import FullScreenButton from "./FullScrinButton.jsx";
 
 const coverImages = [
     { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://i.pinimg.com/736x/31/bd/9d/31bd9dcd26c6395e06f9a55011ae4856.jpg'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://i.pinimg.com/736x/31/bd/9d/31bd9dcd26c6395e06f9a55011ae4856.jpg'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://i.pinimg.com/736x/31/bd/9d/31bd9dcd26c6395e06f9a55011ae4856.jpg'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://i.pinimg.com/736x/31/bd/9d/31bd9dcd26c6395e06f9a55011ae4856.jpg'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
-    { url: 'https://avatars.mds.yandex.net/i?id=022c655b21f79d8837185f96c6e208dd_l-10767434-images-thumbs&n=13'},
+
+
 
 ]
 
@@ -35,10 +17,8 @@ function AddList() {
     return (
         <div className={styles.container}>
             <div className={styles.content}>
-                <h2 className={styles.title}>Create a Closet</h2>
-                <button className={styles.close}>×</button>
-
-                <label className={styles.label}>Choose a Closet Name:</label>
+                <h2 className={styles.title}>Создать подборку</h2>
+                <label className={styles.label}>Название</label>
                 <input
                     type="text"
                     value={closetName}
@@ -46,7 +26,7 @@ function AddList() {
                     className={styles.input}
                 />
 
-                <label className={styles.label}>Cover Image:</label>
+                <label className={styles.label}>Обложка</label>
                 <div className={styles.selectedCover}>
                     <img src={selectedCover} alt="Selected Cover"/>
                     <span className={styles.coverText}>{closetName}</span>
@@ -54,9 +34,8 @@ function AddList() {
 
                 <div className={styles.coverGrid}>
                     {coverImages.map((img) => (
-                        <div>
+                        <div key={img.url}>
                             <img
-                                key={img._key}
                                 src={img.url}
                                 className={`${styles.coverThumb} ${selectedCover === img ? styles.active : ''}`}
                                 onClick={() => setSelectedCover(img.url)}
@@ -67,10 +46,11 @@ function AddList() {
                 </div>
             </div>
 
-            <div className={styles.buttons}>
-                <button className={styles.cancel}>Cancel</button>
-                <button className={styles.create}>Create Closet</button>
-            </div>
+            <ButtonWrapper>
+                <FullScreenButton>
+                    Сохранить подборку
+                </FullScreenButton>
+            </ButtonWrapper>
         </div>
     );
 }

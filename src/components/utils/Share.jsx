@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     TelegramShareButton,
     WhatsappShareButton,
@@ -9,7 +9,7 @@ import {
 } from 'react-share';
 import styles from '../ui/share.module.css';
 
-const Share = ({ isOpen, onClose, url }) => {
+const Share = ({ url }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -22,32 +22,27 @@ const Share = ({ isOpen, onClose, url }) => {
         }
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className={styles.backdrop} onClick={onClose}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <button className={styles.closeIcon} onClick={onClose}>✕</button>
-                <h3 className={styles.title}>Поделиться</h3>
+        <>
+            <h3 className={styles.title}>Поделиться</h3>
 
-                <div className={styles.icons}>
-                    <TelegramShareButton url={url}>
-                        <TelegramIcon size={48} round />
-                    </TelegramShareButton>
-                    <WhatsappShareButton url={url}>
-                        <WhatsappIcon size={48} round />
-                    </WhatsappShareButton>
-                    <FacebookShareButton url={url}>
-                        <FacebookIcon size={48} round />
-                    </FacebookShareButton>
-                    <button className={styles.copyIcon} onClick={handleCopy} title="Скопировать ссылку">
-                        📋
-                    </button>
-                </div>
-
-                {copied && <div className={styles.toast}>Ссылка скопирована!</div>}
+            <div className={styles.icons}>
+                <TelegramShareButton url={url}>
+                    <TelegramIcon size={48} round />
+                </TelegramShareButton>
+                <WhatsappShareButton url={url}>
+                    <WhatsappIcon size={48} round />
+                </WhatsappShareButton>
+                <FacebookShareButton url={url}>
+                    <FacebookIcon size={48} round />
+                </FacebookShareButton>
+                <button className={styles.copyIcon} onClick={handleCopy} title="Скопировать ссылку">
+                    📋
+                </button>
             </div>
-        </div>
+
+            {copied && <div className={styles.toast}>Ссылка скопирована!</div>}
+        </>
     );
 };
 

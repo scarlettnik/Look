@@ -1,0 +1,79 @@
+.page {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.userInfo {
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 8px;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userName {
+    font-weight: 500;
+    font-size: 17px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.menuContainer {
+    overflow: hidden;
+    width: 100vw;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    position: relative;
+}
+
+.menuIcon {
+    color: #4b5563;
+    margin-right: 12px;
+}
+
+.menuLabel {
+    font-size: 16px;
+    color: #1f2937;
+}
+
+.devPanel {
+    position: absolute;
+    right: 20px;
+    z-index: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
+.supportButtonsWrapper {
+    position: fixed;
+    bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    z-index: 1000;
+    left: 0;
+    right: 0;
+}

@@ -1,89 +1,183 @@
-import { useState, useEffect } from 'react';
+import {
+    UserIcon,
+    ShoppingBagIcon,
+    CreditCardIcon,
+    PercentIcon,
+    Trash2Icon,
+    HelpCircleIcon,
+} from "lucide-react";
 import Sidebar from "./Sidebar.jsx";
 import { useAuth } from "../provider/AuthProvider.jsx";
+import { useState, useEffect, useRef } from "react";
+import FullScreenButton from "./FullScrinButton.jsx";
+import styles from "./ui/profile.module.css";
+import ButtonWrapper from "./ButtonWrapper.jsx";
 
+const menuItems = [
+    { label: "Мои параметры", icon: UserIcon },
+    { label: "Заказы", icon: ShoppingBagIcon, dev: true },
+    { label: "Способ оплаты", icon: CreditCardIcon, dev: true },
+    { label: "Промокоды", icon: PercentIcon, dev: true },
+    { label: "Удаление аккаунта", icon: Trash2Icon, delete: true },
+    { label: "Поддержка", icon: HelpCircleIcon, support: true },
+];
 
-const Profile = () => {
-    const { data, loading, error } = useAuth();
+const UserInfo = ({ photoUrl, firstName, lastName }) => (
+    <div className={styles.userInfo}>
+        <div className={styles.avatar}>
+            <img
+                src={photoUrl || "https://svgsilh.com/svg/1299805-9e9e9e.svg"}
+                className={styles.avatarImage}
+                alt="User avatar"
+            />
+        </div>
+        <div className={styles.userName}>
+            {firstName || lastName ? (
+                <div>
+                    {firstName} {lastName}
+                </div>
+            ) : (
+                <p>User</p>
+            )}
+        </div>
+    </div>
+);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-
-    console.log(data)
-
-    if (!data) {
-        return (
-            <>
-                <div>Loading user data...</div>
-                <Sidebar/>
-            </>
-
-        );
-    }
+const MenuItem = ({ item, index, activeIndex, onClick }) => {
+    const Icon = item.icon;
+    const isActive = activeIndex === index;
 
     return (
-        <>
-            <div style={styles.profileContainer}>
-                <div style={styles.avatarContainer}>
-                    {data.photo_url ? (
-                        <img
-                            src={data.photo_url}
-                            alt="User Avatar"
-                            style={styles.avatar}
-                        />
-                    ) : (
-                        <div style={styles.avatarPlaceholder}>
-                            {(data.first_name && data.first_name[0]) || ''}
-                            {(data.last_name && data.last_name[0]) || ''}
-                        </div>
-                    )}
-                </div>
-
-                <div style={styles.username}>
-
-                    {data.first_name} {" "} {data.last_name || ''}
-                </div>
-            </div>
-            <Sidebar/>
-        </>
-
+        <div
+            className={styles.menuItem}
+            onClick={() => onClick(item, index)}
+        >
+            <Icon size={20} className={styles.menuIcon} />
+            <span className={styles.menuLabel}>{item.label}</span>
+            {item.dev && isActive && (
+                <div className={styles.devPanel}>В разработке</div>
+            )}
+        </div>
     );
 };
 
-const styles = {
-    profileContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: '16px',
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    },
-    avatarContainer: {
-        marginRight: '16px',
-    },
-    avatar: {
-        width: '56px',
-        height: '56px',
-        borderRadius: '50%',
-        objectFit: 'cover',
-    },
-    avatarPlaceholder: {
-        width: '56px',
-        height: '56px',
-        borderRadius: '50%',
-        backgroundColor: '#007bff',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '20px',
-    },
-    username: {
-        fontSize: '18px',
-        fontWeight: 500,
-        color: '#212121',
-    },
-};
+const SupportButtons = ({ onSupportClick }) => (
+    <ButtonWrapper>
+        <FullScreenButton
+            color="var(--light-gray)"
+            textColor="var(--black)"
+            onClick={onSupportClick}
+        >
+            Связаться с поддержкой в Telegram
+        </FullScreenButton>
+    </ButtonWrapper>
+);
 
-export default Profile;
+const DeleteProfileButtons = ({ onDelete, onCancel }) => (
+    <ButtonWrapper>
+        <FullScreenButton
+            color="var(--light-gray)"
+            textColor="var(--black)"
+            onClick={onDelete}
+        >
+            Удалить аккаунт
+        </FullScreenButton>
+        <FullScreenButton onClick={onCancel}>
+            Отменить
+        </FullScreenButton>
+    </ButtonWrapper>
+);
+
+export default function ProfilePage() {
+    const { data, loading, error } = useAuth();
+    const [activeDevItem, setActiveDevItem] = useState(null);
+    const [showSupportButton, setShowSupportButton] = useState(false);
+    const [showDeleteProfileButton, setShowDeleteProfileButton] = useState(false);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
+    const handleMenuItemClick = (item, index) => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        if (item.support) {
+            setShowSupportButton(true);
+            setShowDeleteProfileButton(false);
+            setActiveDevItem(null);
+            return;
+        }
+
+        if (item.delete) {
+            setShowDeleteProfileButton(true);
+            setShowSupportButton(false);
+            setActiveDevItem(null);
+            return;
+        }
+
+        if (item.dev) {
+            setActiveDevItem(index);
+            setShowSupportButton(false);
+            setShowDeleteProfileButton(false);
+
+            timeoutRef.current = setTimeout(() => {
+                setActiveDevItem(null);
+            }, 3000);
+        } else {
+            setActiveDevItem(null);
+            setShowSupportButton(false);
+        }
+    };
+
+    const handleSupportButtonClick = () => {
+        window.open("https://t.me/scarlettnik", "_blank");
+    };
+
+    const handleDeleteBackScape = () => {
+        setShowDeleteProfileButton(false);
+    };
+
+    if (error) return <div>Error: {error}</div>;
+
+    return (
+        <div className={styles.page}>
+            <UserInfo
+                photoUrl={data?.photo_url}
+                firstName={data?.first_name}
+                lastName={data?.last_name}
+            />
+
+            <div className={styles.menuContainer}>
+                {menuItems.map((item, index) => (
+                    <MenuItem
+                        key={index}
+                        item={item}
+                        index={index}
+                        activeIndex={activeDevItem}
+                        onClick={handleMenuItemClick}
+                    />
+                ))}
+            </div>
+
+            <Sidebar />
+
+            {showSupportButton && (
+                <SupportButtons onSupportClick={handleSupportButtonClick} />
+            )}
+
+            {showDeleteProfileButton && (
+                <DeleteProfileButtons
+                    onDelete={() => console.log("Удаление")}
+                    onCancel={handleDeleteBackScape}
+                />
+            )}
+        </div>
+    );
+}

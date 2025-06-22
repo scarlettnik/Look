@@ -40,7 +40,7 @@ function AppContent() {
                 <Route path="/save/:id/product/:id" element={<ProductPage />} />
                 <Route path='/shoppingcard' element={<ShoppingCard />} />
                 <Route path='/pref' element={<Preferences />} />
-                <Route path='/compare' element={<Comparing />} />
+                <Route path='/trends' element={<Comparing />} />
                 <Route path='/measur' element={<Measurment/>} />
                 <Route path='/prod' element={<Product/>} />
                 <Route path='/cloth' element={<AddToCloset/>} />

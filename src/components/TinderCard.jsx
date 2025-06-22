@@ -1,6 +1,8 @@
-import {useCallback, useEffect, useRef, useState} from "react";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {useEffect, useRef, useState} from "react";
+import {useLocation} from "react-router-dom";
 import {StatusIcons} from "./utils/StatusIcons.jsx";
+import {Bookmark} from "lucide-react";
+import './ui/TinderCards.css'
 
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
@@ -219,6 +221,16 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
         >
             <StatusIcons swipeProgress={swipeProgress}/>
             <div className="card-content" ref={contentRef}>
+                <div className="card-content">
+                    <div className="card-bottom">
+                        <div className="card-info">
+                            <div className="product-name">One Shoulder Blouse</div>
+                            <div className="manufacturer">Commense</div>
+                            <div className="price">$199</div>
+                        </div>
+                        <button className="save-button"><Bookmark size={40}/></button>
+                    </div>
+                </div>
             </div>
         </div>
     );

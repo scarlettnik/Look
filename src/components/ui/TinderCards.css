@@ -67,7 +67,54 @@
 }
 
 .card-content {
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    padding: 10px 0;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.card-info {
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    color: white;
+    padding-left: 15px;
+
+}
+
+.product-name {
+    font-size: 140%;
+    font-weight: bold;
+}
+
+.manufacturer {
+    font-size: 120%;
+]}
+
+.price {
+    font-size: 130%;
+    font-weight: 600;
+]}
+
+.save-button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .tinder--card h3 {

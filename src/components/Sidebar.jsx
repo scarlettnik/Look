@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { Bookmark, GitBranch, House, ShoppingCart, User } from 'lucide-react';
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
 import './ui/Sidebar.css';
+import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
 const Sidebar = () => {
+    const isKeyboardOpen = useIsKeyboardOpen();
     const navigate = useNavigate();
     const location = useLocation();
 
     const sidebarConfig = [
         { path: '/', exact: true },
         { path: '/save', matchPattern: '/save/*' },
-        { path: '/compare', exact: true },
+        { path: '/trends', matchPattern: '/trends/*' },
         { path: '/shoppingcard', exact: true },
         { path: '/profile', exact: true }
     ];
@@ -26,41 +27,63 @@ const Sidebar = () => {
                     : location.pathname.startsWith(path);
         })?.path;
 
-        if(currentPath) setActivePath(currentPath);
+        if (currentPath) setActivePath(currentPath);
     }, [location.pathname]);
 
-    return (
-        <div
-            className='sidebar'
-        >
+    const getIconPath = (iconName, isActive) => {
+        return `/menuIcons/${isActive ? 'active' : 'unactive'}/${iconName}.svg`;
+    };
+
+    return isKeyboardOpen ? null : (
+        <div className='sidebar'>
             <button
-                className={`sidebarbutton ${activePath === '/' ? 'active' : ''}`}
+                className= "sidebarbutton"
                 onClick={() => navigate('/')}>
-                <House/>
+                <img
+                    src={getIconPath('home', activePath === '/')}
+                    alt="Home"
+                    className="icon"
+                />
             </button>
 
             <button
                 className={`sidebarbutton ${activePath === '/save' ? 'active' : ''}`}
                 onClick={() => navigate('/save')}>
-                <Bookmark/>
+                <img
+                    src={getIconPath('save', activePath === '/save')}
+                    alt="save"
+                    className="icon"
+                />
             </button>
 
             <button
                 className={`sidebarbutton ${activePath === '/compare' ? 'active' : ''}`}
-                onClick={() => navigate('/compare')}>
-                <GitBranch/>
+                onClick={() => navigate('/trends')}>
+                <img
+                    src={getIconPath('trends', activePath === '/trends')}
+                    alt="trends"
+                    className="icon"
+                />
             </button>
 
             <button
                 className={`sidebarbutton ${activePath === '/shoppingcard' ? 'active' : ''}`}
                 onClick={() => navigate('/shoppingcard')}>
-                <ShoppingCart/>
+                <img
+                    src={getIconPath('shop', activePath === '/shoppingcard')}
+                    alt="Cart"
+                    className="icon"
+                />
             </button>
 
             <button
                 className={`sidebarbutton ${activePath === '/profile' ? 'active' : ''}`}
                 onClick={() => navigate('/profile')}>
-                <User/>
+                <img
+                    src={getIconPath('profile', activePath === '/profile')}
+                    alt="Profile"
+                    className="icon"
+                />
             </button>
         </div>
     );

@@ -14,20 +14,133 @@ const Save = () => {
     const [selectedSaves, setSelectedSaves] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newCollectionName, setNewCollectionName] = useState('');
     const [savesData, setSavesData] = useState([
-        { id: 1, name: "All Saved" },
-        { id: 2, name: "Travel Plans" },
-        { id: 3, name: "Home Decor" },
-        { id: 4, name: "Recipes" },
-        { id: 5, name: "Books" },
-        { id: 6, name: "Movies" },
-        { id: 7, name: "All Saved" },
-        { id: 8, name: "Travel Plans" },
-        { id: 9, name: "Home Decor" },
-        { id: 10, name: "Recipes" },
-        { id: 11, name: "Books" },
-        { id: 12, name: "Movies" },
+        { id: 1, name: "All Saved", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13', items: [ {
+                url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                id: 1
+            },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                    id: 2
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                    id: 3
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                }]},
+        { id: 2, name: "Travel Plans", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13', items:[ {
+                url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                id: 1
+            },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                    id: 2
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg',
+                    id: 3
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },
+                {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },    {
+                    url: 'https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg'
+                },]},
+        { id: 3, name: "Home Decor", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 4, name: "Recipes", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 5, name: "Books", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 6, name: "Movies", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 7, name: "All Saved", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13'},
+        { id: 8, name: "Travel Plans", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 9, name: "Home Decor", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13'},
+        { id: 10, name: "Recipes", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 11, name: "Books", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
+        { id: 12, name: "Movies", url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' },
     ]);
 
     const containerRef = useRef(null);
@@ -94,14 +207,14 @@ const Save = () => {
         setDeleteMode(false);
     };
 
-    const handleCreateCollection = () => {
-        if (newCollectionName.trim()) {
+    const handleCreateCollection = (name, coverUrl) => {
+        if (name.trim()) {
             const newCollection = {
                 id: Date.now(),
-                name: newCollectionName
+                name: name,
+                url: coverUrl
             };
-            setSavesData([...savesData, newCollection]);
-            setNewCollectionName('');
+            setSavesData(prev => [newCollection, ...prev]);
             setIsModalOpen(false);
         }
     };
@@ -178,7 +291,7 @@ const Save = () => {
                             <Link to={`/save/${save.id}`} state={{save}}>
                                 <div className={styles.card}>
                                     <img
-                                        src='https://salehard.артстена.рф/storage/categories-created/abstrakciya/fotooboi-abstraktsiya-22285540_-_id___20730.jpg'
+                                        src={save.url}
                                         alt={save.name}
                                         className={styles.image}
                                     />
@@ -188,10 +301,9 @@ const Save = () => {
                         </div>
                     ))}
                 </div>
-
                     <Modal  isOpen={isModalOpen}
                             onClose={createClose}>
-                        <AddList/>
+                        <AddList onCreate={handleCreateCollection}/>
                     </Modal>
 
             </div>

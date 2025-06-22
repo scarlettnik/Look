@@ -80,7 +80,9 @@ button:visited {
   box-shadow: none !important;
 }
 
-
+button:disabled {
+  opacity: 0.7;
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

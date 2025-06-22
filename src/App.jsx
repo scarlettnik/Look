@@ -13,14 +13,19 @@ import Measurment from "./components/Measurment.jsx";
 import Product from "./components/Product.jsx";
 import AddList from "./components/AddList.jsx";
 import AddToCloset from "./components/AddToCloset.jsx";
+import { StoreProvider } from './provider/StoreContext.jsx';
 
 function App() {
     return (
-        <AuthProvider>
-            <Router>
-                <AppContent />
-            </Router>
-        </AuthProvider>
+
+            <StoreProvider>
+                <AuthProvider>
+                    <Router>
+                        <AppContent />
+                    </Router>
+                </AuthProvider>
+            </StoreProvider>
+
     );
 }
 

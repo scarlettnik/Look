@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ui/productPage.module.css';
 import Share from "./utils/Share.jsx";
 import Modal from "./utils/Modal.jsx";
+import FullScreenButton from "./FullScrinButton.jsx";
 
 const Compilation = () => {
     const { state } = useLocation();
@@ -50,12 +51,21 @@ const Compilation = () => {
     return (
         <>
         <div className={styles.container}>
+
             <div
                 className={styles.slider}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
             >
+                <button className={styles.backButton} onClick={() => {
+                    navigate(-1)
+                }}>
+                    <img style={{width: '30px'}} src='/subicons/arrowLeft.svg'/>
+                </button>
+                <button className={styles.shareButton} onClick={handleShare}>
+                    <img style={{width: '20px'}}  src='/subicons/darkShare.svg'/>
+                </button>
                 <div
                     className={styles.sliderInner}
                     style={{
@@ -64,7 +74,7 @@ const Compilation = () => {
                     }}
                 >
                     {images.map((src, index) => (
-                        <img key={index} src={src} alt={`Slide ${index}`} className={styles.image} />
+                        <img key={index} src={src} alt={`Slide ${index}`} className={styles.image}/>
                     ))}
                 </div>
                 <div className={styles.progressDots}>
@@ -78,16 +88,21 @@ const Compilation = () => {
             </div>
 
             <div className={styles.infoCard}>
+                <p className={styles.title}>
+                    Рубашка 12storeez
+                </p>
+                <p className={styles.brand}>
+                    Recycle Boucle Knit Cardigan Pink
+                </p>
                 <div className={styles.header}>
-                    <div className={styles.brand}>
-                        <img src="https://i.pinimg.com/736x/f8/af/cd/f8afcdbd0cd75cba2978005baf44f75a.jpg"
-                             alt="Beginning Boutique" className={styles.logo}/>
-                        <span className={styles.brandName}>Beginning Boutique</span>
-                    </div>
-                    <button className={styles.bookmark}>🔖</button>
+                    <p className={styles.price}>7500 ₽</p>
+                    <img src='/menuIcons/unactive/save.svg'/>
                 </div>
-                <h2 className={styles.title}>Pink Mesh Mini Dress</h2>
-                <p className={styles.price}>$75</p>
+
+                <FullScreenButton>
+                    <p style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent:'center'}} > На сайт продавца <img src='/subicons/shoppingBag.svg'/> </p>
+                </FullScreenButton>
+
                 <div className={styles.description}>
                     <h3>Description</h3>
                     <button className={styles.bookmark} onClick={handleShare}>📤</button>

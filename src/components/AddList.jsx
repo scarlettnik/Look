@@ -21,19 +21,39 @@ const SelectedCoverPreview = ({ imageUrl, title }) => (
     </div>
 );
 
-function AddList({onCreate}) {
+function AddList({
+                     onCreate,
+                     onUpdate,
+                     collection = null // Передаем коллекцию для редактирования
+                 })  {
     const [closetName, setClosetName] = useState('');
-    const [selectedCover, setSelectedCover] = useState(coverImages[0].url);
+    const [selectedCover, setSelectedCover] = useState(
+        collection?.url || coverImages[0].url
+    );
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const containerRef = useRef(null);
     const isKeyboardOpen = useIsKeyboardOpen()
 
+    useEffect(() => {
+        if (collection) {
+            setClosetName(collection.name);
+            setSelectedCover(collection.url);
+        }
+    }, [collection]);
+
     const handleSave = () => {
-        if (closetName.trim()) {
-            // Вызываем функцию создания из пропсов
+        if (!closetName.trim()) return;
+
+        if (collection) {
+            // Режим редактирования
+            onUpdate(closetName, selectedCover);
+        } else {
+            // Режим создания
             onCreate(closetName, selectedCover);
         }
     };
+
+
 
     useEffect(() => {
         if (!window.visualViewport) return;
@@ -62,7 +82,8 @@ function AddList({onCreate}) {
             }}
         >
             <div className={styles.content}>
-                <h2 className={styles.title}>Создать подборку</h2>
+                <h2 className={styles.title}>{collection ? "Редактировать подборку" : "Создать подборку"}</h2>
+
                 <label className={styles.label}>Название</label>
                 <input
                     type="text"
@@ -107,7 +128,7 @@ function AddList({onCreate}) {
                         onClick={handleSave}
                         disabled={!closetName.trim()}
                     >
-                        Сохранить подборку
+                        {collection ? "Сохранить изменения" : "Сохранить подборку"}
                     </FullScreenButton>
                 </ButtonWrapper>}
         </div>

@@ -7,7 +7,6 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 0 22px;
     z-index: 1000;
     transition: transform 0.3s ease;
     background-color: var(--white-gray);

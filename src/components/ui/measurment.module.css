@@ -91,8 +91,9 @@
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid black;
+    border-bottom: 6px solid black;
     transition: left 0.3s ease;
+    rotate: 30deg;
 }
 
 .triangle[data-fit="tight"] {

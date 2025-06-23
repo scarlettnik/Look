@@ -1,13 +1,12 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Sidebar from './Sidebar';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './ui/productPage.module.css';
 import Share from "./utils/Share.jsx";
 import Modal from "./utils/Modal.jsx";
 import FullScreenButton from "./FullScrinButton.jsx";
 
 const Compilation = () => {
-    const { state } = useLocation();
     const navigate = useNavigate();
     const [isShareOpen, setIsShareOpen] = useState(false);
     const handleShare = () => setIsShareOpen(true);
@@ -24,11 +23,32 @@ const Compilation = () => {
     const [dragX, setDragX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const touchStartX = useRef(0);
+    const [selectedColor, setSelectedColor] = useState(null);
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+    const sizes = [
+        'XS / 42-44',
+        'S / 46-48',
+        'M / 50-52',
+        'L / 54-56',
+        'XL / 58-60',
+        'XXL / 62-64',
+        '3XL / 66-68',
+        '4XL / 70-72'
+    ];
+    const colors = [
+        { name: 'Черный', code: '#000000' },
+        { name: 'Белый', code: '#FFFFFF' },
+        { name: 'Красный', code: '#FF0000' },
+        { name: 'Синий', code: '#0000FF' },
+        { name: 'Зеленый', code: '#61a361' },
+        { name: 'Серый', code: '#772222' },
+        { name: 'Красный2', code: '#c52d2d' },
+        { name: 'Синий2', code: '#7c7cbf' },
+        { name: 'Зеленый2', code: '#00FF00' },
+        { name: 'Серый2', code: '#808080' },
+    ];
 
+    const [selectedSize, setSelectedSize] = useState(null);
     const handleTouchStart = (e) => {
         touchStartX.current = e.touches[0].clientX;
         setIsDragging(true);
@@ -86,7 +106,9 @@ const Compilation = () => {
                     ))}
                 </div>
             </div>
-
+            <Modal isOpen={isShareOpen} onClose={handleCloseShare}>
+                <Share url={window.location.href}/>
+            </Modal>
             <div className={styles.infoCard}>
                 <p className={styles.title}>
                     Рубашка 12storeez
@@ -100,67 +122,73 @@ const Compilation = () => {
                 </div>
 
                 <FullScreenButton>
-                    <p style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent:'center'}} > На сайт продавца <img src='/subicons/shoppingBag.svg'/> </p>
+                    <p style={{display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center'}}> На сайт
+                        продавца <img src='/subicons/shoppingBag.svg'/></p>
                 </FullScreenButton>
 
-                <div className={styles.description}>
-                    <h3>Description</h3>
-                    <button className={styles.bookmark} onClick={handleShare}>📤</button>
-                    <Modal isOpen={isShareOpen} onClose={handleCloseShare}>
-                       <Share url={window.location.href}/>
-                    </Modal>
-                    <p>
-                        Pretty in pink! Go for sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.
-                        Pretty in pink! Go for sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.
-                        Pretty in pink! Go for sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.
-                        Pretty in pink! Go for sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.Pretty in pink! Go for
-                        sunset cocktails in this stunning pink mesh mini dress.
-                        Whether it’s a special occasion or a night out, this dress is the perfect pick!
-                        Accessories with gold jewellery, heels and a shoulder bag for a jaw dropping fit.
-                        Open back. Halter neck. Mini length. V neckline. Fully lined with mesh outer layer.
-                        Bodycon style. Stretch material. Frill mesh hem. Mesh rose on bottom hem.
-                    </p>
+                <p className={styles.blockTitle}>О товаре</p>
+                <p className={styles.description} style={{color: 'var(--black)'}}>
+                    Рубашка отлично сочетается с ремнями, галстуками и другими аксессуарами, дополняя любой стиль — от
+                    делового до Casual.
+                </p>
+
+                <p className={styles.blockTitle}>Размеры</p>
+
+                <div className={styles.bar}>
+                    {sizes.map((size, index) => (
+                        <button
+                            key={index}
+                            className={`${styles.sizeOption} ${
+                                selectedSize === size ? styles.active : ''
+                            }`}
+                            onClick={() => setSelectedSize(size)}
+                        >
+                            {size}
+                        </button>
+                    ))}
+                </div>
+                <p className={styles.description} style={{color: 'var(--light-cold-gray)'}}>
+                    Размер подобран на основе ваших параметров
+                </p>
+
+                <div style={{display: "flex", alignItems: 'center'}}>
+                    <p className={styles.blockTitle}>Цвет</p>
+                    <p className={styles.colorTitle}>{selectedColor?.name}</p>
+                </div>
+                <div className={`${styles.bar} ${styles.border}`}>
+                    {colors.map((color, index) => (
+                        <div
+                            key={index}
+                            className={styles.colorCircleWrapper}
+                            onClick={() => setSelectedColor(color)}
+                        >
+                            <div
+                                className={`${styles.colorCircle} ${
+                                    selectedColor?.code === color?.code ? styles.selected : ''
+                                }`}
+                                style={{backgroundColor: color?.code}}
+                            />
+                        </div>
+                    ))}
+                </div>
+                <p className={styles.blockTitle}>О товаре</p>
+                <div className={styles.infoSection}>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Производитель</span>
+                        <span className={styles.infoValue}>Nike</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Состав</span>
+                        <span className={styles.infoValue}>Хлопок 80%, Полиэстер 20% Хлопок 80%, Полиэстер 20%</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Страна изготовитель</span>
+                        <span className={styles.infoValue}>Вьетнам</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Дополнительн0</span>
+                        <span className={styles.infoValue}>Сезон: Весна-Лето 2023</span>
+                    </div>
                 </div>
             </div>
             <Sidebar/>

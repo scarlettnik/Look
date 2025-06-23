@@ -25,66 +25,75 @@ class AppStore {
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 4,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 5,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 6,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 7,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 8,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 9,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 10,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 11,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 12,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 13,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 14,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 15,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 16,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 17,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 18,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 19,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 20,
                 },
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
+                    id: 21,
                 },
             ],
         },
@@ -104,69 +113,6 @@ class AppStore {
                 {
                     url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
                     id: 3,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
                 },
             ],
         },
@@ -233,17 +179,13 @@ class AppStore {
     async loadInitialData() {
         this.isLoading = true;
         try {
-            // В реальном приложении здесь будет запрос к API
-            // Для демонстрации создадим искусственную задержку
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Симулируем получение данных
             this.appData = {
                 message: "Данные успешно загружены!",
                 timestamp: new Date().toISOString()
             };
 
-            // Загружаем дополнительные элементы
             this.items = [
                 { id: 401, title: "Дикая природа", description: "Животные в естественной среде", imageUrl: "https://via.placeholder.com/150/d32776" },
                 { id: 402, title: "Космические пейзажи", description: "Туманности и галактики", imageUrl: "https://via.placeholder.com/150/f66b97" },
@@ -262,10 +204,6 @@ class AppStore {
             this.saveToLocalStorage(); // Если используете localStorage
         }
     };
-    getCollectionById = (id) => {
-        return this.saves.find(save => save.id === id);
-    };
-
 
     createCollection = (name, coverUrl) => {
         if (!name.trim()) return;

@@ -45,10 +45,8 @@ function AddList({
         if (!closetName.trim()) return;
 
         if (collection) {
-            // Режим редактирования
             onUpdate(closetName, selectedCover);
         } else {
-            // Режим создания
             onCreate(closetName, selectedCover);
         }
     };

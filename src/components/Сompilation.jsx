@@ -44,7 +44,6 @@ const Compilation = observer(() => {
                     filters={filters}
                     setFilters={setFilters}
                 />
-
                 <div className={styles.itemsGrid}>
                     {save.items?.map((item, index) => (
                         <Link
@@ -60,7 +59,7 @@ const Compilation = observer(() => {
                     ))}
                 </div>
             </div>
-            <Sidebar />
+            <Sidebar/>
         </div>
     );
 });
@@ -68,7 +67,7 @@ const Compilation = observer(() => {
 export default Compilation;
 
 
-export const Banner = observer(({ save }) => {
+export const Banner = observer(({save}) => {
     const [isShareOpen, setIsShareOpen] = useState(false);
     const handleCloseShare = () => setIsShareOpen(false);
     const [editingCollection, setEditingCollection] = useState(null);
@@ -195,7 +194,7 @@ const FilterBar = ({filters, setFilters}) => {
                     className={`${styles.filterButton} ${filters.size ? styles.activeFilter : ''}`}
                     onClick={() => openFilter('size')}
                 >
-                    Размерhhhhhhhhhhhhhhh
+                    Размер
                     {filters.size && (
                         <span
                             className={styles.clearFilter}

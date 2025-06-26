@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar.jsx";
 import FullScreenButton from "./FullScrinButton.jsx";
 import { observer } from 'mobx-react';
 import { useStore } from "../provider/StoreContext.jsx";
+import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
 const ShoppingCard = observer(() => {
     const store = useStore();
@@ -13,6 +14,7 @@ const ShoppingCard = observer(() => {
     const [deliveryMethod, setDeliveryMethod] = useState('standard');
     const [showPromoInput, setShowPromoInput] = useState(false);
     const [showDeliveryOptions, setShowDeliveryOptions] = useState(false);
+    const isKeyBoardOpen = useIsKeyboardOpen()
 
     if (store.cartStore.isCartLoading) {
         return <div className={styles.loading}>Загрузка корзины...</div>;
@@ -142,7 +144,7 @@ const ShoppingCard = observer(() => {
                             <span>${total.toFixed(2)}</span>
                         </div>
                     </div>
-                    {store.cartStore.cart.length > 0 && (
+                    {store.cartStore.cart.length > 0 && !isKeyBoardOpen && (
                         <div className={styles.checkoutButtonContainer}>
                             <FullScreenButton onClick={() => console.log('Оформление заказа')}>
                                 Оформить заказ

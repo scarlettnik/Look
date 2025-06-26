@@ -1,55 +1,89 @@
-// components/onboarding/AboutStep.jsx
-import React from 'react';
-import styles from '../ui/OnboardingModal.module.css';
+import React, {useEffect, useRef, useState} from 'react';
+import styles from '../ui/aboutStep.module.css';
+import FullScreenButton from "../FullScrinButton.jsx";
 
 const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
     const { gender, age } = userData;
+    const sliderRef = useRef(null);
+    const [valuePosition, setValuePosition] = useState(0);
+
+    useEffect(() => {
+        if (sliderRef.current) {
+            const sliderWidth = sliderRef.current.offsetWidth;
+            const min = 16;
+            const max = 80;
+            const thumbWidth = 20; // Ширина ползунка
+
+            // Рассчитываем позицию с учетом границ
+            const ratio = (age - min) / (max - min);
+            let position = ratio * (sliderWidth - thumbWidth);
+
+            // Корректировка для крайних положений
+            position = Math.max(thumbWidth/2, Math.min(position, sliderWidth - thumbWidth/2));
+
+            setValuePosition(position);
+        }
+    }, [age]);
 
     return (
-        <div className={styles.onboardingStep}>
-            <h2 className={styles.stepTitle}>Выберите пол и возраст</h2>
+        <div className={styles.container}>
+            <h2 className={styles.title}>Выберите пол и возраст</h2>
 
-            <div className="gender-selection">
+            <div className={styles.genderContainer}>
                 <button
-                    className={`gender-button ${gender === 'female' ? 'selected' : ''}`}
+                    className={`${styles.genderOption} ${gender === 'female' ? styles.selected : ''}`}
                     onClick={() => onUpdate({gender: 'female'})}
                 >
-                    Женщина
+                    Девушка
                 </button>
                 <button
-                    className={`gender-button ${gender === 'male' ? 'selected' : ''}`}
+                    className={`${styles.genderOption} ${gender === 'male' ? styles.selected : ''}`}
                     onClick={() => onUpdate({gender: 'male'})}
+                    disabled={true}
                 >
-                    Мужчина
+                    Пврень*
                 </button>
-
+                <p style={{fontSize: '8px' , fontWeight: '400', color: 'var(--beige)'}}>
+                    *В разработке
+                </p>
             </div>
 
-            <div className="age-slider">
-                <label className="slider-label">Возраст: {age}</label>
+            <div className={styles.sliderWrapper} ref={sliderRef}>
                 <input
                     type="range"
                     min="16"
                     max="80"
                     value={age}
-                    onChange={(e) => onUpdate({ age: e.target.value })}
-                    className="slider-input"
+                    onChange={(e) => onUpdate({age: e.target.value})}
+                    className={styles.ageSlider}
                 />
+                <div
+                    className={styles.ageValue}
+                    style={{
+                        left: `${age == 16 ? valuePosition: valuePosition+10}px`,
+                        transform: 'translateX(-50%)'
+                    }}
+                >
+                    {age}
+                </div>
             </div>
 
-            <div className="onboarding-actions">
-                <button
-                    className="onboarding-button primary"
+
+            <div className={styles.actions}>
+                <FullScreenButton
+                    color='var(--beige)'
+                    textColor='var(--black)'
+                    className={styles.primaryButton}
                     onClick={onNext}
                     disabled={!gender}
                 >
                     Далее
-                </button>
+                </FullScreenButton>
                 <button
-                    className="onboarding-button secondary"
+                    className={styles.secondaryButton}
                     onClick={onSkip}
                 >
-                    Пропустить регистрацию
+                    Войти без регистрации
                 </button>
             </div>
         </div>

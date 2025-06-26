@@ -38,7 +38,7 @@ const OnboardingModal = observer(() => {
     return (
         <div className={styles.onboardingModal}>
             <div className={styles.onboardingBackGround}/>
-            <img className={styles.logo} src='/public/logo.svg'/>
+            <img className={styles.logo} src='/logo.svg' alt='/logo.png'/>
             <div className={styles.onboardingContent}>
 
                 {currentStep === 1 && (

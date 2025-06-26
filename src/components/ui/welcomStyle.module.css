@@ -1,13 +1,12 @@
 .image {
-    width: 86vw;
+    width: 82vw;
     max-width: 500px;
     position: fixed;
     border-radius: 10px;
 }
 .prevImage {
     max-width: 500px;
-
-    width: 80vw;
+    width: 76vw;
     padding-left: 10vw;
     margin-top: 4vw;
     border-radius: 10px;
@@ -16,13 +15,19 @@
     color: var(--white);
     font-weight: 400;
     font-size: 20px;
-    padding-bottom: 7vw;
+    padding-bottom: 5vw;
 }
 .starterButton {
     position: fixed;
+    bottom: 8vw;
+    left: 10vw;
     width: 80vw;
     padding: 12px 24px;
     border-radius: 30px;
-    bottom: 60px;
-    left: 10vw;
+    background-color: var(--beige);
+    font-size: 16px;
+    font-weight: 400;
+    justify-content: center;
+    color: #2E2E2E;
+
 }

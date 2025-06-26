@@ -3,13 +3,13 @@ import Sidebar from "./Sidebar";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import FullScreenButton from "./FullScrinButton.jsx";
-import ButtonWrapper from "./ButtonWrapper.jsx";
+import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import Modal from "./utils/Modal.jsx";
 import AddList from "./AddList.jsx";
 import {observer} from "mobx-react-lite/src";
 import { useStore } from '../provider/StoreContext.jsx';
 
-const Save = observer(({appStore}) => {
+const Save = observer(() => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedSaves, setSelectedSaves] = useState([]);
@@ -49,7 +49,7 @@ const Save = observer(({appStore}) => {
     };
   }, []);
 
-  const filteredSaves = store?.saves?.filter((save) =>
+  const filteredSaves = store?.collectionStore.saves?.filter((save) =>
     save.name.toLowerCase().includes(filterText.toLowerCase())
   );
 
@@ -73,16 +73,14 @@ const Save = observer(({appStore}) => {
     setIsModalOpen(false);
   };
     const handleDelete = () => {
-        // Используем метод store для удаления
-        store.deleteCollections(selectedSaves);
+        store.collectionStore.deleteCollections(selectedSaves);
         setSelectedSaves([]);
         setDeleteMode(false);
     };
 
     const handleCreateCollection = (name, coverUrl) => {
         if (name.trim()) {
-            // Вызываем метод store для создания коллекции
-            store.createCollection(name, coverUrl);
+            store.collectionStore.createCollection(name, coverUrl);
             setIsModalOpen(false);
         }
     };

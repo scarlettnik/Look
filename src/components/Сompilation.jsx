@@ -6,13 +6,14 @@ import Modal from './utils/Modal.jsx'
 import { observer } from "mobx-react-lite";
 import { useStore } from '../provider/StoreContext';
 import Share from "./utils/Share.jsx";
-import AddList from "./AddList.jsx"; // Путь к вашему контексту
+import AddList from "./AddList.jsx";
+import FullScreenButton from "./FullScrinButton.jsx"; // Путь к вашему контексту
 
 const Compilation = observer(() => {
     const { id } = useParams();
     const store = useStore();
 
-    const save = store.saves.find(save => save.id === parseInt(id));
+    const save = store.collectionStore.saves.find(save => save.id === parseInt(id));
 
     const [filters, setFilters] = useState({
         size: null,
@@ -252,8 +253,8 @@ const FilterBar = ({filters, setFilters}) => {
             </div>
 
             <Modal isOpen={isModalOpen} onClose={closeFilter}>
-            <div className={styles.filterModal}>
-                    <h3 className={styles.modalTitle}>
+            <div>
+                    <h3>
                         {activeFilter === 'size' && 'Выберите размер'}
                         {activeFilter === 'brand' && 'Выберите бренд'}
                         {activeFilter === 'price' && 'Укажите диапазон цены'}
@@ -310,12 +311,9 @@ const BrandFilter = ({ applyFilter, currentValue }) => {
                     </button>
                 ))}
             </div>
-            <button
-                className={styles.cancelButton}
-                onClick={() => applyFilter(null)}
-            >
-                Отмена
-            </button>
+            <FullScreenButton>
+                Применить
+            </FullScreenButton>
         </>
     );
 };

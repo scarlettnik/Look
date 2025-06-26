@@ -1,93 +1,36 @@
-import {useState, useEffect, useCallback, useRef} from 'react';
+// TinderCards.jsx
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 import './ui/TinderCards.css';
 import Sidebar from './Sidebar';
-import {useAuth} from "../provider/AuthProvider.jsx";
 import TinderCard from "./TinderCard.jsx";
-import {SearchHeader} from "./utils/SearchHeaderMain.jsx";
-import {FilterBar} from "./utils/FilterBar.jsx";
+import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
+import { FilterBar } from "./utils/FilterBar.jsx";
+import CardSkeleton from './CardSceleton.jsx';
+import { useStore } from "../provider/StoreContext.jsx";
 
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const ANIMATION_DURATION = 800;
-const ANIMATE_SCROLL = 100;
-const authToken = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
+const ANIMATION_DURATION = 2000;
+const INITIAL_CARDS_COUNT = 3;
+const SKELETON_COUNT = 3;
 
-
-const TinderCards = () => {
-    const [cards, setCards] = useState([]);
-    const [basket, setBasket] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const TinderCards = observer(() => {
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const [swipeHistory, setSwipeHistory] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
-    const { data } = useAuth();
-
     const containerRef = useRef(null);
-    const fetchCards = useCallback(async () => {
-        if (!hasMore || isFetching) return;
+    const store = useStore();
 
-        try {
-            setIsFetching(true);
-            const response = await fetch(`https://api.lookvogue.ru/v1/catalog/feed`, {
-                method: 'GET',
-                headers: {
-                    "ngrok-skip-browser-warning": true,
-                    'Content-Type': 'application/json',
-                    'Authorization': `tma ${authToken}`
-                },
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            const newCards = await response.json();
-            const filtered = newCards.filter(card =>
-                !cards.some(c => c.id === card.id)
-            );
-
-            if (filtered.length === 0) {
-                setHasMore(false);
-                return;
-            }
-
-            const pendingCards = filtered.map(card => ({
-                ...card,
-                _pending: true,
-                _key: Math.random().toString(36).substr(2, 9)
-            }));
-
-            setCards(prev => [...prev, ...pendingCards]);
-
-            setTimeout(() => {
-                setCards(prev => prev.map(c =>
-                    c._pending ? {...c, _pending: false} : c
-                ));
-            }, 50);
-
-
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsFetching(false);
-            setLoading(false);
-        }
-    }, [hasMore, isFetching]);
-
+    console.log(store)
     useEffect(() => {
-        if (data) fetchCards();
-    }, [data]);
-
-    useEffect(() => {
-        if (cards.length <= 3 && hasMore && !isFetching) {
-            fetchCards();
+        if (store?.catalogStore?.cards?.length <= INITIAL_CARDS_COUNT &&
+            store.catalogStore.hasMore &&
+            !store.catalogStore.isFetching) {
+            store.catalogStore.fetchCards();
         }
-    }, [cards.length, hasMore, isFetching, fetchCards]);
+    }, [store?.catalogStore.cards?.length]);
 
-
-    console.log(cards)
     const animateSwipe = useCallback((direction, cardId) => {
         const card = document.getElementById(cardId);
         if (!card) return;
@@ -95,7 +38,9 @@ const TinderCards = () => {
         const { innerWidth, innerHeight } = window;
         const rotation = direction === 'right' ? 25 : -25;
 
-        card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        card.classList.add('swiping-out');
+
+        card.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
 
         switch(direction) {
             case 'left':
@@ -114,58 +59,16 @@ const TinderCards = () => {
         card.style.opacity = '0';
     }, []);
 
-    const undoSwipe = useCallback(() => {
-        if (swipeHistory.length === 0) return;
-
-        const lastAction = swipeHistory[0];
-        const { direction, card } = lastAction;
-
-        const restoredCard = {
-            ...card,
-            _pending: true,
-            _key: Math.random().toString(36).substr(2, 9)
-        };
-
-        setCards(prev => [{
-            ...restoredCard,
-            style: {
-                opacity: 0,
-                zIndex: 1001
-            }
-        }, ...prev]);
-        setTimeout(() => {
-            setCards(prev => prev.map(c =>
-                c.id === restoredCard.id ? {
-                    ...c,
-                    _pending: false,
-                    style: {
-                        transform: 'translate(0, 0) rotate(0deg)',
-                        opacity: 1,
-                        transition: `all ${ANIMATION_DURATION}ms ease-out`
-                    }
-                } : c
-            ));
-        }, 50);
-
-        setSwipeHistory(prev => prev.slice(1));
-        if (direction === 'up') {
-            setBasket(prev => prev.filter(c => c.id !== card.id));
-        }
-    }, [swipeHistory]);
-
-
     const handleSwipe = useCallback((direction, card) => {
         if (direction === 'down') return;
 
         animateSwipe(direction, card.id);
         setSwipeProgress({ direction: null, opacity: 0 });
-        setSwipeHistory(prev => [{ direction, card }, ...prev]);
 
         setTimeout(() => {
-            setCards(prev => prev.filter(c => c.id !== card.id));
-            if (direction === 'up') setBasket(prev => [...prev, card]);
-        }, ANIMATE_SCROLL);
-    }, [animateSwipe]);
+            store.catalogStore.handleSwipe(direction, card);
+        }, 50);
+    }, [animateSwipe, ANIMATION_DURATION]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
         const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
@@ -185,20 +88,26 @@ const TinderCards = () => {
         setSwipeProgress({ direction, opacity });
     }, []);
 
-
     return (
         <div className="tinder" ref={containerRef} style={{height: `${window.innerHeight}px`}}>
-            <SearchHeader onUndo={undoSwipe} undoDisabled={swipeHistory.length === 0}/>
+            <SearchHeader
+                onUndo={store.catalogStore.undoSwipe}
+                undoDisabled={store.catalogStore.swipeHistory?.length === 0}
+            />
             <FilterBar/>
 
             <div className="tinder--cards">
-                {cards.map((card, index) => (
+                {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                    <CardSkeleton key={`skeleton-${i}`} zIndex={SKELETON_COUNT - i} />
+                ))}
+
+                {!store.catalogStore.loading && store?.catalogStore?.cards?.map((card, index) => (
                     <TinderCard
                         key={card._key}
                         card={card}
                         onSwipe={handleSwipe}
                         updateSwipeFeedback={updateSwipeFeedback}
-                        zIndex={cards.length - index}
+                        zIndex={store.catalogStore.cards.length - index}
                         offset={index}
                         isExpanded={expandedCardId === card.id}
                         onExpand={() => setExpandedCardId(card.id)}
@@ -207,7 +116,8 @@ const TinderCards = () => {
                         swipeProgress={index === 0 ? swipeProgress : { direction: null, opacity: 0 }}
                     />
                 ))}
-                {cards.length === 0 && (
+
+                {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
                     <div className="empty-state">
                         <h2>No more cards!</h2>
                     </div>
@@ -216,7 +126,6 @@ const TinderCards = () => {
             <Sidebar/>
         </div>
     );
-};
-
+});
 
 export default TinderCards;

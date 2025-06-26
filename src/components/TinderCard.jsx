@@ -1,17 +1,24 @@
 import {useEffect, useRef, useState} from "react";
 import {useLocation} from "react-router-dom";
-import {StatusIcons} from "./utils/StatusIcons.jsx";
 import {Bookmark} from "lucide-react";
 import './ui/TinderCards.css'
 
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
-const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
-const ANIMATION_DURATION = 800;
+const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
+const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
+const ANIMATION_DURATION = 1000;
 
-
-const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPending, swipeProgress}) => {
+const TinderCard = ({
+                        card,
+                        onSwipe,
+                        updateSwipeFeedback,
+                        zIndex,
+                        offset,
+                        isPending,
+                        isTopCard,
+                        topCardPosition
+                    }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -27,7 +34,7 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
         const isTopCard = offset === 0;
         const isCurrentlyExpanded = location.state?.expandedCard === card.id;
         if (isCurrentlyExpanded && !isExpanded) {
-            setIsExpanded(false); // Не позволяйте открывать карточку на полный экран
+            setIsExpanded(false);
         } else if (isTopCard && isCurrentlyExpanded) {
             setIsExpanded(true);
         } else {
@@ -49,6 +56,12 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
         }
     };
 
+    useEffect(() => {
+        if (!cardRef.current) return;
+
+        cardRef.current.style.opacity = '1';
+
+    }, []);
 
     const cardRef = useRef(null);
 
@@ -86,7 +99,7 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
             const onTransitionEnd = () => {
                 cardElement.removeEventListener('transitionend', onTransitionEnd);
                 setPosition({ x: 0, y: 0, rotate: 0 });
-                updateSwipeFeedback(0, 0);
+                if (isTopCard) updateSwipeFeedback(0, 0);
                 cardElement.style.transition = '';
             };
 
@@ -111,7 +124,7 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
             const rotate = Math.min(Math.max(deltaX * 0.1, -15), 15);
 
             setPosition({ x: deltaX, y: deltaY, rotate });
-            updateSwipeFeedback(deltaX, deltaY);
+            if (isTopCard) updateSwipeFeedback(deltaX, deltaY);
         });
     };
 
@@ -146,7 +159,6 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
             ANIMATION_DURATION / (Math.abs(velocity.x) + Math.abs(velocity.y) + 0.1)
         );
 
-        // Handle only up and horizontal swipes
         if (isVerticalUp) {
             animateWithVelocity('up', dynamicDuration);
         } else if (isHorizontal) {
@@ -184,18 +196,32 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
         const cardElement = cardRef.current;
         if (!cardElement) return;
 
-        const scale = 1 - offset * 0.03;
-        const translateY = -offset * 10;
+        let scale = 1 - offset * 0.03;
+        let translateY = -offset * 10;
+        let translateX = 0;
+        let rotate = 0;
+
+        if (offset === 1 && topCardPosition) {
+            const progressX = Math.min(1, Math.abs(topCardPosition.x) / (window.innerWidth * 0.5));
+            const progressY = Math.min(1, Math.abs(topCardPosition.y) / (window.innerHeight * 0.5));
+            const progress = Math.max(progressX, progressY);
+
+            scale = 0.97 + (0.03 * progress);
+            translateY = -10 - (5 * progress);
+
+            if (topCardPosition.x !== 0) {
+                const direction = topCardPosition.x > 0 ? 1 : -1;
+                translateX = direction * 5 * progress;
+            }
+        }
 
         cardElement.style.transform = `
-            translate(${position.x}px, ${position.y}px)
-            rotate(${position.rotate}deg)
+            translate(${position.x + translateX}px, ${position.y + translateY}px)
+            rotate(${position.rotate + rotate}deg)
             scale(${scale})
-            translateY(${translateY}px)
         `;
         cardElement.style.zIndex = zIndex;
-    }, [position, zIndex, offset]);
-
+    }, [position, zIndex, offset, topCardPosition]);
 
     return (
         <div
@@ -210,16 +236,15 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
             onMouseUp={!isExpanded ? handleEnd : undefined}
             onMouseLeave={!isExpanded ? handleEnd : undefined}
             style={{
-                    backgroundImage: `url(${card.image_urls[0]})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    opacity: 0,
+                backgroundImage: `url(${card.image_urls[0]})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                opacity: 0,
                 zIndex: zIndex,
-                transform: `translate(${offset * 2}px, ${offset * 1}px) ${card.style?.transform || ''}`
-                }}
+            }}
         >
-            <StatusIcons swipeProgress={swipeProgress}/>
+            {/* Убраны StatusIcons */}
             <div className="card-content" ref={contentRef}>
                 <div className="card-content">
                     <div className="card-bottom">
@@ -235,4 +260,4 @@ const TinderCard = ({card, onSwipe, updateSwipeFeedback, zIndex, offset, isPendi
         </div>
     );
 };
-export default TinderCard
+export default TinderCard;

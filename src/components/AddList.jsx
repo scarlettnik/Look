@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './ui/addList.module.css';
-import ButtonWrapper from "./ButtonWrapper.jsx";
+import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import FullScreenButton from "./FullScrinButton.jsx";
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 

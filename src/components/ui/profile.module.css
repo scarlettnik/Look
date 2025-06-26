@@ -136,6 +136,13 @@
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+.confirmDelete {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--black);
+    padding-bottom: 18px;
+}
 .paramsBlock {
     margin: 2vw;
     padding: 2vw;

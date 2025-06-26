@@ -1,78 +1,161 @@
-import React from 'react';
+// ShoppingCard.jsx
+import React, { useState } from 'react';
 import styles from './ui/shoppingCart.module.css';
-import {Trash2} from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import Sidebar from "./Sidebar.jsx";
+import FullScreenButton from "./FullScrinButton.jsx";
+import { observer } from 'mobx-react';
+import { useStore } from "../provider/StoreContext.jsx";
 
-const ShoppingCard = () => {
+const ShoppingCard = observer(() => {
+    const store = useStore();
+    const [promoCode, setPromoCode] = useState('');
+    const [deliveryMethod, setDeliveryMethod] = useState('standard');
+    const [showPromoInput, setShowPromoInput] = useState(false);
+    const [showDeliveryOptions, setShowDeliveryOptions] = useState(false);
+
+    if (store.cartStore.isCartLoading) {
+        return <div className={styles.loading}>Загрузка корзины...</div>;
+    }
+
+    if (store.cartStore.cartError) {
+        return <div className={styles.error}>Ошибка: {store.cartStore.cartError}</div>;
+    }
+
+    const subtotal = store.cartStore.cart.reduce((sum, item) => sum + (item.price || 10), 0);
+    const deliveryCost = deliveryMethod === 'express' ? 10 : 5;
+    const total = subtotal + deliveryCost;
+
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <span className={styles.clear}>Clear</span>
-                <h2>My Cart</h2>
-                <span className={styles.faqs}>FAQs</span>
-            </header>
+            <div className={styles.contentWrapper}>
+                <div className={styles.cardItems}>
+                    {store?.cartStore.cart.length === 0 ? (
+                        <div className={styles.emptyCart}>Корзина пуста</div>
+                    ) : (
+                        store.cartStore.cart.map(item => (
+                            <div key={item.cartItemId} className={styles.cartItem}>
+                                <img
+                                    src={item.image_urls?.[0] || "https://via.placeholder.com/150"}
+                                    alt={item.name}
+                                    className={styles.itemImage}
+                                />
+                                <div className={styles.itemDetails}>
+                                    <div className={styles.itemTitle}>{item.name}</div>
+                                    <div className={styles.itemBrand}>{item.brand || "Бренд не указан"}</div>
+                                    <div className={styles.price}>{item.price?.toFixed(2) || 10} ₽</div>
+                                </div>
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={() => store.removeFromCart(item.cartItemId)}
+                                    disabled={store.isCartLoading}
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))
+                    )}
 
-            <div className={styles.subtotal}>Subtotal: <span>$130</span></div>
-            <div className={styles.cardItems}>
-                <div className={styles.cartItem}>
-                    <img src="https://ir.ozone.ru/s3/multimedia-1-p/wc1000/7333611505.jpg" alt="Christy Hoodie" className={styles.itemImage}/>
-                    <div className={styles.itemDetails}>
-                        <div className={styles.itemTitle}>Christy Hoodie</div>
-                        <div className={styles.itemBrand}>Brandy Melville</div>
-                        <select className={styles.sizeSelect}>
-                            <option>RegularFit</option>
-                        </select>
-                        <div className={styles.quantityRow}>
-                            <button>-</button>
-                            <span>1</span>
-                            <button>+</button>
-                            <Trash2 size={20} className={styles.trashIcon}/>
+                    <div className={styles.promoSection}>
+                        <div
+                            className={styles.sectionHeader}
+                            onClick={() => setShowPromoInput(!showPromoInput)}
+                        >
+                            <span>Промокод</span>
+                            {showPromoInput ? <ChevronUp /> : <ChevronDown />}
                         </div>
-                        <div className={styles.estimated}>Estimated arrival 19 Sep - 24 Sep</div>
-                        <div className={styles.price}>$35</div>
+
+                        {showPromoInput && (
+                            <div className={styles.promoInputGroup}>
+                                <input
+                                    type="text"
+                                    placeholder="Введите промокод"
+                                    value={promoCode}
+                                    onChange={(e) => setPromoCode(e.target.value)}
+                                    className={styles.promoInput}
+                                />
+                                <button
+                                    className={styles.applyButton}
+                                    onClick={() => console.log('Применить промокод:', promoCode)}
+                                >
+                                    Применить
+                                </button>
+                            </div>
+                        )}
                     </div>
+
+                    <div className={styles.deliverySection}>
+                        <div
+                            className={styles.sectionHeader}
+                            onClick={() => setShowDeliveryOptions(!showDeliveryOptions)}
+                        >
+                            <span>Способ доставки</span>
+                            {showDeliveryOptions ? <ChevronUp /> : <ChevronDown />}
+                        </div>
+
+                        {showDeliveryOptions && (
+                            <div className={styles.deliveryOptions}>
+                                <label className={styles.deliveryOption}>
+                                    <input
+                                        type="radio"
+                                        name="delivery"
+                                        value="standard"
+                                        checked={deliveryMethod === 'standard'}
+                                        onChange={() => setDeliveryMethod('standard')}
+                                    />
+                                    <div className={styles.deliveryInfo}>
+                                        <span>Стандартная доставка</span>
+                                        <span>$5.00</span>
+                                    </div>
+                                    <div className={styles.deliveryTime}>3-5 рабочих дней</div>
+                                </label>
+
+                                <label className={styles.deliveryOption}>
+                                    <input
+                                        type="radio"
+                                        name="delivery"
+                                        value="express"
+                                        checked={deliveryMethod === 'express'}
+                                        onChange={() => setDeliveryMethod('express')}
+                                    />
+                                    <div className={styles.deliveryInfo}>
+                                        <span>Экспресс-доставка</span>
+                                        <span>$10.00</span>
+                                    </div>
+                                    <div className={styles.deliveryTime}>1-2 рабочих дня</div>
+                                </label>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.summarySection}>
+                        <div className={styles.summaryRow}>
+                            <span>Товары:</span>
+                            <span>${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className={styles.summaryRow}>
+                            <span>Доставка:</span>
+                            <span>${deliveryCost.toFixed(2)}</span>
+                        </div>
+                        <div className={styles.summaryRowTotal}>
+                            <span>Итого:</span>
+                            <span>${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    {store.cartStore.cart.length > 0 && (
+                        <div className={styles.checkoutButtonContainer}>
+                            <FullScreenButton onClick={() => console.log('Оформление заказа')}>
+                                Оформить заказ
+                            </FullScreenButton>
+                        </div>
+                    )}
                 </div>
 
-                <div className={styles.cartItem}>
-                    <img src="https://ir.ozone.ru/s3/multimedia-1-p/wc1000/7333611505.jpg" alt="Stay On My Mind Set Black" className={styles.itemImage}/>
-                    <div className={styles.itemDetails}>
-                        <div className={styles.itemTitle}>Stay On My Mind Set Black</div>
-                        <div className={styles.itemBrand}>Hello Molly</div>
-                        <select className={styles.sizeSelect}>
-                            <option>M</option>
-                        </select>
-                        <div className={styles.quantityRow}>
-                            <button>-</button>
-                            <span>1</span>
-                            <button>+</button>
-                            <Trash2 size={20} className={styles.trashIcon}/>                        </div>
-                        <div className={styles.estimated}>Estimated arrival 21 Sep - 25 Sep</div>
-                        <div className={styles.price}>$95</div>
-                    </div>
-                </div>
-                <div className={styles.cartItem}>
-                    <img src="https://ir.ozone.ru/s3/multimedia-1-p/wc1000/7333611505.jpg" alt="Stay On My Mind Set Black" className={styles.itemImage}/>
-                    <div className={styles.itemDetails}>
-                        <div className={styles.itemTitle}>Stay On My Mind Set Black</div>
-                        <div className={styles.itemBrand}>Hello Molly</div>
-                        <select className={styles.sizeSelect}>
-                            <option>M</option>
-                        </select>
-                        <div className={styles.quantityRow}>
-                            <button>-</button>
-                            <span>1</span>
-                            <button>+</button>
-                            <Trash2 size={20} className={styles.trashIcon}/>
-                        </div>
-                        <div className={styles.estimated}>Estimated arrival 21 Sep - 25 Sep</div>
-                        <div className={styles.price}>$95</div>
-                    </div>
-                </div>
             </div>
-            <button className={styles.dealButton}>Find the best deal</button>
-            <Sidebar/>
+
+            <Sidebar />
         </div>
     );
-};
+});
 
 export default ShoppingCard;

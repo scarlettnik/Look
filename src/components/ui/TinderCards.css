@@ -1,10 +1,8 @@
 :root {
     --card-width: 92vw;
-    --card-max-width: 600px;
     --card-height: 76%;
     --button-size: 60px;
-    --shadow-normal: 0 4px 12px rgba(0,0,0,0.1);
-    --shadow-card: 0 12px 24px rgba(0,0,0,0.1);
+
 }
 
 .tinder {
@@ -127,63 +125,9 @@
     color: #666;
 }
 
-.tinder--buttons {
-    flex: 0 0 70px;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    z-index: 2;
-}
 
-.tinder--buttons button {
-    width: var(--button-size);
-    height: var(--button-size);
-    border-radius: 50%;
-    border: none;
-    background: white;
-    box-shadow: var(--shadow-normal);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
 
-.tinder--buttons button:active {
-    transform: scale(0.95);
-}
 
-.empty-state {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #666;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -40%);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-}
-
-.tinder--card.expanded {
-    width: 100vw;
-    height: 90% !important;
-    max-width: none !important;
-    overflow-y: auto;
-    cursor: default;
-    transform: none !important;
-}
-
-.tinder--card.expanded .card-content {
-    transition: height 0.3s ease;
-}
 
 .detailed-content {
     padding: 20px;
@@ -195,55 +139,50 @@
     position: relative;
 }
 
-.tinder--card.expanded .detailed-content {
-    opacity: 1;
-    transform: translateY(0);
-}
 
-.close-button {
-    position: absolute;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    top: 0;
-    left: 0;
-}
-.tinder--card.expanded {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    transform: none !important;
-    max-width: none !important;
-    background: white;
-    border-radius: 0;
-    z-index: 1000;
-}
-
-.tinder--card {
-    transition:
-            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            opacity 0.3s ease,
-            width 0.3s ease,
-            height 0.3s ease,
-            z-index 0.3s ease;
-}
 .tinder--card {
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
 }
-.tinder--card.exiting .card-status-icons {
-    transition: opacity 0.2s ease-out;
-    opacity: 0 !important;
+
+
+.tinder--card.swiping-out {
+    transition:
+            transform 3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+            opacity 3s ease;
+    opacity: 1;
+    pointer-events: none;
+}
+.swipe-feedback {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100000;
+    color: pink;
 }
 
-.tinder--card.exiting {
-    transition:
-            transform 800ms cubic-bezier(0.23, 1, 0.32, 1),
-            opacity 800ms ease;
-    opacity: 0;
+.swipe-feedback.left {
+    left: 10%;
+}
+
+.swipe-feedback.right {
+    right: 10%;
+}
+
+
+.tinder--card.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeletonShine 1.5s infinite linear;
+    border: none;
+    overflow: hidden;
+}
+
+@keyframes skeletonShine {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }

@@ -107,4 +107,28 @@
     object-fit: cover;
     border-radius: 8px;
 }
+.filterModal {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modalTitle {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+}
+
+.filterOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 

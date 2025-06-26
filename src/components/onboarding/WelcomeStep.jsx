@@ -13,7 +13,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                 className={welcomstyle.starterButton}
                 onClick={onNext}
             >
-                <div style={{display: 'flex', alignItems: "center", justifyContent: 'center'}}>Начать <img style={{paddingLeft: '10px'}} src='/public/subicons/rightArrow.svg' alt='/public/subicons/rightArrow.png'/></div>
+                <div style={{display: 'flex', alignItems: "center", justifyContent: 'center'}}>Начать <img style={{paddingLeft: '10px'}} src={'/public/subicons/rightArrow.svg' || ''}/></div>
             </button>
         </div>
     );

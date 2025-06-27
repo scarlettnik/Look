@@ -1,4 +1,3 @@
-// stores/UIStore.js
 import { makeAutoObservable } from "mobx";
 
 class Onboarding {

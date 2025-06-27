@@ -1,13 +1,12 @@
-// components/OnboardingModal.jsx
-import { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { useStore } from '../provider/StoreContext.jsx';
-import { useAuth } from '../provider/AuthProvider.jsx';
-import WelcomeStep from './onboarding/WelcomeStep';
-import AboutStep from './onboarding/AboutStep';
-import StylesStep from './onboarding/StylesStep';
-import SizeStep from './onboarding/SizeStep';
+import SizeStep from "./onboarding/SizeStep.jsx";
+import StylesStep from "./onboarding/StylesStep.jsx";
+import AboutStep from "./onboarding/AboutStep.jsx";
+import WelcomeStep from "./onboarding/WelcomeStep.jsx";
+import {useStore} from "../provider/StoreContext.jsx";
+import {useAuth} from "../provider/AuthProvider.jsx";
+import {useState} from "react";
 import styles from './ui/OnboardingModal.module.css'
+import {observer} from "mobx-react";
 
 const OnboardingModal = observer(() => {
     const store = useStore();
@@ -17,15 +16,25 @@ const OnboardingModal = observer(() => {
         gender: 'female',
         age: 25,
         styles: [],
-        size: ''
+        size: {
+            size: "",
+            bust: 90,
+            waist: 63,
+            hip: 92,
+            fit: "true",
+        }
     });
+
+    console.log(userData)
+
     const [isClosed, setIsClosed] = useState(false);
+
     const updateUserData = (data) => {
         setUserData(prev => ({ ...prev, ...data }));
     };
 
     const nextStep = () => {
-        setCurrentStep(prev => Math.min(prev + 1, 5));
+        setCurrentStep(prev => Math.min(prev + 1, 4));
     };
 
     const skipOnboarding = () => {
@@ -33,8 +42,13 @@ const OnboardingModal = observer(() => {
         setIsClosed(true);
     };
 
+    const completeOnboarding = () => {
+        store.onboarding.setOnboardingCompleted(true);
+        setIsClosed(true);
+    };
+
     if (store.onboarding.onboardingCompleted || isClosed) return null;
-    
+
     return (
         <div className={styles.onboardingModal}>
             <div className={styles.onboardingBackGround}/>
@@ -44,7 +58,7 @@ const OnboardingModal = observer(() => {
                 {currentStep === 1 && (
                     <WelcomeStep
                         userName={auth.data?.first_name}
-                        userSername = {auth.data?.last_name}
+                        userSername={auth.data?.last_name}
                         onNext={nextStep}
                     />
                 )}
@@ -71,7 +85,7 @@ const OnboardingModal = observer(() => {
                     <SizeStep
                         selectedSize={userData.size}
                         onUpdate={updateUserData}
-                        onNext={nextStep}
+                        onNext={completeOnboarding}
                         onSkip={skipOnboarding}
                     />
                 )}
@@ -79,5 +93,4 @@ const OnboardingModal = observer(() => {
         </div>
     );
 });
-
 export default OnboardingModal;

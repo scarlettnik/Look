@@ -9,7 +9,6 @@ import Preferences from "./components/Preferences.jsx";
 import ShoppingCard from "./components/ShoppingCard.jsx";
 import Compilation from "./components/Сompilation.jsx";
 import {AuthProvider, useAuth} from "./provider/AuthProvider.jsx";
-import Measurment from "./components/Measurment.jsx";
 import Product from "./components/Product.jsx";
 import AddList from "./components/AddList.jsx";
 import AddToCloset from "./components/AddToCloset.jsx";
@@ -49,7 +48,6 @@ function AppContent() {
                 <Route path='/shoppingcard' element={<ShoppingCard/>}/>
                 <Route path='/pref' element={<Preferences/>}/>
                 <Route path='/trends' element={<Comparing/>}/>
-                <Route path='/measur' element={<Measurment/>}/>
                 <Route path='/prod' element={<Product/>}/>
                 <Route path='/cloth' element={<AddToCloset/>}/>
             </Routes>

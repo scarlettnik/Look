@@ -8,6 +8,7 @@ import Modal from "./utils/Modal.jsx";
 import AddList from "./AddList.jsx";
 import {observer} from "mobx-react-lite/src";
 import { useStore } from '../provider/StoreContext.jsx';
+import CustomCheckbox from "./CustomCheckbox.jsx";
 
 const Save = observer(() => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -140,15 +141,11 @@ const Save = observer(() => {
           {filteredSaves?.map((save) => (
             <div key={save.id} className={styles.cardContainer}>
               {deleteMode && (
-                <label className={styles.customCheckbox}>
-                  <input
-                    type="checkbox"
-                    checked={selectedSaves.includes(save.id)}
-                    onChange={() => toggleSaveSelection(save.id)}
-                    className={styles.hiddenCheckbox}
+                  <CustomCheckbox
+                      id={`save-${save.id}`}
+                      checked={selectedSaves.includes(save.id)}
+                      onChange={() => toggleSaveSelection(save.id)}
                   />
-                  <span className={styles.checkmark}></span>
-                </label>
               )}
               <Link to={`/save/${save.id}`}>
                 <div className={styles.card}>

@@ -1,41 +1,90 @@
-// components/onboarding/SizeStep.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../ui/OnboardingModal.module.css';
-
-
-const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+import FullScreenButton from "../FullScrinButton.jsx";
+import SizeGrid from "../SizeGrid.jsx";
+import ParamsTab from "../ParamsTab.jsx";
+import FitOptions from "../FitOptions.jsx";
 
 const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip }) => {
+    const [activeTab, setActiveTab] = useState("size");
+    const [pendingSize, setPendingSize] = useState(selectedSize);
+
+    useEffect(() => {
+        setPendingSize(selectedSize);
+    }, [selectedSize]);
+
+    const handleNext = () => {
+        onUpdate({ size: pendingSize });
+        onNext();
+    };
+
+    const  UpdateParem = (field, value) => {
+        setPendingSize(prev => ({ ...prev, [field]: value }))
+    }
+
+    const handleFitChange = (event) => {
+        setPendingSize(prev => ({
+            ...prev,
+            fit: event.target.value
+        }));
+    };
+
     return (
-        <div className="onboarding-step">
-            <h2 className="step-title">Ваш размер</h2>
-            <p className="step-description">Выберите наиболее подходящий размер одежды</p>
-
-            <div className="size-grid">
-                {sizes.map(size => (
-                    <button
-                        key={size}
-                        className={`size-button ${selectedSize === size ? 'selected' : ''}`}
-                        onClick={() => onUpdate({ size })}
-                    >
-                        {size}
-                    </button>
-                ))}
-            </div>
-
-            <div className="onboarding-actions">
+        <div className={styles.onboardingStep}>
+            <p className={styles.stepTitle} style={{paddingBottom: '5vh'}}>Выберите размер или параметры</p>
+            <div className={styles.tabs}>
                 <button
-                    className="onboarding-button primary"
-                    onClick={onNext}
-                    disabled={!selectedSize}
+                    className={`${styles.tabButton} ${activeTab === "size" ? styles.active : ''}`}
+                    onClick={() => setActiveTab("size")}
                 >
-                    Завершить
+                    Размер
                 </button>
                 <button
-                    className="onboarding-button secondary"
+                    className={`${styles.tabButton} ${activeTab === "params" ? styles.active : ''}`}
+                    onClick={() => setActiveTab("params")}
+                >
+                    Параметры
+                </button>
+            </div>
+            <div className={styles.paramsBlock}>
+                <div className={styles.tabContent}>
+                    {activeTab === "size" && (
+                        <SizeGrid
+                            params={pendingSize}
+                            updateParam={UpdateParem}
+                        />
+                    )}
+
+                    {activeTab === "params" && (
+                        <ParamsTab
+                            params={pendingSize}
+                            updateParam={UpdateParem}
+                        />
+                    )}
+
+                    <div className={styles.fitOptionsWrapper}>
+                        <p>Ношу одежду</p>
+                        <FitOptions
+                            params={pendingSize}
+                            updateParam={handleFitChange}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className={styles.actions}>
+                <FullScreenButton
+                    color='var(--beige)'
+                    textColor='var(--black)'
+                    onClick={handleNext}
+                >
+                    Далее
+                </FullScreenButton>
+                <button
+                    className={styles.secondaryButton}
                     onClick={onSkip}
                 >
-                    Пропустить
+                    Войти без регистрации
                 </button>
             </div>
         </div>

@@ -14,11 +14,9 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
             const max = 80;
             const thumbWidth = 20; // Ширина ползунка
 
-            // Рассчитываем позицию с учетом границ
             const ratio = (age - min) / (max - min);
             let position = ratio * (sliderWidth - thumbWidth);
 
-            // Корректировка для крайних положений
             position = Math.max(thumbWidth/2, Math.min(position, sliderWidth - thumbWidth/2));
 
             setValuePosition(position);

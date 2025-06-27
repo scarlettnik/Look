@@ -168,13 +168,13 @@
     border: none;
     cursor: pointer;
 }
-
 .tabs .active {
     border: 1px solid var(--black);
 }
 .fitOptionsWrapper {
     margin-top: 10px;
 }
+
 .sizesGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

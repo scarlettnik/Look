@@ -11,7 +11,7 @@ const SizeGrid = ({ params, updateParam }) => {
             {["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"].map(size => (
                 <div
                     key={size}
-                    className={`${styles.sizeBox} ${params.size === size ? styles.selectedSize : ''}`}
+                    className={`${styles.sizeBox} ${params?.size === size ? styles.selectedSize : ''}`}
                     onClick={() => handleChange("size", size)}
                 >
                     {size}

@@ -5,7 +5,7 @@ import SizeGrid from "../SizeGrid.jsx";
 import ParamsTab from "../ParamsTab.jsx";
 import FitOptions from "../FitOptions.jsx";
 
-const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip }) => {
+const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip, onBack }) => {
     const [activeTab, setActiveTab] = useState("size");
     const [pendingSize, setPendingSize] = useState(selectedSize);
 
@@ -31,7 +31,15 @@ const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip }) => {
 
     return (
         <div className={styles.onboardingStep}>
-            <p className={styles.stepTitle} style={{paddingBottom: '5vh'}}>Выберите размер или параметры</p>
+            <div className={styles.stepHeader}>
+                <button
+                    className={styles.backButton}
+                    onClick={onBack}
+                >
+                    <img src='/public/subicons/whiteArrowLeft.svg' alt="Назад"/>
+                </button>
+                <p className={styles.stepTitle}>Выберите размер или параметры</p>
+            </div>
             <div className={styles.tabs}>
                 <button
                     className={`${styles.tabButton} ${activeTab === "size" ? styles.active : ''}`}
@@ -50,6 +58,7 @@ const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip }) => {
                 <div className={styles.tabContent}>
                     {activeTab === "size" && (
                         <SizeGrid
+                            color='var(--ultralight-gray)'
                             params={pendingSize}
                             updateParam={UpdateParem}
                         />
@@ -84,7 +93,7 @@ const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip }) => {
                     className={styles.secondaryButton}
                     onClick={onSkip}
                 >
-                    Войти без регистрации
+                    Пропустить
                 </button>
             </div>
         </div>

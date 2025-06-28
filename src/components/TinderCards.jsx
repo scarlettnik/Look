@@ -1,14 +1,12 @@
-// TinderCards.jsx
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import './ui/TinderCards.css';
+import styles from './ui/TinderCards.module.css';
 import Sidebar from './Sidebar';
 import TinderCard from "./TinderCard.jsx";
 import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
 import { FilterBar } from "./utils/FilterBar.jsx";
-import CardSkeleton from './CardSceleton.jsx';
 import { useStore } from "../provider/StoreContext.jsx";
-
+import { Heart, Trash } from "lucide-react";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -22,7 +20,6 @@ const TinderCards = observer(() => {
     const containerRef = useRef(null);
     const store = useStore();
 
-    console.log(store)
     useEffect(() => {
         if (store?.catalogStore?.cards?.length <= INITIAL_CARDS_COUNT &&
             store.catalogStore.hasMore &&
@@ -90,15 +87,40 @@ const TinderCards = observer(() => {
 
     return (
         <div className="tinder" ref={containerRef} style={{height: `${window.innerHeight}px`}}>
-            <SearchHeader
+            <SearchHeader/>
+            <FilterBar
                 onUndo={store.catalogStore.undoSwipe}
                 undoDisabled={store.catalogStore.swipeHistory?.length === 0}
             />
-            <FilterBar/>
 
-            <div className="tinder--cards">
+            {/*<div className={styles.globalSwipeFeedback}>*/}
+            {/*    <div*/}
+            {/*        className={`${styles.swipeFeedbackIcon} ${styles.leftIcon}`}*/}
+            {/*        style={{*/}
+            {/*            opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0,*/}
+            {/*            transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <Trash size={80} />*/}
+            {/*    </div>*/}
+            {/*    <div*/}
+            {/*        className={`${styles.swipeFeedbackIcon} ${styles.rightIcon}`}*/}
+            {/*        style={{*/}
+            {/*            opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0,*/}
+            {/*            transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <Heart size={80} />*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+
+            <div className={styles.cardsContainer}>
                 {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
-                    <CardSkeleton key={`skeleton-${i}`} zIndex={SKELETON_COUNT - i} />
+                    <div
+                        key={`skeleton-${i}`}
+                        className={styles.skeleton}
+                        style={{ zIndex: SKELETON_COUNT - i }}
+                    />
                 ))}
 
                 {!store.catalogStore.loading && store?.catalogStore?.cards?.map((card, index) => (
@@ -114,6 +136,7 @@ const TinderCards = observer(() => {
                         onCollapse={() => setExpandedCardId(null)}
                         isPending={card._pending}
                         swipeProgress={index === 0 ? swipeProgress : { direction: null, opacity: 0 }}
+                        isTopCard={index === 0}
                     />
                 ))}
 

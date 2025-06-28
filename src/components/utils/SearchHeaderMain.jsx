@@ -1,31 +1,25 @@
 import { useState } from 'react';
 import { Undo2, X, Clock, TrendingUp } from 'lucide-react';
 import styles from '../ui/product.module.css';
-export const SearchHeader = ({ onUndo, undoDisabled }) => {
+export const SearchHeader = () => {
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-
     const searchHistory = ['Платья', 'Кроссовки', 'Джинсы'];
     const popularSearches = ['Куртки', 'Сумки', 'Аксессуары', 'Юбки'];
 
     return (
         <>
             <div className={styles.searchHeader}>
-                <button
-                    onClick={onUndo}
-                    disabled={undoDisabled}
-                    className={styles.backButton}
-                >
-                    <Undo2/>
-                </button>
-                <input
-                    type="text"
-                    placeholder={searchQuery || 'Looking for something specific?'}
-                    className={styles.searchInput}
-                    onClick={() => setIsSearchActive(true)}
-                    readOnly={!isSearchActive}
-                />
-                <div className={styles.logo}>styl.</div>
+                <span className={styles.searchIcon}>
+                  <img src="/subicons/search.svg"/>
+                </span>
+                    <input
+                        type="text"
+                        placeholder={searchQuery || 'Стиль, повод, настроение'}
+                        className={styles.searchInput}
+                        onClick={() => setIsSearchActive(true)}
+                        readOnly={!isSearchActive}
+                    />
             </div>
 
             {isSearchActive && (
@@ -59,7 +53,9 @@ export const SearchHeader = ({ onUndo, undoDisabled }) => {
                                         <button
                                             key={index}
                                             className={styles.searchItem}
-                                            onClick={() => {setSearchQuery(item), setIsSearchActive(false)}}
+                                            onClick={() => {
+                                                setSearchQuery(item), setIsSearchActive(false)
+                                            }}
                                         >
                                             {item}
                                         </button>
@@ -75,7 +71,9 @@ export const SearchHeader = ({ onUndo, undoDisabled }) => {
                                         <button
                                             key={index}
                                             className={styles.searchItem}
-                                            onClick={() => {setSearchQuery(item), setIsSearchActive(false)}}
+                                            onClick={() => {
+                                                setSearchQuery(item), setIsSearchActive(false)
+                                            }}
                                         >
                                             {item}
                                         </button>
@@ -84,7 +82,7 @@ export const SearchHeader = ({ onUndo, undoDisabled }) => {
                             </>
                         ) : (
                             <div className={styles.searchResults}>
-
+                                Ничего не найдено
                             </div>
                         )}
                     </div>

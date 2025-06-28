@@ -12,7 +12,7 @@ const ClothStyles = [
     { id: 6, name: "Вечерний", url: '/public/styleReference.png' },
 ];
 
-const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip }) => {
+const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const handleStyleToggle = (styleId) => {
         const newStyles = selectedStyles.includes(styleId)
             ? selectedStyles.filter(id => id !== styleId)
@@ -22,25 +22,33 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip }) => {
 
     return (
         <div className={styles.onboardingStep}>
-            <p className={styles.stepTitle} style={{paddingBottom: '2vh'}}>Выберите стили</p>
-            <div className={styles.scrollContainer}>
-            <div className={styles.styleGrid}>
-                {ClothStyles.map(style => (
-                    <div
-                        key={style.id}
-                        className={`${styles.styleCard} ${selectedStyles.includes(style.id) ? styles.selected : ''}`}
-                    >
-                        <img src={style.url} alt={style.name} className={styles.styleImage} />
-                        <div className={styles.styleContent}>
-                            <CustomCheckbox
-                                checked={selectedStyles.includes(style.id)}
-                                onChange={() => handleStyleToggle(style.id)}
-                            />
-                            <span className={styles.styleName}>{style.name}</span>
-                        </div>
-                    </div>
-                ))}
+            <div className={styles.stepHeader}>
+                <button
+                    className={styles.backButton}
+                    onClick={onBack}
+                >
+                    <img src='/public/subicons/whiteArrowLeft.svg' alt="Назад"/>
+                </button>
+                <p className={styles.stepTitle}>Выберите стили</p>
             </div>
+            <div className={styles.scrollContainer}>
+                <div className={styles.styleGrid}>
+                    {ClothStyles.map(style => (
+                        <div
+                            key={style.id}
+                            className={`${styles.styleCard} ${selectedStyles.includes(style.id) ? styles.selected : ''}`}
+                        >
+                            <img src={style.url} alt={style.name} className={styles.styleImage}/>
+                            <div className={styles.styleContent}>
+                                <CustomCheckbox
+                                    checked={selectedStyles.includes(style.id)}
+                                    onChange={() => handleStyleToggle(style.id)}
+                                />
+                                <span className={styles.styleName}>{style.name}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className={styles.onboardingActions}>

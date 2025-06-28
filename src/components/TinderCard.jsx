@@ -1,13 +1,15 @@
 import {useEffect, useRef, useState} from "react";
-import {useLocation} from "react-router-dom";
-import {Bookmark} from "lucide-react";
-import './ui/TinderCards.css'
-
+import {useLocation, useNavigate} from "react-router-dom";
+import {Bookmark, Heart, Tractor, Trash} from "lucide-react";
+import styles from "./ui/TinderCard.module.css";
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const ANIMATION_DURATION = 1000;
+const DOUBLE_TAP_DELAY = 300;
+const TAP_MOVEMENT_THRESHOLD = 10; // пикселей
+
 
 const TinderCard = ({
                         card,
@@ -17,18 +19,68 @@ const TinderCard = ({
                         offset,
                         isPending,
                         isTopCard,
-                        topCardPosition
+                        topCardPosition,
+                        swipeProgress
                     }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
+    const [showDoubleClickFeedback, setShowDoubleClickFeedback] = useState(false);
+
     const animationFrame = useRef(null);
     const contentRef = useRef(null);
+    const cardRef = useRef(null);
     const startTime = useRef(0);
+    const lastTapTime = useRef(0);
+    const lastTapPosition = useRef({ x: 0, y: 0 });
+    const tapTimeout = useRef(null);
 
+    const navigate = useNavigate();
     const location = useLocation();
+
+    console.log(swipeProgress)
+
+    const handleInteraction = (e) => {
+        if (isDragging || isExpanded) {
+            e.preventDefault();
+            return;
+        }
+
+        const currentTime = Date.now();
+        const currentPos = e.touches ?
+            { x: e.touches[0].clientX, y: e.touches[0].clientY } :
+            { x: e.clientX, y: e.clientY };
+
+        if (currentTime - lastTapTime.current < DOUBLE_TAP_DELAY &&
+            Math.abs(currentPos.x - lastTapPosition.current.x) < TAP_MOVEMENT_THRESHOLD &&
+            Math.abs(currentPos.y - lastTapPosition.current.y) < TAP_MOVEMENT_THRESHOLD) {
+
+            clearTimeout(tapTimeout.current);
+            handleDoubleAction();
+            return;
+        }
+
+        lastTapTime.current = currentTime;
+        lastTapPosition.current = currentPos;
+
+        tapTimeout.current = setTimeout(() => {
+        }, DOUBLE_TAP_DELAY);
+    };
+
+    const handleDoubleAction = () => {
+        setShowDoubleClickFeedback(true);
+        setTimeout(() => {
+            navigate(`/product/${card.id}`);
+        }, 500);
+    };
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(tapTimeout.current);
+        };
+    }, []);
 
     useEffect(() => {
         const isTopCard = offset === 0;
@@ -63,7 +115,6 @@ const TinderCard = ({
 
     }, []);
 
-    const cardRef = useRef(null);
 
     useEffect(() => {
         if (!cardRef.current) return;
@@ -227,37 +278,68 @@ const TinderCard = ({
         <div
             ref={cardRef}
             id={card.id}
-            className={`tinder--card ${isDragging ? 'moving' : ''} ${isExpanded ? 'expanded' : ''} ${isVisible ? 'visible' : ''}`}
-            onTouchStart={(e) => !isExpanded && handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+            className={`${styles.card} ${isDragging ? styles.moving : ''}`}
+            onTouchStart={(e) => {
+                if (!isExpanded) {
+                    handleInteraction(e);
+                    handleStart(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }}
             onTouchMove={(e) => !isExpanded && handleMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={!isExpanded ? handleEnd : undefined}
-            onMouseDown={(e) => !isExpanded && handleStart(e.clientX, e.clientY)}
+            onMouseDown={(e) => {
+                if (!isExpanded) {
+                    handleInteraction(e);
+                    handleStart(e.clientX, e.clientY);
+                }
+            }}
             onMouseMove={(e) => !isExpanded && handleMove(e.clientX, e.clientY)}
             onMouseUp={!isExpanded ? handleEnd : undefined}
             onMouseLeave={!isExpanded ? handleEnd : undefined}
             style={{
                 backgroundImage: `url(${card.image_urls[0]})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                opacity: 0,
                 zIndex: zIndex,
             }}
         >
-            {/* Убраны StatusIcons */}
-            <div className="card-content" ref={contentRef}>
-                <div className="card-content">
-                    <div className="card-bottom">
-                        <div className="card-info">
-                            <div className="product-name">One Shoulder Blouse</div>
-                            <div className="manufacturer">Commense</div>
-                            <div className="price">$199</div>
+            {isTopCard && (
+                <>
+                    <div
+                        className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}
+                        style={{
+                            opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0,
+                            transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
+                        }}
+                    >
+                        <Heart size={48} />
+                    </div>
+                    <div
+                        className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
+                        style={{
+                            opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0,
+                            transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
+                        }}
+                    >
+                        <Trash size={48} />
+                    </div>
+                </>
+            )}
+
+            <div className={styles.cardContent} ref={contentRef}>
+                <div className={styles.cardBottom}>
+                    <div className={styles.cardInfo}>
+                        <div className={styles.productName}>{card.name}</div>
+                        <div className={styles.manufacturer}>{card.brand}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' , justifyContent: 'space-between', width: '86vw', alignItems: 'center' }}>
+                            <div className={styles.price}>5000 ₽</div>
+                            <button className={styles.saveButton}>
+                                <img src='/public/subicons/whiteBookmark.svg'/>
+                            </button>
                         </div>
-                        <button className="save-button"><Bookmark size={40}/></button>
                     </div>
                 </div>
             </div>
         </div>
     );
 };
+
 export default TinderCard;

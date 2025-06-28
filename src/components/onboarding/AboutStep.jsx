@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from '../ui/aboutStep.module.css';
 import FullScreenButton from "../FullScrinButton.jsx";
+import titleStyle from '../ui/OnboardingModal.module.css'
 
-const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
+const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
     const { gender, age } = userData;
     const sliderRef = useRef(null);
     const [valuePosition, setValuePosition] = useState(0);
@@ -25,7 +26,15 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>Выберите пол и возраст</h2>
+            <div className={titleStyle.stepHeader}>
+                <button
+                    className={titleStyle.backButton}
+                    onClick={onBack}
+                >
+                    <img src='/public/subicons/whiteArrowLeft.svg' alt="Назад"/>
+                </button>
+                <p className={titleStyle.stepTitle}>Выберите пол и возрасты</p>
+            </div>
 
             <div className={styles.genderContainer}>
                 <button
@@ -41,7 +50,7 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
                 >
                     Пврень*
                 </button>
-                <p style={{fontSize: '8px' , fontWeight: '400', color: 'var(--beige)'}}>
+                <p style={{fontSize: '8px', fontWeight: '400', color: 'var(--beige)'}}>
                     *В разработке
                 </p>
             </div>
@@ -58,7 +67,7 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip }) => {
                 <div
                     className={styles.ageValue}
                     style={{
-                        left: `${age == 16 ? valuePosition: valuePosition+10}px`,
+                        left: `${age == 16 ? valuePosition : valuePosition + 10}px`,
                         transform: 'translateX(-50%)'
                     }}
                 >

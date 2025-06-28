@@ -1,7 +1,7 @@
 import styles from "./ui/profile.module.css";
 import React from "react";
 
-const SizeGrid = ({ params, updateParam }) => {
+const SizeGrid = ({ params, updateParam, color = 'var(--white)' }) => {
     const handleChange = (field, value) => {
         updateParam(field, value);
     };
@@ -10,6 +10,7 @@ const SizeGrid = ({ params, updateParam }) => {
         <div className={styles.sizesGrid}>
             {["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"].map(size => (
                 <div
+                    style={{backgroundColor: color}}
                     key={size}
                     className={`${styles.sizeBox} ${params?.size === size ? styles.selectedSize : ''}`}
                     onClick={() => handleChange("size", size)}

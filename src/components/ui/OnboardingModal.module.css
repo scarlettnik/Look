@@ -35,14 +35,36 @@
 .logo {
     padding: 5vw;
 }
+.stepHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    padding: 2vw;
+    padding-bottom: 5vh;
+}
+
+.backButton {
+    position: absolute;
+    left: 2vw;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
 .stepTitle {
     font-size: 16px;
     font-weight: 400;
     color: var(--white);
+    text-align: center;
+    width: 100%;
+    margin: 0;
 }
 .scrollContainer {
     width: 100%;
-    max-height: 70vh;
+    max-height: 65vh;
     overflow-y: auto;
     margin: 0 auto;
     scrollbar-width: thin;
@@ -105,12 +127,13 @@
 }
 
 .paramsBlock {
+    padding-bottom: 2vw;
     margin: 2vw;
-    padding: 2vw;
-    background-color: var(--ultralight-gray);
+    background-color: var(--white);
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    height: 40vh;
 }
 .tabContent {
     display: flex;
@@ -119,13 +142,13 @@
 .tabs {
     display: flex;
     justify-content: space-between;
-    width: 94vw;
-    padding: 3vw;
+    width: 96vw;
+    padding: 2vw;
 }
 
 .tabs button {
-    width: 45vw;
-    height: calc(45vw / 4);
+    width: 46vw;
+    height: calc(46vw / 4);
     font-size: 12px;
     background: var(--dark-warm-gray);
     border: none;
@@ -153,4 +176,7 @@
 }
 .actions {
     padding-top: 2vh;
+}
+.backButton {
+    background-color: transparent;
 }

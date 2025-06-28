@@ -37,6 +37,11 @@ const OnboardingModal = observer(() => {
         setCurrentStep(prev => Math.min(prev + 1, 4));
     };
 
+    const prevStep = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+    };
+
+
     const skipOnboarding = () => {
         store.onboarding.setOnboardingCompleted(true);
         setIsClosed(true);
@@ -68,6 +73,7 @@ const OnboardingModal = observer(() => {
                         userData={userData}
                         onUpdate={updateUserData}
                         onNext={nextStep}
+                        onBack={prevStep}
                         onSkip={skipOnboarding}
                     />
                 )}
@@ -76,6 +82,7 @@ const OnboardingModal = observer(() => {
                     <StylesStep
                         selectedStyles={userData.styles}
                         onUpdate={updateUserData}
+                        onBack={prevStep}
                         onNext={nextStep}
                         onSkip={skipOnboarding}
                     />
@@ -87,6 +94,8 @@ const OnboardingModal = observer(() => {
                         onUpdate={updateUserData}
                         onNext={completeOnboarding}
                         onSkip={skipOnboarding}
+                        onBack={prevStep}
+
                     />
                 )}
             </div>

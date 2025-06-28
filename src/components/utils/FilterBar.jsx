@@ -1,8 +1,15 @@
 import styles from '../ui/product.module.css'
-import {ChevronDown, SlidersHorizontal} from "lucide-react";
+import {ChevronDown, SlidersHorizontal, Undo2} from "lucide-react";
 
-export const FilterBar = () => (
+export const FilterBar = ({onUndo, undoDisabled}) => (
     <div className={styles.filterBar}>
+        <button
+            onClick={onUndo}
+            disabled={undoDisabled}
+            className={styles.backButton}
+        >
+            <Undo2/>
+        </button>
         <button className={styles.filterButton}>
             <SlidersHorizontal size={18}/>
         </button>

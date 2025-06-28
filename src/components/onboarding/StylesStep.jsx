@@ -4,12 +4,12 @@ import CustomCheckbox from "../CustomCheckbox";
 import FullScreenButton from "../FullScrinButton.jsx";
 
 const ClothStyles = [
-    { id: 1, name: "Классический", url: '/public/styleReference.png' },
-    { id: 2, name: "Спортивный", url: '/public/styleReference.png' },
-    { id: 3, name: "Повседневный", url: '/public/styleReference.png' },
-    { id: 4, name: "Деловой", url: '/public/styleReference.png' },
-    { id: 5, name: "Уличный", url: '/public/styleReference.png' },
-    { id: 6, name: "Вечерний", url: '/public/styleReference.png' },
+    { id: 1, name: "Классический", url: '/stylereference.png' },
+    { id: 2, name: "Спортивный", url: '/stylereference.png' },
+    { id: 3, name: "Повседневный", url: '/stylereference.png' },
+    { id: 4, name: "Деловой", url: '/stylereference.png' },
+    { id: 5, name: "Уличный", url: '/stylereference.png' },
+    { id: 6, name: "Вечерний", url: '/stylereference.png' },
 ];
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {

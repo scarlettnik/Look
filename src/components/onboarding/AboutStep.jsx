@@ -13,7 +13,7 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
             const sliderWidth = sliderRef.current.offsetWidth;
             const min = 16;
             const max = 80;
-            const thumbWidth = 20; // Ширина ползунка
+            const thumbWidth = 20;
 
             const ratio = (age - min) / (max - min);
             let position = ratio * (sliderWidth - thumbWidth);

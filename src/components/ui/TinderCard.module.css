@@ -1,7 +1,7 @@
 .card {
     display: inline-block;
     width: 92vw;
-    height: 76vh;
+    height: calc(90% - 60px);
     border-radius: 8px;
     overflow: hidden;
     position: absolute;
@@ -14,6 +14,7 @@
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
+
 }
 
 .card::after {
@@ -45,7 +46,6 @@
     flex-direction: column;
     justify-content: flex-end;
     height: 100%;
-    padding: 10px 0;
     box-sizing: border-box;
     position: relative;
     z-index: 2;

@@ -31,6 +31,12 @@ const ShoppingCard = observer(() => {
     return (
         <div className={styles.container}>
             <div className={styles.contentWrapper}>
+                <div className={styles.inCreate}>
+                    <p style={{width: '100vw', textAlign: 'center', padding: '5vh 0', right: '0'
+                    }}>
+                        Страница находится в разработке
+                    </p>
+                </div>
                 <div className={styles.cardItems}>
                     {store?.cartStore.cart.length === 0 ? (
                         <div className={styles.emptyCart}>Корзина пуста</div>
@@ -52,7 +58,7 @@ const ShoppingCard = observer(() => {
                                     onClick={() => store.removeFromCart(item.cartItemId)}
                                     disabled={store.isCartLoading}
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={18}/>
                                 </button>
                             </div>
                         ))
@@ -64,7 +70,7 @@ const ShoppingCard = observer(() => {
                             onClick={() => setShowPromoInput(!showPromoInput)}
                         >
                             <span>Промокод</span>
-                            {showPromoInput ? <ChevronUp /> : <ChevronDown />}
+                            {showPromoInput ? <ChevronUp/> : <ChevronDown/>}
                         </div>
 
                         {showPromoInput && (
@@ -92,39 +98,49 @@ const ShoppingCard = observer(() => {
                             onClick={() => setShowDeliveryOptions(!showDeliveryOptions)}
                         >
                             <span>Способ доставки</span>
-                            {showDeliveryOptions ? <ChevronUp /> : <ChevronDown />}
+                            {showDeliveryOptions ? <ChevronUp/> : <ChevronDown/>}
                         </div>
 
                         {showDeliveryOptions && (
                             <div className={styles.deliveryOptions}>
                                 <label className={styles.deliveryOption}>
-                                    <input
-                                        type="radio"
-                                        name="delivery"
-                                        value="standard"
-                                        checked={deliveryMethod === 'standard'}
-                                        onChange={() => setDeliveryMethod('standard')}
-                                    />
                                     <div className={styles.deliveryInfo}>
-                                        <span>Стандартная доставка</span>
-                                        <span>$5.00</span>
+                                        <div>
+                                            <input
+                                                type="radio"
+                                                name="delivery"
+                                                value="standard"
+                                                checked={deliveryMethod === 'standard'}
+                                                onChange={() => setDeliveryMethod('standard')}
+                                                className={styles.radioInput}
+                                            />
+                                            <span>Стандартная доставка</span>
+                                        </div>
+                                        <span>5.00 ₽</span>
                                     </div>
                                     <div className={styles.deliveryTime}>3-5 рабочих дней</div>
+
                                 </label>
 
                                 <label className={styles.deliveryOption}>
-                                    <input
-                                        type="radio"
-                                        name="delivery"
-                                        value="express"
-                                        checked={deliveryMethod === 'express'}
-                                        onChange={() => setDeliveryMethod('express')}
-                                    />
-                                    <div className={styles.deliveryInfo}>
-                                        <span>Экспресс-доставка</span>
-                                        <span>$10.00</span>
+                                    <div className={styles.optionContent}>
+
+                                        <div className={styles.deliveryInfo}>
+                                            <div>
+                                                <input
+                                                    type="radio"
+                                                    name="delivery"
+                                                    value="express"
+                                                    checked={deliveryMethod === 'express'}
+                                                    onChange={() => setDeliveryMethod('express')}
+                                                    className={styles.radioInput}
+                                                />
+                                                <span>Экспресс-доставка</span>
+                                            </div>
+                                            <span>10.00 ₽</span>
+                                        </div>
+                                        <div className={styles.deliveryTime}>1-2 рабочих дня</div>
                                     </div>
-                                    <div className={styles.deliveryTime}>1-2 рабочих дня</div>
                                 </label>
                             </div>
                         )}
@@ -133,15 +149,15 @@ const ShoppingCard = observer(() => {
                     <div className={styles.summarySection}>
                         <div className={styles.summaryRow}>
                             <span>Товары:</span>
-                            <span>${subtotal.toFixed(2)}</span>
+                            <span>{subtotal.toFixed(2)} ₽</span>
                         </div>
                         <div className={styles.summaryRow}>
                             <span>Доставка:</span>
-                            <span>${deliveryCost.toFixed(2)}</span>
+                            <span>{deliveryCost.toFixed(2)} ₽</span>
                         </div>
                         <div className={styles.summaryRowTotal}>
                             <span>Итого:</span>
-                            <span>${total.toFixed(2)}</span>
+                            <span>{total.toFixed(2)} ₽</span>
                         </div>
                     </div>
                     {store.cartStore.cart.length > 0 && !isKeyBoardOpen && (
@@ -155,7 +171,7 @@ const ShoppingCard = observer(() => {
 
             </div>
 
-            <Sidebar />
+            <Sidebar/>
         </div>
     );
 });

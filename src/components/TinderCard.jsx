@@ -2,9 +2,10 @@ import {useEffect, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {Bookmark, Heart, Tractor, Trash} from "lucide-react";
 import styles from "./ui/TinderCard.module.css";
+
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
-const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
+const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const ANIMATION_DURATION = 1000;
 const DOUBLE_TAP_DELAY = 300;
@@ -22,7 +23,6 @@ const TinderCard = ({
                         topCardPosition,
                         swipeProgress
                     }) => {
-    const [isVisible, setIsVisible] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
@@ -310,7 +310,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <Heart size={48} />
+                        <img style={{width:'60px'}} src='/subicons/whitebookmark.svg'/>
                     </div>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
@@ -319,7 +319,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <Trash size={48} />
+                        <img style={{width: '60px'}} src='/subicons/close.svg'/>
                     </div>
                 </>
             )}

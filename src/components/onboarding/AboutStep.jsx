@@ -31,7 +31,7 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
                     className={titleStyle.backButton}
                     onClick={onBack}
                 >
-                    <img src='/public/subicons/whiteArrowLeft.svg' alt="Назад"/>
+                    <img src='/subicons/whitearrowleft.svg' alt="Назад"/>
                 </button>
                 <p className={titleStyle.stepTitle}>Выберите пол и возрасты</p>
             </div>

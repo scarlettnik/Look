@@ -81,10 +81,10 @@ const Compilation = () => {
                 <button className={styles.backButton} onClick={() => {
                     navigate(-1)
                 }}>
-                    <img style={{width: '30px'}} src='/subicons/arrowLeft.svg'/>
+                    <img style={{width: '30px'}} src='/subicons/arrowleft.svg'/>
                 </button>
                 <button className={styles.shareButton} onClick={handleShare}>
-                    <img style={{width: '20px'}}  src='/subicons/darkShare.svg'/>
+                    <img style={{width: '20px'}}  src='/subicons/darkshare.svg'/>
                 </button>
                 <div
                     className={styles.sliderInner}

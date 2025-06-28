@@ -36,7 +36,7 @@ const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip, onBack }) => {
                     className={styles.backButton}
                     onClick={onBack}
                 >
-                    <img src='/public/subicons/whiteArrowLeft.svg' alt="Назад"/>
+                    <img src='/subicons/whitearrowleft.svg' alt="Назад"/>
                 </button>
                 <p className={styles.stepTitle}>Выберите размер или параметры</p>
             </div>

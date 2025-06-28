@@ -189,7 +189,7 @@ const FilterBar = ({filters, setFilters}) => {
     return (
         <>
             <div className={styles.filterBar}>
-                <button onClick={handleBack} className={styles.filterButton}><img src='/subicons/arrowLeft.svg'/></button>
+                <button onClick={handleBack} className={styles.filterButton}><img src='/subicons/arrowleft.svg'/></button>
                 <button className={styles.filterButton}><img src='/subicons/filter.svg'/></button>
                 <button
                     className={`${styles.filterButton} ${filters.size ? styles.activeFilter : ''}`}

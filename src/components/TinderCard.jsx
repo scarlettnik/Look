@@ -332,7 +332,7 @@ const TinderCard = ({
                         <div style={{ display: 'flex', flexWrap: 'wrap' , justifyContent: 'space-between', width: '86vw', alignItems: 'center' }}>
                             <div className={styles.price}>5000 ₽</div>
                             <button className={styles.saveButton}>
-                                <img src='/public/subicons/whiteBookmark.svg'/>
+                                <img src='/subicons/whitebookmark.svg'/>
                             </button>
                         </div>
                     </div>

@@ -14,6 +14,8 @@ import AddList from "./components/AddList.jsx";
 import AddToCloset from "./components/AddToCloset.jsx";
 import { StoreProvider } from './provider/StoreContext.jsx';
 import OnboardingModal from "./components/OnboardingModal.jsx";
+import AccountDeleted from "./components/AccountDeleted.jsx";
+
 
 function App() {
     return (
@@ -50,6 +52,7 @@ function AppContent() {
                 <Route path='/trends' element={<Comparing/>}/>
                 <Route path='/prod' element={<Product/>}/>
                 <Route path='/cloth' element={<AddToCloset/>}/>
+                <Route path="/account-deleted" element={<AccountDeleted />} />
             </Routes>
         </div>
     );

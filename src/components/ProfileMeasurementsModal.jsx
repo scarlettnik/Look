@@ -17,14 +17,23 @@ const ProfileMeasurementsModal = ({ isOpen, onClose }) => {
         bust: 40,
         waist: 63,
         hip: 92,
-        fit: "true",
+        fits: ["true"],
     });
 
+
     const updateParam = (field, value) => {
-        setParams(prev => ({ ...prev, [field]: value }));
+        setParams(prev => {
+            if (field !== "fits") {
+                return { ...prev, [field]: value };
+            }
+            const newFits = prev.fits.includes(value)
+                ? prev.fits.filter(f => f !== value)
+                : [...prev.fits, value];
+            return { ...prev, fits: newFits };
+        });
     };
     const handleRadioChange = (event) => {
-        updateParam("fit", event.target.value);
+        updateParam("fits", event.target.value);
     };
     console.log(params)
     if (!isOpen) return null;

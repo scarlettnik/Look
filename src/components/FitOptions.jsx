@@ -6,7 +6,7 @@ const FitOptions = ({ params, updateParam }) => (
     <div>
         <div className={styles.fitOptionsWrapper}>
             <div className={styles.fitOptions}>
-                {["tight", "true", "oversized"].map((fit) => (
+                {["tight", "normal", "oversize"].map((fit) => (
                     <FitOption
                         key={fit}
                         id={fit}
@@ -14,18 +14,18 @@ const FitOptions = ({ params, updateParam }) => (
                         label={
                             fit === "tight"
                                 ? "Облегающую"
-                                : fit === "true"
+                                : fit === "normal"
                                     ? "В размер"
                                     : "Оверсайз"
                         }
-                        currentValue={params?.fits}
+                        currentValue={params?.wearing_styles}
                         onChange={updateParam}
                     />
                 ))}
             </div>
             <div className={styles.underline}></div>
 
-            {params?.fits?.map((fit) => (
+            {params?.wearing_styles?.map((fit) => (
                 <div
                     key={fit}
                     className={styles.triangle}

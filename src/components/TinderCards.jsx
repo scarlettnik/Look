@@ -6,7 +6,6 @@ import TinderCard from "./TinderCard.jsx";
 import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
 import { FilterBar } from "./utils/FilterBar.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
-import { Heart, Trash } from "lucide-react";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -86,33 +85,12 @@ const TinderCards = observer(() => {
     }, []);
 
     return (
-        <div className="tinder" ref={containerRef} style={{height: `${window.innerHeight}px`}}>
+        <div className={styles.container} ref={containerRef}>
             <SearchHeader/>
             <FilterBar
                 onUndo={store.catalogStore.undoSwipe}
                 undoDisabled={store.catalogStore.swipeHistory?.length === 0}
             />
-
-            {/*<div className={styles.globalSwipeFeedback}>*/}
-            {/*    <div*/}
-            {/*        className={`${styles.swipeFeedbackIcon} ${styles.leftIcon}`}*/}
-            {/*        style={{*/}
-            {/*            opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0,*/}
-            {/*            transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`*/}
-            {/*        }}*/}
-            {/*    >*/}
-            {/*        <Trash size={80} />*/}
-            {/*    </div>*/}
-            {/*    <div*/}
-            {/*        className={`${styles.swipeFeedbackIcon} ${styles.rightIcon}`}*/}
-            {/*        style={{*/}
-            {/*            opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0,*/}
-            {/*            transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`*/}
-            {/*        }}*/}
-            {/*    >*/}
-            {/*        <Heart size={80} />*/}
-            {/*    </div>*/}
-            {/*</div>*/}
 
             <div className={styles.cardsContainer}>
                 {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
@@ -140,8 +118,9 @@ const TinderCards = observer(() => {
                     />
                 ))}
 
+
                 {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
-                    <div className="empty-state">
+                    <div className={styles.emptyState}>
                         <h2>No more cards!</h2>
                     </div>
                 )}

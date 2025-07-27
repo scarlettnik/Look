@@ -50,7 +50,9 @@ const Save = observer(() => {
     };
   }, []);
 
-  const filteredSaves = store?.collectionStore.saves?.filter((save) =>
+
+  console.log(store)
+  const filteredSaves = store?.authStore?.data?.collections?.filter((save) =>
     save.name.toLowerCase().includes(filterText.toLowerCase())
   );
 
@@ -139,25 +141,26 @@ const Save = observer(() => {
           style={{ marginBottom: deleteMode ? "120px" : "0px" }}
         >
           {filteredSaves?.map((save) => (
-            <div key={save.id} className={styles.cardContainer}>
-              {deleteMode && (
-                  <CustomCheckbox
-                      id={`save-${save.id}`}
-                      checked={selectedSaves.includes(save.id)}
-                      onChange={() => toggleSaveSelection(save.id)}
-                  />
-              )}
-              <Link to={`/save/${save.id}`}>
-                <div className={styles.card}>
-                  <img
-                    src={save.url}
-                    alt={save.name}
-                    className={styles.image}
-                  />
-                </div>
-                <h3 className={styles.cardTitle}>{save.name}</h3>
-              </Link>
-            </div>
+              <div key={save.id} className={styles.cardContainer}>
+                {deleteMode && (
+                    <CustomCheckbox
+                        id={`save-${save.id}`}
+                        checked={selectedSaves.includes(save.id)}
+                        onChange={() => toggleSaveSelection(save.id)}
+                    />
+                )}
+                <Link to={`/save/${save.id}`}>
+                  <div className={styles.card}>
+                    <img
+                        src={save.cover_image_url}
+                        className={styles.image}
+                    />
+                  </div>
+                  <h3 className={styles.cardTitle}>
+                    {save.name.toUpperCase() === "__FAVOURITES__" ? 'Все избранное' : save.name}
+                  </h3>
+                </Link>
+              </div>
           ))}
         </div>
         <Modal isOpen={isModalOpen} onClose={createClose}>

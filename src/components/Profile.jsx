@@ -59,7 +59,7 @@ const SupportButtons = ({ onSupportClick }) => (
 
 
 export default function ProfilePage() {
-    const {data, loading, error} = useAuth();
+    const { data } = useAuth();
     const [activeDevItem, setActiveDevItem] = useState(null);
     const [showSupportButton, setShowSupportButton] = useState(false);
     const [showDeleteProfileButton, setShowDeleteProfileButton] = useState(false);
@@ -116,8 +116,6 @@ export default function ProfilePage() {
     const handleDeleteBackScape = () => {
         setShowDeleteProfileButton(false);
     };
-
-    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className={styles.page}>

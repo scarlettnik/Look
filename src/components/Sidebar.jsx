@@ -11,7 +11,7 @@ const Sidebar = () => {
     const sidebarConfig = [
         { path: '/', exact: true },
         { path: '/save', matchPattern: '/save/*' },
-        { path: '/trends', matchPattern: '/trends/*' },
+        { path: '/trands', matchPattern: '/trands/*' },
         { path: '/shoppingcard', exact: true },
         { path: '/profile', exact: true }
     ];
@@ -58,9 +58,9 @@ const Sidebar = () => {
 
             <button
                 className={`sidebarbutton ${activePath === '/compare' ? 'active' : ''}`}
-                onClick={() => navigate('/trends')}>
+                onClick={() => navigate('/trands')}>
                 <img
-                    src={getIconPath('trends', activePath === '/trends')}
+                    src={getIconPath('trends', activePath === '/trands')}
                     alt="trends"
                     className="icon"
                 />

@@ -1,15 +1,18 @@
 import { makeAutoObservable } from "mobx";
-import CollectionStore from "../src/provider/collectionStore.js";
-import CartStore from "../src/provider/cardStore.js";
-import CatalogStore from "../src/provider/catalogStore.js";
-import Onboarding from "./provider/Onboarding.js";
-
+import AuthStore from "./provider/AuthStore";
+import CollectionStore from "./provider/collectionStore";
+import CartStore from "./provider/cardStore";
+import CatalogStore from "./provider/catalogStore";
+import Onboarding from "./provider/Onboarding";
+import PopularStore from "./provider/PopularStore";
 
 class AppStore {
+    authStore = new AuthStore();
     collectionStore = new CollectionStore();
     cartStore = new CartStore();
     catalogStore = new CatalogStore();
-    onboarding = new Onboarding()
+    onboarding = new Onboarding();
+    popular = new PopularStore();
 
     constructor() {
         makeAutoObservable(this);

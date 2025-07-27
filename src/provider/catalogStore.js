@@ -28,8 +28,9 @@ class CatalogStore {
             this.isFetching = true;
             if (initialLoad) this.loading = true;
 
-            const response = yield fetch(`https://api.lookvogue.ru/v1/catalog/feed`, {
-                method: 'GET',
+            const response = yield fetch(`https://api.lookvogue.ru/v1/catalog/search`, {
+                method: 'POST',
+                body: JSON.stringify({}),
                 headers: this.getAuthHeaders(),
             });
 

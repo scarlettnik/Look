@@ -248,7 +248,7 @@ const TinderCard = ({
         if (!cardElement) return;
 
         let scale = 1 - offset * 0.03;
-        let translateY = -offset * 10;
+        let translateY = offset * 10;
         let translateX = 0;
         let rotate = 0;
 
@@ -310,7 +310,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img style={{width:'60px'}} src='/subicons/whitebookmark.svg'/>
+                        <img style={{width:'60px'}} src='/menuIcons/unactive/save.svg'/>
                     </div>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}

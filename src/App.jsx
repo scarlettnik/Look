@@ -15,6 +15,7 @@ import AddToCloset from "./components/AddToCloset.jsx";
 import { StoreProvider } from './provider/StoreContext.jsx';
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import AccountDeleted from "./components/AccountDeleted.jsx";
+import PopularCollection from "./components/PopularCollection.jsx";
 
 
 function App() {
@@ -37,11 +38,11 @@ function AppContent() {
     console.log(auth)
     return (
         <div>
-            <OnboardingModal/>
             {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)}/>}
             <Routes>
                 <Route path="/add" element={<AddList/>}/>
-                <Route path="/" element={<TinderCards/>}/>
+                <Route path="/cards" element={<TinderCards/>}/>
+                <Route path="/" element={<OnboardingModal/>}/>
                 <Route path="/product/:id" element={<ProductPage/>}/>
                 <Route path="/profile" element={<Profile/>}/>
                 <Route path="/save" element={<Save/>}/>
@@ -49,7 +50,9 @@ function AppContent() {
                 <Route path="/save/:id/product/:id" element={<ProductPage/>}/>
                 <Route path='/shoppingcard' element={<ShoppingCard/>}/>
                 <Route path='/pref' element={<Preferences/>}/>
-                <Route path='/trends' element={<Comparing/>}/>
+                <Route path='/trands' element={<Comparing/>}/>
+                <Route path='/trands/:id' element={<PopularCollection/>}/>
+                <Route path='/trands/collection/:id' element={<Compilation/>}/>
                 <Route path='/prod' element={<Product/>}/>
                 <Route path='/cloth' element={<AddToCloset/>}/>
                 <Route path="/account-deleted" element={<AccountDeleted />} />

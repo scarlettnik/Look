@@ -301,12 +301,12 @@
     transform: translateX(25%);
 }
 
-.triangle[data-fit="true"] {
+.triangle[data-fit="normal"] {
     left: 48%;
     transform: translateX(-50%);
 }
 
-.triangle[data-fit="oversized"] {
+.triangle[data-fit="oversize"] {
     left: 80%;
     transform: translateX(-75%);
 }

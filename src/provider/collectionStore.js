@@ -1,123 +1,37 @@
-import { makeAutoObservable } from "mobx";
-import { toJS } from 'mobx';
+import { makeAutoObservable } from 'mobx';
+import {AUTH_TOKEN} from "../constants.js";
 
 class CollectionStore {
-    saves = [
-        {
-            id: 1,
-            name: "All Saved",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-            items: [
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 1,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 2,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 3,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 4,
-                },
-            ],
-        },
-        {
-            id: 2,
-            name: "Travel Plans",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-            items: [
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 1,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 2,
-                },
-                {
-                    url: "https://ir.ozone.ru/s3/multimedia-1-e/wc1000/7159910162.jpg",
-                    id: 3,
-                },
-            ],
-        },
-        {
-            id: 3,
-            name: "Home Decor",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-        {
-            id: 4,
-            name: "Recipes",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-        {
-            id: 5,
-            name: "Books",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-        {
-            id: 6,
-            name: "Movies",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-        {
-            id: 7,
-            name: "All Saved",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-        {
-            id: 8,
-            name: "Travel Plans",
-            url: "https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13",
-        },
-    ];
+    currentCollection = null;
+    loading = false;
+    error = null;
 
     constructor() {
         makeAutoObservable(this);
-        this.loadFromLocalStorage();
     }
 
-    loadFromLocalStorage() {
-        const saved = localStorage.getItem('saves');
-        if (saved) this.saves = JSON.parse(saved);
-    }
+    async loadCollection(collectionId, isSave = false) {
+        this.loading = true;
+        this.error = null;
 
-    saveToLocalStorage() {
-        localStorage.setItem('saves', JSON.stringify(toJS(this.saves)));
-    }
-
-    updateCollection = (id, updates) => {
-        const index = this.saves.findIndex(save => save.id === id);
-        if (index !== -1) {
-            this.saves[index] = { ...this.saves[index], ...updates };
-            this.saveToLocalStorage();
+        try {
+            const response = await fetch(`https://api.lookvogue.ru/v1/collection/${collectionId}`, {
+                method: 'GET',
+                headers: {
+                    "ngrok-skip-browser-warning": true,
+                    "Content-Type": "application/json",
+                    Authorization: `tma ${AUTH_TOKEN}`,
+                },
+            });
+            const data = await response.json();
+            console.log(data)
+            this.currentCollection = data;
+        } catch (error) {
+            this.error = error.message;
+        } finally {
+            this.loading = false;
         }
-    };
-
-    createCollection = (name, coverUrl) => {
-        if (!name.trim()) return;
-
-        this.saves = [
-            {
-                id: Date.now(),
-                name: name.trim(),
-                url: coverUrl || "https://via.placeholder.com/150/cccccc",
-                items: []
-            },
-            ...this.saves
-        ];
-        this.saveToLocalStorage();
-    };
-
-    deleteCollections = (ids) => {
-        this.saves = this.saves.filter(save => !ids.includes(save.id));
-        this.saveToLocalStorage();
-    };
+    }
 }
 
 export default CollectionStore;

@@ -101,12 +101,12 @@
     transform: translateX(25%);
 }
 
-.triangle[data-fit="true"] {
+.triangle[data-fit="normal"] {
     left: 50%;
     transform: translateX(-50%);
 }
 
-.triangle[data-fit="oversized"] {
+.triangle[data-fit="oversize"] {
     left: 85%;
     transform: translateX(-75%);
 }

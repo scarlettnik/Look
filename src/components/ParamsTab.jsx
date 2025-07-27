@@ -12,29 +12,26 @@ const ParamsTab = ({ params, updateParam }) => {
             <div className={styles.paramsInputGroup}>
                 <ParamControl
                     label="Объем груди"
-                    value={params.bust}
-                    onChange={(value) => handleChange("bust", value)}
+                    value={params.size_parameters?.breast || 90}
+                    onChange={(value) => handleChange("breast", value)}
                     min={40}
                     max={200}
                 />
                 <ParamControl
                     label="Объем талии"
-                    value={params.waist}
+                    value={params.size_parameters?.waist || 60}
                     onChange={(value) => handleChange("waist", value)}
                     min={40}
                     max={200}
                 />
-
                 <ParamControl
                     label="Объем бедер"
-                    value={params.hip}
+                    value={params.size_parameters?.hip || 90}
                     onChange={(value) => handleChange("hip", value)}
                     min={40}
                     max={200}
                 />
             </div>
-
-
         </div>
     );
 };

@@ -248,7 +248,7 @@ const TinderCard = ({
         if (!cardElement) return;
 
         let scale = 1 - offset * 0.03;
-        let translateY = offset * 10;
+        let translateY = 0;
         let translateX = 0;
         let rotate = 0;
 

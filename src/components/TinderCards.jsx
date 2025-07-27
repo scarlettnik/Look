@@ -16,8 +16,23 @@ const SKELETON_COUNT = 3;
 const TinderCards = observer(() => {
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const containerRef = useRef(null);
     const store = useStore();
+    const [containerHeight, setContainerHeight] = useState(window.innerHeight);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (containerRef.current) {
+                const initialHeight = containerRef.current.getBoundingClientRect().height;
+                setContainerHeight(initialHeight);
+            }
+        };
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (store?.catalogStore?.cards?.length <= INITIAL_CARDS_COUNT &&
@@ -85,9 +100,15 @@ const TinderCards = observer(() => {
     }, []);
 
     return (
-        <div className={styles.container} ref={containerRef}>
-            <SearchHeader/>
-            <FilterBar
+        <div className={styles.container} style={{ height: `${containerHeight}px` }} ref={containerRef}>
+            <SearchHeader
+                onSearch={(searchRequest) => {
+                    console.log('Search request:', searchRequest);
+                    store.catalogStore.fetchCardsWithSearch(searchRequest);
+                }}
+                onClearSearch={() => store.catalogStore.resetSearch()}
+
+            />            <FilterBar
                 onUndo={store.catalogStore.undoSwipe}
                 undoDisabled={store.catalogStore.swipeHistory?.length === 0}
             />

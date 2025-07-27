@@ -1,4 +1,5 @@
 import { makeAutoObservable, flow } from "mobx";
+import { AUTH_TOKEN } from "../constants.js";
 
 class CatalogStore {
     cards = [];
@@ -8,11 +9,28 @@ class CatalogStore {
     swipeHistory = [];
     isFetching = false;
     hasMore = true;
-    authToken = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
+    authToken = AUTH_TOKEN;
+    currentSearchQuery = null;
+
+    getUniqueKey = () => {
+        // Пытаемся использовать crypto.randomUUID() если доступно
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+
+        // Фолбэк для старых браузеров
+        const timestamp = Date.now().toString(36);
+        const randomPart = Math.random().toString(36).substr(2, 16);
+        const performanceMark = typeof performance !== 'undefined'
+            ? performance.now().toString(36).replace('.', '')
+            : Math.random().toString(36).substr(2, 8);
+
+        return `${timestamp}-${randomPart}-${performanceMark}`;
+    };
 
     constructor() {
         makeAutoObservable(this);
-        this.fetchCards()
+        this.fetchCards();
     }
 
     getAuthHeaders = () => ({
@@ -21,44 +39,52 @@ class CatalogStore {
         'Authorization': `tma ${this.authToken}`
     });
 
+    // Основной метод загрузки карточек
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching) return;
 
         try {
             this.isFetching = true;
-            if (initialLoad) this.loading = true;
+            if (initialLoad) {
+                this.loading = true;
+                this.cards = []; // Очищаем карточки при новой загрузке
+            }
+
+            // Всегда добавляем searchQuery если он есть
+            const requestBody = this.currentSearchQuery
+                ? { query: this.currentSearchQuery }
+                : {};
 
             const response = yield fetch(`https://api.lookvogue.ru/v1/catalog/search`, {
                 method: 'POST',
-                body: JSON.stringify({}),
+                body: JSON.stringify(requestBody),
                 headers: this.getAuthHeaders(),
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const newCards = yield response.json();
-            const filtered = newCards.filter(card =>
-                !this.cards.some(c => c.id === card.id)
-            );
 
-            if (filtered.length === 0) {
-                this.hasMore = false;
-                return;
-            }
-
-            const pendingCards = filtered.map(card => ({
+            const pendingCards = newCards.map(card => ({
                 ...card,
                 _pending: true,
-                _key: Math.random().toString(36).substr(2, 9)
+                _key: this.getUniqueKey()
             }));
 
             this.cards = [...this.cards, ...pendingCards];
+            this.hasMore = newCards.length > 0;
 
             setTimeout(() => {
-                this.cards = this.cards.map(c =>
-                    c._pending ? {...c, _pending: false} : c
-                );
-            }, 300);
+                this.cards = this.cards.map(c => ({
+                    ...c,
+                    _pending: false,
+                    style: {
+                        transform: 'translate(0, 0) rotate(0deg)',
+                        opacity: 1,
+                        transition: `all 800ms ease-out`
+                    }
+                }));
+            }, 50);
 
         } catch (err) {
             this.error = err.message;
@@ -69,6 +95,20 @@ class CatalogStore {
         }
     });
 
+    // Метод для поиска
+    fetchCardsWithSearch = flow(function* (searchRequest) {
+        this.currentSearchQuery = searchRequest.query?.trim() || null;
+        this.hasMore = true; // Сбрасываем флаг при новом поиске
+        yield this.fetchCards(true); // initialLoad = true
+    });
+
+    // Метод для сброса поиска
+    resetSearch = () => {
+        this.currentSearchQuery = null;
+        this.hasMore = true;
+        this.fetchCards(true);
+    };
+
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
 
@@ -77,6 +117,11 @@ class CatalogStore {
 
         if (direction === 'up') {
             this.basket = [...this.basket, card];
+        }
+
+        // Автоподгрузка при малом количестве карточек
+        if (this.cards.length < 3 && this.hasMore && !this.isFetching) {
+            this.fetchCards();
         }
     };
 
@@ -89,16 +134,16 @@ class CatalogStore {
         const restoredCard = {
             ...card,
             _pending: true,
-            _key: Math.random().toString(36).substr(2, 9)
+            _key: this.getUniqueKey()
         };
 
-        this.cards = [{
+        this.cards = [...this.cards, {
             ...restoredCard,
             style: {
                 opacity: 0,
                 zIndex: 1001
             }
-        }, ...this.cards];
+        }];
 
         setTimeout(() => {
             this.cards = this.cards.map(c =>

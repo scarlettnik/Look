@@ -7,6 +7,7 @@ import {useAuth} from "../provider/AuthProvider.jsx";
 import {useState} from "react";
 import styles from './ui/OnboardingModal.module.css'
 import {observer} from "mobx-react";
+import {useNavigate} from "react-router-dom";
 
 const OnboardingModal = observer(() => {
     const store = useStore();
@@ -26,6 +27,7 @@ const OnboardingModal = observer(() => {
     });
 
     console.log(userData)
+    const navigate = useNavigate()
 
     const [isClosed, setIsClosed] = useState(false);
 
@@ -50,6 +52,7 @@ const OnboardingModal = observer(() => {
     const completeOnboarding = () => {
         store.onboarding.setOnboardingCompleted(true);
         setIsClosed(true);
+        navigate('/cards')
     };
 
     if (store.onboarding.onboardingCompleted || isClosed) return null;

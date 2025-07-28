@@ -29,6 +29,8 @@
 .filterButton {
     background-color: transparent;
     font-size: 14px;
+    margin-right: 10px;
+
 }
 
 .banner::after {
@@ -78,6 +80,8 @@
 }
 
 .filterBar {
+    width: 94vw;
+    padding: 8px 3vw;
     display: flex;
     justify-content: space-between;
     overflow-x: auto;
@@ -86,7 +90,6 @@
     position: sticky;
     top: 0;
     scrollbar-width: none;
-    padding: 8px 0;
 }
 
 .filterBar::-webkit-scrollbar {
@@ -128,7 +131,88 @@
 .filterOptions {
     display: flex;
     flex-direction: column;
-    gap: 10px;
     margin-bottom: 20px;
 }
 
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.modalHeader {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.modalBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.applyButton {
+    background: black;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    width: 100%;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+.gridOptions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.optionButton {
+    padding: 8px 5px;
+    border-radius: 6px;
+    text-align: center;
+    background: var(--ultralight-gray);
+    font-size: 12px;
+    border: 1px solid transparent;
+
+}
+
+.selected {
+    border: 1px solid var(--black);
+    background: var(--white);
+}
+
+.priceInputGroup {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding-bottom: 20px;
+    margin: auto;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.priceInputGroup input {
+    background-color: var(--ultralight-gray);
+    width: 32vw;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+}
+
+.activeFilter {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    background-color: var(--ultralight-gray);
+    padding: 0 7px 0 10px;
+    border-radius: 20px;
+}

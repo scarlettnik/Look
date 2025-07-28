@@ -22,8 +22,10 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose }) => {
             waist: 60,
             hip: 90
         },
-        wearing_styles: store.authStore.data?.preferences?.wearing_styles || []
+        wearing_styles: store.authStore.data?.preferences?.wearing_styles || [],
+        age: store.authStore.data?.preferences?.age || 25 // ← добавили
     });
+
     const { data } = useAuth();
     const [activeTab, setActiveTab] = useState("size");
     const [isLoading, setIsLoading] = useState(false);

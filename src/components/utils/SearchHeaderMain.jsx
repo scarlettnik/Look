@@ -115,7 +115,7 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                 />
             )}
 
-            <div className={styles.searchWrapper} ref={searchRef}>
+            <div className={styles.searchWrapper} ref={searchRef} style={{ zIndex: isSearchActive ? 100 : 1 }}>
                 <div className={styles.searchContainer}>
                     <div className={styles.searchHeaderWrapper}>
                         <div className={styles.searchHeader}>

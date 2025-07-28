@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import './ui/Sidebar.css';
+import styles from './ui/sidebar.module.css'; // Измененный импорт стилей
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
-const Sidebar = () => {
+const Sidebar = ({highlightSave, highlightPopular, onboarding}) => {
     const isKeyboardOpen = useIsKeyboardOpen();
     const navigate = useNavigate();
     const location = useLocation();
@@ -16,7 +16,11 @@ const Sidebar = () => {
         { path: '/profile', exact: true }
     ];
 
-    const [activePath, setActivePath] = useState('/');
+    const [activePath, setActivePath] = useState('/cards');
+    useEffect(() => {
+        setActivePath(onboarding ? '/' : '/cards');
+    }, [onboarding]);
+
 
     useEffect(() => {
         const currentPath = sidebarConfig.find(({ path, matchPattern, exact }) => {
@@ -35,54 +39,62 @@ const Sidebar = () => {
     };
 
     return isKeyboardOpen ? null : (
-        <div className='sidebar'>
+        <div className={`${onboarding ? styles.onboarding : ''} ${styles.sidebar}`}>
             <button
-                className= "sidebarbutton"
-                onClick={() => navigate('/')}>
+                disabled={onboarding}
+                className={styles.sidebarbutton}
+                onClick={() => navigate('/cards')}>
                 <img
-                    src={getIconPath('home', activePath === '/')}
+                    src={getIconPath('home', activePath === '/cards')}
                     alt="Home"
-                    className="icon"
+                    className={styles.icon}
                 />
             </button>
 
             <button
-                className={`sidebarbutton ${activePath === '/save' ? 'active' : ''}`}
+                disabled={onboarding}
+
+                className={`${styles.sidebarbutton} ${activePath === '/save' ? styles.active : ''} ${highlightSave ? styles.highlight : ''}`}
                 onClick={() => navigate('/save')}>
                 <img
-                    src={getIconPath('save', activePath === '/save')}
+                    src={highlightSave ? '/menuIcons/onboarding/save.svg' : getIconPath('save', activePath === '/save')}
                     alt="save"
-                    className="icon"
+                    className={styles.icon}
                 />
             </button>
 
             <button
-                className={`sidebarbutton ${activePath === '/compare' ? 'active' : ''}`}
+                disabled={onboarding}
+                className={`${styles.sidebarbutton} ${activePath === '/compare' ? styles.active : ''} ${highlightPopular ? styles.highlight : ''}`}
                 onClick={() => navigate('/trands')}>
                 <img
-                    src={getIconPath('trends', activePath === '/trands')}
+                    src={highlightPopular ? '/menuIcons/onboarding/trands.svg' : getIconPath('trends', activePath === '/trands')}
                     alt="trends"
-                    className="icon"
+                    className={styles.icon}
                 />
             </button>
 
             <button
-                className={`sidebarbutton ${activePath === '/shoppingcard' ? 'active' : ''}`}
+                disabled={onboarding}
+
+                className={`${styles.sidebarbutton} ${activePath === '/shoppingcard' ? styles.active : ''}`}
                 onClick={() => navigate('/shoppingcard')}>
                 <img
                     src={getIconPath('shop', activePath === '/shoppingcard')}
                     alt="Cart"
-                    className="icon"
+                    className={styles.icon}
                 />
             </button>
 
             <button
-                className={`sidebarbutton ${activePath === '/profile' ? 'active' : ''}`}
+                disabled={onboarding}
+
+                className={`${styles.sidebarbutton} ${activePath === '/profile' ? styles.active : ''}`}
                 onClick={() => navigate('/profile')}>
                 <img
                     src={getIconPath('profile', activePath === '/profile')}
                     alt="Profile"
-                    className="icon"
+                    className={styles.icon}
                 />
             </button>
         </div>

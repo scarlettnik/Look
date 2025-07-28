@@ -4,7 +4,6 @@
     --button-size: 60px;
 
 }
-
 .tinder {
     width: 100vw;
     overflow: hidden;
@@ -82,7 +81,6 @@
 }
 
 .card-info {
-
     display: flex;
     flex-direction: column;
     gap: 4px;

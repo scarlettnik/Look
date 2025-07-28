@@ -184,6 +184,9 @@
 .selectedSize {
     border: 1px solid var(--black);
 }
+.unSelectedSize {
+    border: 1px solid transparent;
+}
 
 .sizeBox {
     text-align: center;

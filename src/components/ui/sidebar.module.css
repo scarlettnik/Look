@@ -7,11 +7,15 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 1000;
+    z-index: 1001;
     transition: transform 0.3s ease;
     background-color: var(--white-gray);
+    pointer-events: all;
 }
+.onboarding {
+    background-color: rgba(0, 0, 0, 0);
 
+}
 .sidebarbutton {
     background-color: transparent;
     width: 40px;
@@ -24,3 +28,8 @@
     box-shadow: none !important;
     -webkit-tap-highlight-color: transparent;
 }
+.highlight {
+    background: #3A4651;
+    Z-index: 10000;
+    height: 40px;
+ }

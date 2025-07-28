@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Bookmark, Heart, Tractor, Trash} from "lucide-react";
 import styles from "./ui/TinderCard.module.css";
 
 const VELOCITY_THRESHOLD = 0.5;
@@ -21,7 +20,9 @@ const TinderCard = ({
                         isPending,
                         isTopCard,
                         topCardPosition,
-                        swipeProgress
+                        swipeProgress,
+                        setCardRef,
+                        isOnboardingActive
                     }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -69,6 +70,7 @@ const TinderCard = ({
         }, DOUBLE_TAP_DELAY);
     };
 
+
     const handleDoubleAction = () => {
         setShowDoubleClickFeedback(true);
         setTimeout(() => {
@@ -99,14 +101,6 @@ const TinderCard = ({
         setIsExpanded(isTopCard && location.state?.expandedCard === card.id);
     }, [location.state, card.id, offset]);
 
-    const handleStart = (clientX, clientY) => {
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-    };
 
     useEffect(() => {
         if (!cardRef.current) return;
@@ -273,6 +267,39 @@ const TinderCard = ({
         `;
         cardElement.style.zIndex = zIndex;
     }, [position, zIndex, offset, topCardPosition]);
+
+    useEffect(() => {
+        if (cardRef.current) {
+            setCardRef(card.id, cardRef.current);
+        }
+    }, [card.id, setCardRef]);
+
+    const handleStart = (clientX, clientY) => {
+        if (isOnboardingActive) return; // Блокируем во время обучения
+        setStartPos({ x: clientX, y: clientY });
+        setIsDragging(true);
+        startTime.current = Date.now();
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
+        }
+    };
+
+    const [originalStyles, setOriginalStyles] = useState({
+        transform: '',
+        transition: '',
+        opacity: ''
+    });
+
+    useEffect(() => {
+        if (cardRef.current) {
+            const computedStyle = window.getComputedStyle(cardRef.current);
+            setOriginalStyles({
+                transform: computedStyle.transform,
+                transition: computedStyle.transition,
+                opacity: computedStyle.opacity
+            });
+        }
+    }, []);
 
     return (
         <div

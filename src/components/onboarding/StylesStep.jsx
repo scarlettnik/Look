@@ -14,10 +14,7 @@ const ClothStyles = [
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const handleStyleToggle = (styleId) => {
-        const newStyles = selectedStyles.includes(styleId)
-            ? selectedStyles.filter(id => id !== styleId)
-            : [...selectedStyles, styleId];
-        onUpdate({ styles: newStyles });
+        onUpdate('styles', styleId);
     };
 
     return (
@@ -36,13 +33,13 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                     {ClothStyles.map(style => (
                         <div
                             key={style.id}
-                            className={`${styles.styleCard} ${selectedStyles.includes(style.id) ? styles.selected : ''}`}
+                            className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
                         >
                             <img src={style.url} alt={style.name} className={styles.styleImage}/>
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
-                                    checked={selectedStyles.includes(style.id)}
-                                    onChange={() => handleStyleToggle(style.id)}
+                                    checked={selectedStyles.includes(style.name)}
+                                    onChange={() => handleStyleToggle(style.name)}
                                 />
                                 <span className={styles.styleName}>{style.name}</span>
                             </div>

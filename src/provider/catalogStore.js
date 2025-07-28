@@ -11,27 +11,20 @@ class CatalogStore {
     hasMore = true;
     authToken = AUTH_TOKEN;
     currentSearchQuery = null;
-
-    getUniqueKey = () => {
-        // Пытаемся использовать crypto.randomUUID() если доступно
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
-        }
-
-        // Фолбэк для старых браузеров
-        const timestamp = Date.now().toString(36);
-        const randomPart = Math.random().toString(36).substr(2, 16);
-        const performanceMark = typeof performance !== 'undefined'
-            ? performance.now().toString(36).replace('.', '')
-            : Math.random().toString(36).substr(2, 8);
-
-        return `${timestamp}-${randomPart}-${performanceMark}`;
-    };
+    currentOffset = 0; // Добавляем offset для пагинации
+    limit = 10; // Лимит карточек за один запрос
 
     constructor() {
         makeAutoObservable(this);
-        this.fetchCards();
+        this.fetchCards(true); // initial load
     }
+
+    getUniqueKey = () => {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    };
 
     getAuthHeaders = () => ({
         "ngrok-skip-browser-warning": true,
@@ -39,7 +32,6 @@ class CatalogStore {
         'Authorization': `tma ${this.authToken}`
     });
 
-    // Основной метод загрузки карточек
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching) return;
 
@@ -47,23 +39,27 @@ class CatalogStore {
             this.isFetching = true;
             if (initialLoad) {
                 this.loading = true;
-                this.cards = []; // Очищаем карточки при новой загрузке
+                this.currentOffset = 0;
+                this.cards = [];
             }
 
-            // Всегда добавляем searchQuery если он есть
-            const requestBody = this.currentSearchQuery
-                ? { query: this.currentSearchQuery }
-                : {};
+            // Формируем URL с query-параметрами
+            const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
+            url.searchParams.append('offset', this.currentOffset);
+            url.searchParams.append('limit', this.limit);
 
-            const response = yield fetch(`https://api.lookvogue.ru/v1/catalog/search`, {
+
+            const response = yield fetch(url.toString(), {
                 method: 'POST',
-                body: JSON.stringify(requestBody),
                 headers: this.getAuthHeaders(),
+                body: JSON.stringify({query: this.currentSearchQuery})
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const newCards = yield response.json();
+            this.hasMore = newCards.length >= this.limit;
+            this.currentOffset += newCards.length;
 
             const pendingCards = newCards.map(card => ({
                 ...card,
@@ -72,7 +68,6 @@ class CatalogStore {
             }));
 
             this.cards = [...this.cards, ...pendingCards];
-            this.hasMore = newCards.length > 0;
 
             setTimeout(() => {
                 this.cards = this.cards.map(c => ({
@@ -95,19 +90,27 @@ class CatalogStore {
         }
     });
 
-    // Метод для поиска
+    checkPreload = () => {
+        if (this.cards.length <= this.preloadThreshold &&
+            this.hasMore &&
+            !this.isFetching &&
+            !this.preloadInProgress) {
+            this.fetchCards();
+        }
+    };
+
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
-        this.hasMore = true; // Сбрасываем флаг при новом поиске
+        this.hasMore = true;
         yield this.fetchCards(true); // initialLoad = true
     });
 
     // Метод для сброса поиска
-    resetSearch = () => {
+    resetSearch = flow(function* () {
         this.currentSearchQuery = null;
         this.hasMore = true;
-        this.fetchCards(true);
-    };
+        yield this.fetchCards(true);
+    });
 
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
@@ -119,8 +122,7 @@ class CatalogStore {
             this.basket = [...this.basket, card];
         }
 
-        // Автоподгрузка при малом количестве карточек
-        if (this.cards.length < 3 && this.hasMore && !this.isFetching) {
+        if (this.cards.length < 7 && this.hasMore && !this.isFetching) {
             this.fetchCards();
         }
     };
@@ -137,13 +139,13 @@ class CatalogStore {
             _key: this.getUniqueKey()
         };
 
-        this.cards = [...this.cards, {
+        this.cards = [ {
             ...restoredCard,
             style: {
                 opacity: 0,
                 zIndex: 1001
             }
-        }];
+        }, ...this.cards];
 
         setTimeout(() => {
             this.cards = this.cards.map(c =>

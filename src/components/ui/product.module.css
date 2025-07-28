@@ -125,7 +125,6 @@
     background: white;
     margin-right: 10px;
 
-
 }
 .productCard {
     background: white;
@@ -182,4 +181,8 @@
     justify-content: space-around;
     padding: 10px 0;
     border-top: 1px solid #ddd;
+}
+.highlightedButton {
+    background: pink;
+    Z-index: 10000;
 }

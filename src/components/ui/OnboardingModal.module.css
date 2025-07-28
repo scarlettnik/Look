@@ -180,3 +180,7 @@
 .backButton {
     background-color: transparent;
 }
+.text {
+    text-align: left;
+    padding: 0 4vw;
+}

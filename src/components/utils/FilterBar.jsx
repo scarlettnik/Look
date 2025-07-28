@@ -1,12 +1,12 @@
-import styles from '../ui/product.module.css'
+import styles from '../ui/product.module.css';
 import {ChevronDown, SlidersHorizontal, Undo2} from "lucide-react";
 
-export const FilterBar = ({onUndo, undoDisabled}) => (
+export const FilterBar = ({onUndo, undoDisabled, highlightUndo}) => (
     <div className={styles.filterBar}>
         <button
             onClick={onUndo}
             disabled={undoDisabled}
-            className={styles.backButton}
+            className={`${styles.backButton} ${highlightUndo ? styles.highlightedButton : ''}`}
         >
             <Undo2/>
         </button>

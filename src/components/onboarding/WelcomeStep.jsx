@@ -33,7 +33,9 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     ];
 
     useEffect(() => {
-        startAutoSwipe();
+        setTimeout(() => {
+            startAutoSwipe(true);
+        }, 100);
         return () => {
             if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current);

@@ -70,6 +70,10 @@
     font-size: 16px;
     font-weight: 400;
     color: var(--ultralight-gray);
+    max-width: 85vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .manufacturer {
@@ -93,13 +97,13 @@
 }
 
 .swipeFeedback {
-    position: absolute;
+    position: fixed;
     top: 45%;
     transform: translateY(-50%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 100;
+    z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;

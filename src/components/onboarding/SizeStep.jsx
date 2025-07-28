@@ -5,28 +5,11 @@ import SizeGrid from "../SizeGrid.jsx";
 import ParamsTab from "../ParamsTab.jsx";
 import FitOptions from "../FitOptions.jsx";
 
-const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip, onBack }) => {
+const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => {
     const [activeTab, setActiveTab] = useState("size");
-    const [pendingSize, setPendingSize] = useState(selectedSize);
-
-    useEffect(() => {
-        setPendingSize(selectedSize);
-    }, [selectedSize]);
 
     const handleNext = () => {
-        onUpdate({ size: pendingSize });
         onNext();
-    };
-
-    const  UpdateParem = (field, value) => {
-        setPendingSize(prev => ({ ...prev, [field]: value }))
-    }
-
-    const handleFitChange = (event) => {
-        setPendingSize(prev => ({
-            ...prev,
-            fit: event.target.value
-        }));
     };
 
     return (
@@ -59,23 +42,23 @@ const SizeStep = ({ selectedSize, onUpdate, onNext, onSkip, onBack }) => {
                     {activeTab === "size" && (
                         <SizeGrid
                             color='var(--ultralight-gray)'
-                            params={pendingSize}
-                            updateParam={UpdateParem}
+                            params={params}
+                            updateParam={updateParam}
                         />
                     )}
 
                     {activeTab === "params" && (
                         <ParamsTab
-                            params={pendingSize}
-                            updateParam={UpdateParem}
+                            params={params}
+                            updateParam={updateParam}
                         />
                     )}
 
                     <div className={styles.fitOptionsWrapper}>
-                        <p>Ношу одежду</p>
+                        <p className={styles.text}>Ношу одежду</p>
                         <FitOptions
-                            params={pendingSize}
-                            updateParam={handleFitChange}
+                            params={params}
+                            updateParam={(value) => updateParam('wearing_styles', value)}
                         />
                     </div>
                 </div>

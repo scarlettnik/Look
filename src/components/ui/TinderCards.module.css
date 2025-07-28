@@ -17,6 +17,52 @@
     position: relative;
 }
 
+.onboardingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+
+.onboardingContent {
+    background: #3A4651;
+    border-radius: 10px;
+    pointer-events: auto;
+    margin-bottom: 100px;
+    max-width: 400px;
+    width: 80vw;
+    padding: 20px;
+}
+
+.onboardingText {
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 600;
+}
+.onboardingBlock {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    color: var(--ultralight-gray);
+    font-size: 14px;
+    font-weight: 600;
+
+}
+.onboardingButton {
+    background: transparent;
+    border: none;
+    color: var(--ultralight-gray);
+    font-size: 14px;
+    font-weight: 600;
+
+}
 .skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;

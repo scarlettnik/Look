@@ -3,8 +3,7 @@ import styles from '../ui/aboutStep.module.css';
 import FullScreenButton from "../FullScrinButton.jsx";
 import titleStyle from '../ui/OnboardingModal.module.css'
 
-const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
-    const { gender, age } = userData;
+const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
     const sliderRef = useRef(null);
     const [valuePosition, setValuePosition] = useState(0);
 
@@ -38,13 +37,13 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
 
             <div className={styles.genderContainer}>
                 <button
-                    className={`${styles.genderOption} ${gender === 'female' ? styles.selected : ''}`}
+                    className={`${styles.genderOption} ${styles.selected}`}
                     onClick={() => onUpdate({gender: 'female'})}
                 >
                     Девушка
                 </button>
                 <button
-                    className={`${styles.genderOption} ${gender === 'male' ? styles.selected : ''}`}
+                    className={`${styles.genderOption}`}
                     onClick={() => onUpdate({gender: 'male'})}
                     disabled={true}
                 >
@@ -61,13 +60,13 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
                     min="16"
                     max="80"
                     value={age}
-                    onChange={(e) => onUpdate({age: e.target.value})}
+                    onChange={(e) => onUpdate('age', Number(e.target.value))}
                     className={styles.ageSlider}
                 />
                 <div
                     className={styles.ageValue}
                     style={{
-                        left: `${age == 16 ? valuePosition : valuePosition + 10}px`,
+                        left: `${age === 16 ? valuePosition : valuePosition + 10}px`,
                         transform: 'translateX(-50%)'
                     }}
                 >
@@ -82,7 +81,6 @@ const AboutStep = ({ userData, onUpdate, onNext, onSkip, onBack }) => {
                     textColor='var(--black)'
                     className={styles.primaryButton}
                     onClick={onNext}
-                    disabled={!gender}
                 >
                     Далее
                 </FullScreenButton>

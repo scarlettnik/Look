@@ -24,7 +24,7 @@ const SizeGrid = ({ params, updateParam, color = 'var(--white)' }) => {
                 <div
                     style={{backgroundColor: color}}
                     key={size}
-                    className={`${styles.sizeBox} ${params?.clothing_size === size ? styles.selectedSize : ''}`}
+                    className={`${styles.sizeBox} ${params?.clothing_size === size ? styles.selectedSize : styles.unSelectedSize}`}
                     onClick={() => handleChange(size)}
                 >
                     {size}

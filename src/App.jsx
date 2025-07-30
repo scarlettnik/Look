@@ -48,6 +48,7 @@ function AppContent() {
                 <Route path="/save" element={<Save/>}/>
                 <Route path="/save/:id" element={<Compilation/>}/>
                 <Route path="/save/:id/product/:id" element={<ProductPage/>}/>
+                <Route path="/trands/collection/:id/product/:id" element={<ProductPage/>}/>
                 <Route path='/shoppingcard' element={<ShoppingCard/>}/>
                 <Route path='/pref' element={<Preferences/>}/>
                 <Route path='/trands' element={<Comparing/>}/>

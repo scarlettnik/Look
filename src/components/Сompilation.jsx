@@ -80,7 +80,7 @@ const ItemGrid = ({ items, loading }) => {
     return (
         <div className={styles.itemsGrid}>
             {items?.map(item => (
-                <Link to={`/product/${item?.id}`} key={item?.id}>
+                <Link to={`product/${item?.id}`} key={item?.id}>
                     <img
                         src={item?.image_urls?.[0]}
                         alt={item.name}

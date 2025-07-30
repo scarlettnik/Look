@@ -4,6 +4,8 @@ import welcomstyle from '../ui/welcomStyle.module.css';
 
 const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
     const cardsRef = useRef([]);
     const animationRef = useRef(null);
 
@@ -32,16 +34,43 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         { id: 3, image: '/starterscroller2.png', direction: 'resist' }
     ];
 
+    // Функция предзагрузки изображений
+    const preloadImages = async () => {
+        const totalImages = cards.length;
+        let loadedCount = 0;
+
+        const loadPromises = cards.map(card => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = card.image;
+                img.onload = () => {
+                    loadedCount++;
+                    setLoadingProgress(Math.round((loadedCount / totalImages) * 100));
+                    resolve();
+                };
+                img.onerror = resolve;
+            });
+        });
+
+        await Promise.all(loadPromises);
+        setImagesLoaded(true);
+    };
+
     useEffect(() => {
-        setTimeout(() => {
-            startAutoSwipe(true);
-        }, 300);
+        preloadImages();
+
         return () => {
             if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [currentIndex]);
+    }, []);
+
+    useEffect(() => {
+        if (imagesLoaded) {
+            startAutoSwipe();
+        }
+    }, [imagesLoaded, currentIndex]);
 
     const animateResist = (cardElement) => {
         const {
@@ -130,10 +159,30 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     const easeInOut = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
+    if (!imagesLoaded) {
+        return (
+            <div className={styles.onboardingStep}>
+                <div className={welcomstyle.loadingContainer}>
+                    <div className={welcomstyle.loadingBar}>
+                        <div
+                            className={welcomstyle.loadingProgress}
+                            style={{ width: `${loadingProgress}%` }}
+                        ></div>
+                    </div>
+                    <p className={welcomstyle.loadingText}>
+                        Загрузка {loadingProgress}%
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.onboardingStep}>
             <p className={welcomstyle.onBoardingTitle}>
-                Добро пожаловать{userName && ','} <br/> {<>{userName} {userSername}{userName && '!'}</> || <p>ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</p>}</p>
+                Добро пожаловать{userName && ','} <br/>
+                {userName ? `${userName} ${userSername}!` : 'ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ'}
+            </p>
 
             <div className={welcomstyle.cardsContainer}>
                 {cards.map((card, index) => (
@@ -143,9 +192,9 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                         className={welcomstyle.card}
                         style={{
                             zIndex: cards.length - index,
-                            transform: index < currentIndex && card.direction !== 'resist' ?
-                                `translateX(${card.direction === 'left' ? -500 : 500}px) rotate(${card.direction === 'left' ? -30 : 30}deg)` :
-                                'translateX(0) rotate(0)',
+                            transform: index < currentIndex && card.direction !== 'resist'
+                                ? `translateX(${card.direction === 'left' ? -500 : 500}px) rotate(${card.direction === 'left' ? -30 : 30}deg)`
+                                : 'translateX(0) rotate(0)',
                             opacity: 1,
                             display: index < currentIndex && card.direction !== 'resist' ? 'none' : 'block',
                         }}
@@ -154,6 +203,9 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                             src={card.image}
                             alt={`Card ${index + 1}`}
                             className={welcomstyle.cardImage}
+                            width="300"
+                            height="400"
+                            loading="eager"
                         />
                     </div>
                 ))}
@@ -162,9 +214,10 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
             <button
                 className={welcomstyle.starterButton}
                 onClick={onNext}
+                disabled={!imagesLoaded}
             >
-                <div style={{display: 'flex', alignItems: "center", justifyContent: 'center'}}>
-                    Начать <img style={{paddingLeft: '10px'}} src='/rightarrow.svg' alt="Arrow"/>
+                <div style={{ display: 'flex', alignItems: "center", justifyContent: 'center' }}>
+                    Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />
                 </div>
             </button>
         </div>

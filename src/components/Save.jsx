@@ -75,18 +75,36 @@ const Save = observer(() => {
   const createClose = () => {
     setIsModalOpen(false);
   };
-    const handleDelete = () => {
-        store.collectionStore.deleteCollections(selectedSaves);
-        setSelectedSaves([]);
-        setDeleteMode(false);
-    };
 
-    const handleCreateCollection = (name, coverUrl) => {
-        if (name.trim()) {
-            store.collectionStore.createCollection(name, coverUrl);
-            setIsModalOpen(false);
-        }
-    };
+  const handleDelete = async () => {
+    const originalCollections = [...store.authStore.data.collections];
+
+    store.authStore.data.collections = originalCollections.filter(
+        collection => !selectedSaves.includes(collection.id)
+    );
+
+    setSelectedSaves([]);
+    setDeleteMode(false);
+
+    try {
+      await store.collectionStore.deleteCollections(selectedSaves);
+
+    } catch (error) {
+      store.authStore.data.collections = originalCollections;
+      console.error('Delete failed:', error);
+    }
+  };
+  const handleCreateCollection = async (name, coverUrl) => {
+    if (!name.trim()) return;
+    setIsModalOpen(false);
+    try {
+      const newCollection = await store.collectionStore.createCollection(name, coverUrl);
+    } catch (error) {
+      console.error('Create failed:', error);
+      alert('Не удалось создать коллекцию. Попробуйте снова.');
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -143,11 +161,14 @@ const Save = observer(() => {
           {filteredSaves?.map((save) => (
               <div key={save.id} className={styles.cardContainer}>
                 {deleteMode && (
-                    <CustomCheckbox
-                        id={`save-${save.id}`}
-                        checked={selectedSaves.includes(save.id)}
-                        onChange={() => toggleSaveSelection(save.id)}
-                    />
+                   <div>
+                     <CustomCheckbox
+                         id={`save-${save.id}`}
+                         checked={selectedSaves.includes(save.id)}
+                         onChange={() => toggleSaveSelection(save.id)}
+                         className={styles.checkBox}
+                     />
+                   </div>
                 )}
                 <Link to={`/save/${save.id}`}>
                   <div className={styles.card}>

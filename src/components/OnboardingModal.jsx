@@ -118,6 +118,15 @@ const OnboardingModal = observer(() => {
         setCurrentStep(prev => Math.min(prev + 1, 4));
     };
 
+    const next = () => {
+        console.log(store)
+        if (store?.authStore?.data?.preferences?.complete_onboarding) {
+            navigate('/cards');
+        } else {
+            nextStep()
+        }
+    }
+
     const prevStep = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
     };
@@ -129,13 +138,12 @@ const OnboardingModal = observer(() => {
         navigate('/cards')
     };
 
+
     const completeOnboarding = () => {
         handleSaveChanges();
         setIsClosed(true);
         navigate('/cards')
     };
-
-    if (store.onboarding.onboardingCompleted || isClosed) return null;
 
     return (
         <div className={styles.onboardingModal}>
@@ -147,7 +155,7 @@ const OnboardingModal = observer(() => {
                     <WelcomeStep
                         userName={auth.data?.first_name}
                         userSername={auth.data?.last_name}
-                        onNext={nextStep}
+                        onNext={next}
                     />
                 )}
 

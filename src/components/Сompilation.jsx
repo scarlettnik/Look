@@ -19,7 +19,7 @@ const Compilation = observer(() => {
     const { collectionStore } = useStore();
     const [isSave, setIsSave] = useState(false);
 
-    // Инициализируем фильтры с пустыми массивами вместо null
+
     const [filters, setFilters] = useState({
         size: [],
         brand: [],
@@ -34,16 +34,15 @@ const Compilation = observer(() => {
     }, [id, location.pathname]);
 
     const { currentCollection: save, loading } = collectionStore;
+    const [filteredProducts, setFilteredProducts] = useState(save?.products || []);
 
-    const filteredProducts = useMemo(() => {
-        if (!save?.products) return [];
-        return filterProducts(save.products, {
-            sizes: filters.size,
-            brands: filters.brand,
-            price: filters.price,
-            types: filters.type
-        });
-    }, [save?.products, filters]);
+    useEffect(() => {
+        if (save?.products) {
+            setFilteredProducts(save.products);
+        }
+    }, [save?.products]);
+
+
 
     return (
         <div className={styles.container}>
@@ -53,6 +52,7 @@ const Compilation = observer(() => {
                     filters={filters}
                     setFilters={setFilters}
                     products={save?.products || []}
+                    onFilter={setFilteredProducts}
                 />
                 <ItemGrid items={filteredProducts} loading={loading} />
             </div>

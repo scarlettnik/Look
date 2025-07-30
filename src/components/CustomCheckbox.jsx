@@ -1,9 +1,9 @@
 import React from 'react';
 import styles from './ui/customCheckbox.module.css';
 
-const CustomCheckbox = ({ id, checked, onChange }) => {
+const CustomCheckbox = ({ id, checked, onChange, className = '' }) => {
     return (
-        <label className={styles.customCheckbox} htmlFor={id}>
+        <label className={`${styles.customCheckbox} ${className}`} htmlFor={id}>
             <input
                 type="checkbox"
                 id={id}

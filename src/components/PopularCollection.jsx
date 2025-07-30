@@ -2,14 +2,21 @@ import {useNavigate, useParams} from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import {useStore} from "../provider/StoreContext.jsx";
 import styles from './ui/popualCollection.module.css';
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import Sidebar from "./Sidebar.jsx";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
+import Modal from "./utils/Modal.jsx";
+import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 
 const PopularCollection = observer(() => {
     const { id } = useParams();
     const navigate = useNavigate();
     const store = useStore();
+    const [isShareOpen, setIsShareOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    console.log(id)
+    console.log(store)
 
     useEffect(() => {
         store.collectionStore.loadCollection(id);
@@ -17,6 +24,18 @@ const PopularCollection = observer(() => {
 
     const { currentCollection: save, loading } = store.collectionStore;
     const currentItem = store.popular.popular.find(item => item.id === id);
+
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
+    const handleOpenSaveModal = (product) => {
+        setSelectedProduct(product);
+        setIsSaveModalOpen(true);
+    };
+
+    const handleCloseSaveModal = () => {
+        setIsSaveModalOpen(false);
+        setSelectedProduct(null);
+    };
 
 
 
@@ -39,17 +58,38 @@ const PopularCollection = observer(() => {
             <div className={styles.cardContainer}>
                 {loading ? (
                     [...Array(8)].map((_, i) => (
-                            <CustomSkeleton className={styles.card} key={i} style={{width:'46vw', height:'46vw', marginTop: '10px'}}/>
+                        <CustomSkeleton
+                            className={styles.card}
+                            key={i}
+                            style={{width:'46vw', height:'46vw', marginTop: '10px'}}
+                        />
                     ))
                 ) : (
                     save?.products?.map((item) => (
-                        <div key={item.id}>
-                            <img className={styles.card} src={item.image_urls[0]} alt={item.name}/>
+                        <div key={item.id} className={styles.productWrapper}>
+                            <img
+                                className={styles.card}
+                                src={item.image_urls[0]}
+                                alt={item.name}
+                            />
+                            <button
+                                className={styles.saveIcon}
+                                onClick={() => handleOpenSaveModal(item)}
+                            >
+                                <img src="/menuIcons/unactive/save.svg" alt="Сохранить" />
+                            </button>
                         </div>
                     ))
                 )}
             </div>
             <Sidebar/>
+
+            <SaveToCollectionModal
+                isOpen={isSaveModalOpen}
+                onClose={handleCloseSaveModal}
+                productId={selectedProduct?.id}
+                productName={selectedProduct?.name}
+            />
         </div>
     );
 });

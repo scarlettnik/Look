@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 
 import styles from "./ui/compilation.module.css";
 
-export const FilterBar = ({ filters, setFilters, products }) => {
+export const FilterBar = ({ filters, setFilters, catalogStore, products, onFilter }) => {
     const [activeFilter, setActiveFilter] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -21,24 +21,6 @@ export const FilterBar = ({ filters, setFilters, products }) => {
         setActiveFilter(null);
     };
 
-    const applyFilter = (value) => {
-        if (activeFilter) {
-            setFilters(prev => ({
-                ...prev,
-                [activeFilter]: Array.isArray(value) ? value : value
-            }));
-            closeFilter();
-        }
-    };
-
-    const clearFilter = (filterName, e) => {
-        e.stopPropagation();
-        setFilters(prev => ({
-            ...prev,
-            [filterName]: Array.isArray(prev[filterName]) ? [] : null
-        }));
-    };
-
     const renderFilterModal = () => {
         switch (activeFilter) {
             case 'size': return <SizeFilter applyFilter={applyFilter} currentValue={filters.size} />;
@@ -46,6 +28,95 @@ export const FilterBar = ({ filters, setFilters, products }) => {
             case 'price': return <PriceFilter applyFilter={applyFilter} currentValue={filters.price} />;
             case 'type': return <TypeFilter applyFilter={applyFilter} currentValue={filters.type} />;
             default: return null;
+        }
+    };
+
+    const applyFilter = (value) => {
+        if (activeFilter) {
+            const updatedFilters = { ...filters };
+
+            switch (activeFilter) {
+                case 'size':
+                    updatedFilters.size = Array.isArray(value) ? value : [value];
+                    break;
+                case 'brand':
+                    updatedFilters.brand = Array.isArray(value) ? value : [value];
+                    break;
+                case 'price':
+                    updatedFilters.price = {
+                        min: value?.min || null,
+                        max: value?.max || null
+                    };
+                    break;
+                case 'type':
+                    updatedFilters.type = Array.isArray(value) ? value : [value];
+                    break;
+                default:
+                    return;
+            }
+
+            setFilters(updatedFilters);
+            applyFilters(updatedFilters);
+            closeFilter();
+        }
+    };
+
+    const applyFilters = (updatedFilters) => {
+        if (catalogStore) {
+            // Режим API
+            const apiFilters = {
+                categories: updatedFilters.size || [],
+                brands: updatedFilters.brand || [],
+                min_price: updatedFilters.price?.min || null,
+                max_price: updatedFilters.price?.max || null,
+                colors: updatedFilters.type || []
+            };
+            catalogStore.applyFilters(apiFilters);
+        } else if (onFilter) {
+            // Локальный режим
+            const filtered = filterProducts(products || [], updatedFilters);
+            onFilter(filtered);
+        }
+    };
+
+    const clearFilter = (filterName, e) => {
+        e.stopPropagation();
+
+        const updatedFilters = { ...filters };
+
+        switch (filterName) {
+            case 'size':
+                updatedFilters.size = [];
+                break;
+            case 'brand':
+                updatedFilters.brand = [];
+                break;
+            case 'price':
+                updatedFilters.price = { min: null, max: null };
+                break;
+            case 'type':
+                updatedFilters.type = [];
+                break;
+            default:
+                return;
+        }
+
+        setFilters(updatedFilters);
+        applyFilters(updatedFilters);
+    };
+
+    const isFilterActive = (filterName) => {
+        switch (filterName) {
+            case 'size':
+                return filters.size?.length > 0;
+            case 'brand':
+                return filters.brand?.length > 0;
+            case 'price':
+                return filters.price?.min != null || filters.price?.max != null;
+            case 'type':
+                return filters.type?.length > 0;
+            default:
+                return false;
         }
     };
 
@@ -62,41 +133,34 @@ export const FilterBar = ({ filters, setFilters, products }) => {
                     {key: 'brand', label: 'Бренд'},
                     {key: 'price', label: 'Цена'},
                     {key: 'type', label: 'Тип'}
-                ].map(({key, label}) => (
-                    <button
-                        key={key}
-                        className={`${styles.filterButton} ${
-                            (key === 'price'
-                                ? (filters[key]?.min || filters[key]?.max)
-                                : (Array.isArray(filters[key])
-                                    ? filters[key].length > 0
-                                    : filters[key]))
-                                ? styles.activeFilter
-                                : ''
-                        }`}
-                        onClick={() => openFilter(key)}
-                    >
-                        {label}
-                        {(key === 'price'
-                            ? (filters[key]?.min || filters[key]?.max)
-                            : (Array.isArray(filters[key])
-                                ? filters[key].length > 0
-                                : filters[key])) && (
-                            <span
-                                className={styles.clearFilter}
-                                onClick={(e) => clearFilter(key, e)}
-                            >
-                <img src='/subicons/close.svg' alt="Очистить"/>
-            </span>
-                        )}
-                    </button>
-                ))}
+                ].map(({key, label}) => {
+                    const active = isFilterActive(key);
+
+                    return (
+                        <button
+                            key={key}
+                            className={`${styles.filterButton} ${active ? styles.activeFilter : ''}`}
+                            onClick={() => openFilter(key)}
+                        >
+                            {label}
+                            {active && (
+                                <span
+                                    className={styles.clearFilter}
+                                    onClick={(e) => clearFilter(key, e)}
+                                >
+                                    <img src='/subicons/close.svg' alt="Очистить"/>
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             {isModalOpen && renderFilterModal()}
         </>
     );
 };
+
 const SizeFilter = ({ applyFilter, currentValue }) => {
     const [selected, setSelected] = useState(currentValue || []);
 

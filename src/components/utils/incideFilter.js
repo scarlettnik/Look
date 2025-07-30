@@ -1,41 +1,41 @@
 export const filterProducts = (products, filters) => {
-    if (!products || !Array.isArray(products)) return [];
+    if (!products) return [];
 
     return products.filter(product => {
         // Фильтрация по размеру
-        if (filters.sizes?.length > 0) {
-            const hasSize = filters.sizes.some(size =>
-                product.sizes.includes(size) ||
-                (size === 'NO SIZE' && product.sizes.includes('один размер'))
-            );
-            if (!hasSize) return false;
+        if (filters.size?.length > 0) {
+            if (!filters.size.some(size => product.sizes.includes(size))) {
+                return false;
+            }
         }
 
         // Фильтрация по бренду
-        if (filters.brands?.length > 0) {
-            if (!filters.brands.includes(product.brand)) return false;
+        if (filters.brand?.length > 0) {
+            if (!filters.brand.includes(product.brand)) {
+                return false;
+            }
         }
 
         // Фильтрация по цене
         if (filters.price) {
-            const price = product.discount_price || product.price;
-            if (filters.price.min && price < filters.price.min) return false;
-            if (filters.price.max && price > filters.price.max) return false;
+            const productPrice = product.price || 0;
+            if (filters.price.min != null && productPrice < filters.price.min) {
+                return false;
+            }
+            if (filters.price.max != null && productPrice > filters.price.max) {
+                return false;
+            }
         }
 
-        // Фильтрация по типу (категории)
-        if (filters.types?.length > 0) {
-            const categoryPath = product.category.split('/');
-            const hasType = filters.types.some(type =>
-                categoryPath.includes(type.toLowerCase())
-            );
-            if (!hasType) return false;
+        if (filters.type?.length > 0) {
+            if (!filters.type.includes(product.type)) {
+                return false;
+            }
         }
 
         return true;
     });
 };
-
 export const getProductTypes = (products) => {
     const types = new Set();
     products?.forEach(product => {

@@ -10,10 +10,18 @@
             transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
             opacity 0.3s ease;
     will-change: transform, opacity;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     opacity: 0;
+}
+
+.cardImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-position: center;
+    z-index: 1;
 }
 
 .card::after {
@@ -25,6 +33,7 @@
     height: 40%;
     background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
     pointer-events: none;
+    z-index: 2;
 }
 
 .card.moving {
@@ -41,36 +50,34 @@
 }
 
 .cardContent {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: 16px;
     box-sizing: border-box;
-    position: relative;
-    z-index: 2;
 }
 
 .cardBottom {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    width: 100%;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .cardInfo {
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    align-items: flex-start;
     color: white;
-    padding-left: 15px;
 }
 
 .productName {
     font-size: 16px;
     font-weight: 400;
     color: var(--ultralight-gray);
-    max-width: 85vw;
+    max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -82,32 +89,43 @@
     color: var(--light-warm-gray);
 }
 
+.priceRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .price {
     font-size: 14px;
     font-weight: 400;
     color: var(--ultralight-gray);
-    padding: 5px 0;
 }
 
 .saveButton {
     background-color: transparent;
     border: none;
-    border-radius: 12px;
     cursor: pointer;
 }
 
 .swipeFeedback {
-    position: fixed;
+    position: absolute;
     top: 45%;
     transform: translateY(-50%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
-    z-index: 10000;
+    z-index: 4;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
+}
+
+.swipeFeedbackLeft {
+    left: 5%;
+}
+
+.swipeFeedbackRight {
+    right: 5%;
 }
 
 @keyframes fadeInOut {
@@ -118,13 +136,4 @@
 
 .swipeFeedbackActive {
     animation: fadeInOut 0.5s ease-out;
-}
-
-
-.swipeFeedbackLeft {
-    left: 5%;
-}
-
-.swipeFeedbackRight {
-    right: 5%;
 }

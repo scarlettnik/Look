@@ -15,11 +15,14 @@
 
 .modal {
     background: white;
-    width: 100%;
+    width: 100vw;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
     animation: slideUp 0.3s ease-out forwards;
     position: relative;
+    height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .modalClosing {
@@ -49,7 +52,7 @@
 
 .closeIcon {
     position: absolute;
-    top: 16px;
+    top: 20px;
     right: 10px;
     background: none;
     border: none;

@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from '../ui/search.module.css';
 import { AUTH_TOKEN } from "../../constants.js";
+import {useStore} from "../../provider/StoreContext.jsx";
 
 export const SearchHeader = ({ onSearch, onClearSearch }) => {
     const [isSearchActive, setIsSearchActive] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const store = useStore();
+    const [searchQuery, setSearchQuery] = useState(store?.catalogStore?.currentSearchQuery);
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const searchRef = useRef(null);
     const inputRef = useRef(null);
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -37,9 +40,8 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isSearchActive, searchQuery]);
 
-    // Запрос подсказок с debounce
     useEffect(() => {
-        if (searchQuery.trim() && isSearchActive) {
+        if (searchQuery && isSearchActive) {
             const timer = setTimeout(() => {
                 fetchSuggestions(searchQuery);
             }, 100);
@@ -81,21 +83,12 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         inputRef.current?.focus();
         handleSearch(suggestion);
     };
-
-    const handleClearInput = () => {
-        setSearchQuery('');
-        setSuggestions([]);
-        inputRef.current?.focus();
-        onClearSearch?.();
-
-    };
-
     const handleSearch = (query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
-            const searchRequest = {
-                query: trimmedQuery,
-            };
+            const searchRequest = { query: trimmedQuery };
+            console.log(trimmedQuery)
+            store.catalogStore.setLastSearchQuery(trimmedQuery);
 
             if (onSearch) {
                 onSearch(searchRequest);
@@ -106,6 +99,13 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         }
     };
 
+    const handleClearInput = () => {
+        setSearchQuery('');
+        setSuggestions([]);
+        store.catalogStore.clearLastSearchQuery();
+        inputRef.current?.focus();
+        onClearSearch?.();
+    };
     return (
         <>
             {isSearchActive && (
@@ -182,7 +182,7 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                                         {suggestion}
                                     </div>
                                 ))
-                            ) : searchQuery.trim() && !isLoading ? (
+                            ) : searchQuery && !isLoading ? (
                                 <div className={styles.suggestionItem}>Ничего не найдено</div>
                             ) : null}
                         </div>

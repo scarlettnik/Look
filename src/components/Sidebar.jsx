@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import styles from './ui/sidebar.module.css'; // Измененный импорт стилей
+import styles from './ui/sidebar.module.css';
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
 const Sidebar = ({highlightSave, highlightPopular, onboarding}) => {

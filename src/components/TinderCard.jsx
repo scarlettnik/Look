@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import styles from "./ui/TinderCard.module.css";
+import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 
 const VELOCITY_THRESHOLD = 0.5;
 const SWIPE_POWER = 0.6;
@@ -22,7 +23,8 @@ const TinderCard = ({
                         topCardPosition,
                         swipeProgress,
                         setCardRef,
-                        isOnboardingActive
+                        isOnboardingActive,
+                        onSaveClick
                     }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -59,7 +61,6 @@ const TinderCard = ({
             Math.abs(currentPos.y - lastTapPosition.current.y) < TAP_MOVEMENT_THRESHOLD) {
 
             clearTimeout(tapTimeout.current);
-            handleDoubleAction();
             return;
         }
 
@@ -67,9 +68,9 @@ const TinderCard = ({
         lastTapPosition.current = currentPos;
 
         tapTimeout.current = setTimeout(() => {
+            // Одиночный тап не делает ничего
         }, DOUBLE_TAP_DELAY);
     };
-
 
     const handleDoubleAction = () => {
         setShowDoubleClickFeedback(true);
@@ -77,6 +78,7 @@ const TinderCard = ({
             navigate(`/product/${card.id}`);
         }, 500);
     };
+
 
     useEffect(() => {
         return () => {
@@ -274,15 +276,7 @@ const TinderCard = ({
         }
     }, [card.id, setCardRef]);
 
-    const handleStart = (clientX, clientY) => {
-        if (isOnboardingActive) return; // Блокируем во время обучения
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-    };
+
 
     const [originalStyles, setOriginalStyles] = useState({
         transform: '',
@@ -300,6 +294,19 @@ const TinderCard = ({
             });
         }
     }, []);
+
+
+    const handleStart = (clientX, clientY) => {
+        if (isOnboardingActive) return;
+
+        setStartPos({ x: clientX, y: clientY });
+        setIsDragging(true);
+        startTime.current = Date.now();
+
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
+        }
+    };
 
     return (
         <div
@@ -324,10 +331,18 @@ const TinderCard = ({
             onMouseUp={!isExpanded ? handleEnd : undefined}
             onMouseLeave={!isExpanded ? handleEnd : undefined}
             style={{
-                backgroundImage: `url(${card.image_urls[0]})`,
                 zIndex: zIndex,
             }}
         >
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/product/${card.id}`);
+                }}
+            >
+                <img className={styles.cardImage} src={card.image_urls[0]}/>
+            </div>
+
             {isTopCard && (
                 <>
                     <div
@@ -337,7 +352,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img style={{width:'60px'}} src='/menuIcons/unactive/save.svg'/>
+                        <img style={{width: '60px'}} src='/menuIcons/unactive/save.svg'/>
                     </div>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
@@ -354,11 +369,13 @@ const TinderCard = ({
             <div className={styles.cardContent} ref={contentRef}>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>
-                        <div className={styles.productName}>{card.name}</div>
-                        <div className={styles.manufacturer}>{card.brand}</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap' , justifyContent: 'space-between', width: '86vw', alignItems: 'center' }}>
-                            <div className={styles.price}>5000 ₽</div>
-                            <button className={styles.saveButton}>
+                        <div className={styles.productName}>{card?.name}</div>
+                        <div className={styles.manufacturer}>{card?.brand}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', width: '86vw', alignItems: 'center' }}>
+                            <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
+                            <button
+                                onClick={onSaveClick}
+                                className={styles.saveButton}>
                                 <img src='/subicons/whitebookmark.svg'/>
                             </button>
                         </div>
@@ -367,6 +384,5 @@ const TinderCard = ({
             </div>
         </div>
     );
-};
-
+}
 export default TinderCard;

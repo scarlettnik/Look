@@ -7,12 +7,12 @@ import Onboarding from "./provider/Onboarding";
 import PopularStore from "./provider/PopularStore";
 
 class AppStore {
-    authStore = new AuthStore();
-    collectionStore = new CollectionStore();
-    cartStore = new CartStore();
-    catalogStore = new CatalogStore();
-    onboarding = new Onboarding();
-    popular = new PopularStore();
+    authStore = new AuthStore(this);
+    collectionStore = new CollectionStore(this);
+    cartStore = new CartStore(this);
+    catalogStore = new CatalogStore(this);
+    onboarding = new Onboarding(this);
+    popular = new PopularStore(this);
 
     constructor() {
         makeAutoObservable(this);

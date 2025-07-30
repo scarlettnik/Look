@@ -4,8 +4,12 @@ import styles from './ui/TinderCards.module.css';
 import Sidebar from './Sidebar';
 import TinderCard from "./TinderCard.jsx";
 import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
-import { FilterBar } from "./utils/FilterBar.jsx";
+import { FilterBar } from "./FilterBar.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
+import {AUTH_TOKEN} from "../constants.js";
+import {runInAction} from "mobx";
+import {Onboarding} from "./Onboarding.jsx";
+import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.05;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.05;
@@ -22,6 +26,27 @@ const TinderCards = observer(() => {
     const containerRef = useRef(null);
 
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
+
+    const [filters, setFilters] = useState({
+        size: [],
+        brand: [],
+        price: {},
+        type: []
+    });
+
+
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    const handleOpenSaveModal = (product) => {
+        setSelectedProduct(product);
+        setIsSaveModalOpen(true);
+    };
+
+    const handleCloseSaveModal = () => {
+        setIsSaveModalOpen(false);
+        setSelectedProduct(null);
+    };
 
     useEffect(() => {
         if (showOnboarding) {
@@ -110,10 +135,7 @@ const TinderCards = observer(() => {
     const [undoButtonHighlight, setUndoButtonHighlight] = useState(false);
     const [saveHighlight, setsaveHighlight] = useState(false);
     const [popularHighlight, setPopularHighlight] = useState(false);
-
-
     const [isOnboardingActive, setIsOnboardingActive] = useState(false);
-
     const cardRefs = useRef({});
 
     const setCardRef = useCallback((id, ref) => {
@@ -123,6 +145,38 @@ const TinderCards = observer(() => {
             delete cardRefs.current[id];
         }
     }, []);
+
+
+    const handleSaveChanges = async () => {
+        try {
+            const response = await fetch('https://api.lookvogue.ru/v1/user', {
+                method: 'PATCH',
+                headers: {
+                    "Authorization": `tma ${AUTH_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    preferences: {
+                        complete_onboarding: true
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error('Update failed');
+
+            runInAction(() => {
+                if (store.authStore.data) {
+                    store.authStore.data.preferences = {
+                        complete_onboarding: true
+                    };
+                }
+            });
+
+        } catch (error) {
+            console.error('Update error:', error);
+        }
+    };
+
 
     const [isAnimating, setIsAnimating] = useState(false); // Добавляем состояние для отслеживания анимации
 
@@ -150,239 +204,109 @@ const TinderCards = observer(() => {
             up: { endX: window.innerWidth * 0.5, endY: -window.innerHeight * 0.5, rotation: 5 }
         }[direction];
 
-        // Анимация движения вперед
         cardRef.style.transition = 'transform 500ms ease-out, opacity 500ms ease-out';
         cardRef.style.transform = `translate(${params.endX}px, ${params.endY}px) rotate(${params.rotation}deg)`;
         cardRef.style.zIndex = '10000';
 
-        // Задержка в крайней точке (1 секунда)
         setTimeout(() => {
-            // Возврат к исходному положению
-            cardRef.style.transition = 'transform 500ms ease-out, opacity 500ms ease-out';
+            cardRef.style.transition = 'transform 100ms ease-out, opacity 500ms ease-out';
             cardRef.style.transform = originalStyles.transform;
             cardRef.style.opacity = originalStyles.opacity;
 
-            // Восстановление стилей после возврата
             setTimeout(() => {
                 cardRef.style.transition = originalStyles.transition;
                 cardRef.style.zIndex = originalStyles.zIndex;
                 setIsOnboardingActive(false);
-                setIsAnimating(false); // Сбрасываем флаг анимации
+                setIsAnimating(false);
             }, 500);
         }, 1000);
     }, [store.catalogStore.cards, isAnimating]);
 
-    const handleNextOnboardingStep = () => {
-        if (isAnimating) return;
-        switch(onboardingStep) {
-            case 1:
-                setOnboardingStep(2);
-                simulateSwipe('left');
-                break;
-            case 2:
-                setOnboardingStep(3);
-                simulateSwipe('right');
-                break;
-            case 3:
-                setOnboardingStep(4);
-                simulateSwipe('up');
-                setUndoButtonHighlight(true);
-                break;
-            case 4:
-                setOnboardingStep(5);
-                setUndoButtonHighlight(false);
-                setsaveHighlight(true)
-                break;
-            case 5:
-                setOnboardingStep(6);
-                setsaveHighlight(false)
-                setPopularHighlight(true)
-                break;
-            case 6:
-                setOnboardingStep(0);
-                setPopularHighlight(false)
-                break;
-            default:
-                setOnboardingStep(onboardingStep + 1);
-        }
-    };
-
-    const renderOnboardingStep = () => {
-        switch(onboardingStep) {
-            case 1:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            Привет! За пару кликов расскажем, как тут все устроено :)
-                            Открыть карточку с деталями можно кликнув на нее.
-                        </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                1/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
-                        </div>
-
-                    </>
-                );
-            case 2:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            При свайпе влево карточка пропадает из ленты и подобные стили показываются реже
-                        </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                2/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
-                        </div>
-
-                    </>
-                );
-            case 3:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще
-                        </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                3/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
-                        </div>
-
-                    </>
-                );
-            case 4:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            При свайпе вверх появляетсяновая карточка. Предыдущую можно найти, кликнув на иконку «Назад»
-                        </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                4/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
-                        </div>
-
-                    </>
-                );
-            case 5:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            Здесь можно найти все сохраненные карточки и создать свои подборки
-                        </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                5/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
-                        </div>
-
-                    </>
-                );
-            case 6:
-                return (
-                    <>
-                        <p className={styles.onboardingText}>
-                            А тут найти подборки по стилям и направлениям. При нажатии на фото из подборки откроется карточка товара.                         </p>
-                        <div className={styles.onboardingBlock}>
-                            <p>
-                                6/6
-                            </p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Go on
-                            </button>
-                        </div>
-
-                    </>
-                );
-            default:
-                return null;
-        }
-    };
 
     return (
         <>
 
-        <div className={styles.container} style={{ height: `${containerHeight}px` }} ref={containerRef}>
-            <SearchHeader
-                onSearch={(searchRequest) => {
-                    console.log('Search request:', searchRequest);
-                    store.catalogStore.fetchCardsWithSearch(searchRequest);
-                }}
-                onClearSearch={() => store.catalogStore.resetSearch()}
-            />
-            <FilterBar
-                onUndo={store.catalogStore.undoSwipe}
-                undoDisabled={store.catalogStore.swipeHistory?.length === 0}
-                highlightUndo={undoButtonHighlight}
-            />
+            <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
+                {/*<button onClick={() => handleSaveChanges()}>ТЫК</button>*/}
 
-            <div className={styles.cardsContainer}>
-                {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
-                    <div
-                        key={`skeleton-${i}`}
-                        className={styles.skeleton}
-                        style={{ zIndex: SKELETON_COUNT - i }}
-                    />
-                ))}
+                <SearchHeader
+                    onSearch={(searchRequest) => {
+                        console.log('Search request:', searchRequest);
+                        store.catalogStore.fetchCardsWithSearch(searchRequest);
+                    }}
+                    onClearSearch={() => store.catalogStore.resetSearch()}
+                />
+                <FilterBar
+                    filters={filters}
+                    setFilters={setFilters}
+                    catalogStore={store.catalogStore}
+                />
 
-                {!store.catalogStore.loading && store?.catalogStore?.cards?.map((card, index) => (
-                    <TinderCard
-                        key={card._key}
-                        card={card}
-                        onSwipe={handleSwipe}
-                        updateSwipeFeedback={updateSwipeFeedback}
-                        zIndex={store.catalogStore.cards.length - index}
-                        offset={index}
-                        isExpanded={expandedCardId === card.id}
-                        onExpand={() => setExpandedCardId(card.id)}
-                        onCollapse={() => setExpandedCardId(null)}
-                        isPending={card._pending}
-                        swipeProgress={index === 0 ? swipeProgress : { direction: null, opacity: 0 }}
-                        isTopCard={index === 0}
-                        setCardRef={setCardRef}
-                        isOnboardingActive={isOnboardingActive && index === 0}
-                    />
-                ))}
+                <div className={styles.cardsContainer}>
+                    {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                        <div
+                            key={`skeleton-${i}`}
+                            className={styles.skeleton}
+                            style={{zIndex: SKELETON_COUNT - i}}
+                        />
+                    ))}
 
-                {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
-                    <div className={styles.emptyState}>
-                        <h2>No more cards!</h2>
-                    </div>
-                )}
-            </div>
-            <Sidebar
-                highlightSave={saveHighlight}
-                highlightPopular={popularHighlight}
-                onboarding ={onboardingStep > 0}
+                    {!store.catalogStore.loading && store?.catalogStore?.cards?.map((card, index) => (
+                        <TinderCard
+                            key={card._key}
+                            card={card}
+                            onSwipe={handleSwipe}
+                            updateSwipeFeedback={updateSwipeFeedback}
+                            zIndex={store.catalogStore.cards.length - index}
+                            offset={index}
+                            isExpanded={expandedCardId === card.id}
+                            onExpand={() => setExpandedCardId(card.id)}
+                            onCollapse={() => setExpandedCardId(null)}
+                            isPending={card._pending}
+                            swipeProgress={index === 0 ? swipeProgress : {direction: null, opacity: 0}}
+                            isTopCard={index === 0}
+                            setCardRef={setCardRef}
+                            isOnboardingActive={isOnboardingActive && index === 0}
+                            onSaveClick={handleOpenSaveModal}
+                        />
+                    ))}
 
-            />
-            {showOnboarding && onboardingStep > 0 && (
-                <div className={styles.onboardingOverlay}>
-                    <div className={styles.onboardingContent}>
-                        {renderOnboardingStep()}
-                    </div>
+                    {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
+                        <div className={styles.emptyState}>
+                            <h2>No more cards!</h2>
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>
+                <Sidebar
+                    highlightSave={saveHighlight}
+                    highlightPopular={popularHighlight}
+                    onboarding={!store?.authStore?.data?.preferences?.complete_onboarding}
 
-            </>
+                />
+                <Onboarding
+                    showOnboarding={showOnboarding}
+                    onboardingStep={onboardingStep}
+                    setOnboardingStep={setOnboardingStep}
+                    simulateSwipe={simulateSwipe}
+                    isAnimating={isAnimating}
+                    handleSaveChanges={handleSaveChanges}
+                    undoButtonHighlight={undoButtonHighlight}
+                    setUndoButtonHighlight={setUndoButtonHighlight}
+                    saveHighlight={saveHighlight}
+                    setsaveHighlight={setsaveHighlight}
+                    popularHighlight={popularHighlight}
+                    setPopularHighlight={setPopularHighlight}
+
+                />
+                <SaveToCollectionModal
+                    isOpen={isSaveModalOpen}
+                    onClose={handleCloseSaveModal}
+                    productId={selectedProduct?.id}
+                    productName={selectedProduct?.name}
+                />
+            </div>
+
+        </>
     );
 });
 

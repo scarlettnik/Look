@@ -10,9 +10,17 @@ class CatalogStore {
     isFetching = false;
     hasMore = true;
     authToken = AUTH_TOKEN;
-    currentSearchQuery = null;
-    currentOffset = 0; // Добавляем offset для пагинации
-    limit = 10; // Лимит карточек за один запрос
+    currentSearchQuery = '';
+    currentOffset = 0;
+    limit = 10;
+    currentFilters = {
+        categories: [],
+        colors: [],
+        brands: [],
+        min_price: null,
+        max_price: null
+    };
+    lastSearchQuery = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -32,6 +40,13 @@ class CatalogStore {
         'Authorization': `tma ${this.authToken}`
     });
 
+    setLastSearchQuery = (query) => {
+        this.lastSearchQuery = query;
+    };
+
+    clearLastSearchQuery = () => {
+        this.lastSearchQuery = null;
+    };
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching) return;
 
@@ -43,16 +58,23 @@ class CatalogStore {
                 this.cards = [];
             }
 
-            // Формируем URL с query-параметрами
             const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
             url.searchParams.append('offset', this.currentOffset);
             url.searchParams.append('limit', this.limit);
-
+            const requestBody = {
+                query: this.currentSearchQuery,
+                categories: this.currentFilters.categories,
+                colors: this.currentFilters.colors,
+                brands: this.currentFilters.brands,
+                min_price: this.currentFilters.min_price,
+                max_price: this.currentFilters.max_price,
+            };
+            console.log(requestBody);
 
             const response = yield fetch(url.toString(), {
                 method: 'POST',
                 headers: this.getAuthHeaders(),
-                body: JSON.stringify({query: this.currentSearchQuery})
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -105,9 +127,29 @@ class CatalogStore {
         yield this.fetchCards(true); // initialLoad = true
     });
 
-    // Метод для сброса поиска
     resetSearch = flow(function* () {
         this.currentSearchQuery = null;
+        this.hasMore = true;
+        yield this.fetchCards(true);
+    });
+
+    applyFilters = flow(function* (newFilters) {
+        this.currentFilters = {
+            ...this.currentFilters,
+            ...newFilters
+        };
+        this.hasMore = true;
+        yield this.fetchCards(true);
+    });
+
+    resetFilters = flow(function* () {
+        this.currentFilters = {
+            categories: [],
+            colors: [],
+            brands: [],
+            min_price: null,
+            max_price: null
+        };
         this.hasMore = true;
         yield this.fetchCards(true);
     });

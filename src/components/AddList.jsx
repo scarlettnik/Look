@@ -13,22 +13,24 @@ const coverImages = [
     { url: 'https://avatars.mds.yandex.net/i?id=6c27e518e46665088413237506280fd3721711b6-10636720-images-thumbs&n=13' }
 ]
 
-const SelectedCoverPreview = ({ imageUrl, title }) => (
-    <div className={styles.selectedCover}>
-        <img src={imageUrl} alt="Selected Cover"/>
-        <div className={styles.overlay}></div>
-        <span className={styles.coverText}>{title}</span>
-    </div>
-);
+// const SelectedCoverPreview = ({ imageUrl, title }) => (
+//     <div className={styles.selectedCover}>
+//         <img src={imageUrl} alt="Selected Cover"/>
+//         <div className={styles.overlay}></div>
+//         <span className={styles.coverText}>{title}</span>
+//     </div>
+// );
 
 function AddList({
                      onCreate,
                      onUpdate,
-                     collection = null // Передаем коллекцию для редактирования
+                     collection = null,
+                     coverImage
                  })  {
+    console.log(coverImage)
     const [closetName, setClosetName] = useState('');
     const [selectedCover, setSelectedCover] = useState(
-        collection?.url || coverImages[0].url
+        `${coverImage}`
     );
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const containerRef = useRef(null);
@@ -41,17 +43,18 @@ function AddList({
         }
     }, [collection]);
 
+
     const handleSave = () => {
         if (!closetName.trim()) return;
 
         if (collection) {
-            onUpdate(closetName, selectedCover);
+            onUpdate(closetName, selectedCover || coverImage);
         } else {
             onCreate(closetName, selectedCover);
         }
     };
 
-
+    console.log(selectedCover || coverImage)
 
     useEffect(() => {
         if (!window.visualViewport) return;
@@ -91,9 +94,9 @@ function AddList({
                 />
 
                 <label className={styles.label}>Обложка</label>
-                <SelectedCoverPreview
-                    imageUrl={selectedCover}
-                />
+                <div className={styles.selectedCover}>
+                    <img src={selectedCover || coverImage} alt="Selected Cover"/>
+                </div>
 
                 <div className={styles.coverGrid}>
                     {coverImages.map((img) => (

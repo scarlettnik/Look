@@ -66,7 +66,6 @@ const ProductPage = () => {
     const handleCloseSaveModal = useCallback(() => {
         setIsSaveModalOpen(false);
         setSelectedProduct(null);
-        loadProduct(id);
     }, []);
 
 
@@ -286,6 +285,12 @@ const ProductPage = () => {
                 productId={product?.id}
                 productName={product?.name}
                 productInCollection={product?.is_contained_in_user_collections}
+                onSaveSuccess={(isSaved) => {
+                    setProduct(prev => ({
+                        ...prev,
+                        is_contained_in_user_collections: isSaved
+                    }));
+                }}
             />
             <Sidebar/>
         </div>

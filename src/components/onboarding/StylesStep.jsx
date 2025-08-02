@@ -38,6 +38,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                             <img src={style.url} alt={style.name} className={styles.styleImage}/>
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
+                                    className={styles.styleCheckbox}
                                     checked={selectedStyles.includes(style.name)}
                                     onChange={() => handleStyleToggle(style.name)}
                                 />

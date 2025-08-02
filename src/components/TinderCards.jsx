@@ -14,7 +14,6 @@ import {useNavigate} from "react-router-dom";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
-const ANIMATION_DURATION = 2000;
 const INITIAL_CARDS_COUNT = 3;
 const SKELETON_COUNT = 3;
 
@@ -36,9 +35,9 @@ const swipeConfig = {
         animationDuration: 5000
     },
     physics: {
-        velocityThreshold: 0.9, // Уменьшаем порог скорости
-        power: 0.2,           // Уменьшаем силу свайпа
-        deceleration: 0.95    // Увеличиваем замедление
+        velocityThreshold: 0.9,
+        power: 0.2,
+        deceleration: 0.95
     }
 };
 
@@ -52,6 +51,8 @@ const TinderCards = observer(() => {
     const navigate = useNavigate()
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
 
+    console.log(showOnboarding)
+
     const [filters, setFilters] = useState({
         size: [],
         brand: [],
@@ -59,7 +60,25 @@ const TinderCards = observer(() => {
         type: []
     });
 
+    const handleSaveSuccess = useCallback((productId, isSaved) => {
+        runInAction(() => {
+            // Обновляем состояние в catalogStore
+            const card = store.catalogStore.cards.find(c => c.id === productId);
+            if (card) {
+                card.is_contained_in_user_collections = isSaved;
+            }
 
+            // Обновляем состояние в popularStore (если товар есть там)
+            store.popular.popular.forEach(item => {
+                if (item.products) {
+                    const product = item.products.find(p => p.id === productId);
+                    if (product) {
+                        product.is_contained_in_user_collections = isSaved;
+                    }
+                }
+            });
+        });
+    }, [store]);
 
     useEffect(() => {
         if (showOnboarding) {
@@ -103,8 +122,37 @@ const TinderCards = observer(() => {
     }, [store?.catalogStore.cards?.length]);
 
 
+
+    const sendInteraction = async (productId, action) => {
+        try {
+            const response = await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    "Authorization": `tma ${AUTH_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    interaction_type: action
+                })
+            });
+
+            if (response.ok) {
+                console.log(response)
+            }
+        } catch (error) {
+            console.error('Error sending interaction:', error);
+        }
+    };
+
+
     const handleSwipe = useCallback((direction, card) => {
         if (direction === 'down') return;
+
+        // Определяем тип взаимодействия
+        const action = direction === 'right' ? 'like' : 'dislike';
+
+        // Отправляем запрос
+        sendInteraction(card.id, action);
 
         const duration = direction === 'up'
             ? swipeConfig.verticalUp.animationDuration
@@ -137,6 +185,7 @@ const TinderCards = observer(() => {
             store.catalogStore.handleSwipe(direction, card);
         }, duration/2);
     }, [swipeConfig]);
+
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
         const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
@@ -212,40 +261,74 @@ const TinderCards = observer(() => {
         if (!cardRef) return;
 
         setIsOnboardingActive(true);
-        setIsAnimating(true); // Устанавливаем флаг анимации
+        setIsAnimating(true);
 
-        const computedStyle = window.getComputedStyle(cardRef);
-        const originalStyles = {
-            transform: computedStyle.transform,
-            transition: computedStyle.transition,
-            opacity: computedStyle.opacity,
-            zIndex: computedStyle.zIndex
+        // 1. Создаем иконку фильтра динамически
+        const createFeedbackIcon = (side) => {
+            const icon = document.createElement('div');
+            icon.className = `${styles.swipeFeedback} ${styles[`swipeFeedback${side}`]} ${styles.onboardingIcon}`;
+            icon.innerHTML = `<img src="/subicons/filter.svg" alt="Filter" style="width:40px;height:40px"/>`;
+            return icon;
         };
 
+        // 2. Добавляем иконку на карточку
+        const feedbackIcon = createFeedbackIcon(direction === 'right' ? 'Left' : 'Right');
+        cardRef.appendChild(feedbackIcon);
+
+        // 3. Показываем иконку с анимацией
+        setTimeout(() => {
+            feedbackIcon.style.opacity = '1';
+            feedbackIcon.style.transform = 'translateY(-50%) scale(1.2)';
+        }, 50);
+
+        // 4. Параметры анимации свайпа
         const params = {
-            left: { endX: -window.innerWidth * 0.7, endY: 0, rotation: -15 },
-            right: { endX: window.innerWidth * 0.7, endY: 0, rotation: 15 },
-            up: { endX: window.innerWidth * 0.5, endY: -window.innerHeight * 0.5, rotation: 5 }
+            left: {
+                endX: -window.innerWidth * 0.7,
+                endY: 0,
+                rotation: -15
+            },
+            right: {
+                endX: window.innerWidth * 0.7,
+                endY: 0,
+                rotation: 15
+            },
+            up: {
+                endX: window.innerWidth * 0.5,
+                endY: -window.innerHeight * 0.5,
+                rotation: 5
+            }
         }[direction];
 
-        cardRef.style.transition = 'transform 500ms ease-out, opacity 500ms ease-out';
+        const originalStyles = {
+            transform: cardRef.style.transform,
+            transition: cardRef.style.transition,
+            opacity: cardRef.style.opacity,
+            zIndex: cardRef.style.zIndex
+        };
+
+        cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
         cardRef.style.transform = `translate(${params.endX}px, ${params.endY}px) rotate(${params.rotation}deg)`;
         cardRef.style.zIndex = '10000';
 
         setTimeout(() => {
-            cardRef.style.transition = 'transform 100ms ease-out, opacity 500ms ease-out';
+            // Удаляем иконку фильтра
+            feedbackIcon.style.opacity = '0';
+            feedbackIcon.style.transform = 'translateY(-50%) scale(0.5)';
+
+            cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
             cardRef.style.transform = originalStyles.transform;
-            cardRef.style.opacity = originalStyles.opacity;
 
             setTimeout(() => {
+                // Окончательная очистка
+                cardRef.removeChild(feedbackIcon);
                 cardRef.style.transition = originalStyles.transition;
                 cardRef.style.zIndex = originalStyles.zIndex;
                 setIsOnboardingActive(false);
                 setIsAnimating(false);
-            }, 500);
-        }, 1000);
+            }, 300);
+        }, 800);
     }, [store.catalogStore.cards, isAnimating]);
-
 
     return (
         <>
@@ -291,21 +374,21 @@ const TinderCards = observer(() => {
                             swipeProgress={index === 0 ? swipeProgress : {direction: null, opacity: 0}}
                             isTopCard={index === 0}
                             setCardRef={setCardRef}
-                            isOnboardingActive={isOnboardingActive && index === 0}
+                            isOnboardingActive={showOnboarding && index === 0}
                             onSaveClick={handleOpenSaveModal}
                         />
                     ))}
 
                     {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
                         <div className={styles.emptyState}>
-                           <div className={styles.notCard}>
-                               <p  className={styles.notCardText}>Товары из ассортимента брендов закончились</p>
-                           </div>
+                            <div className={styles.notCard}>
+                                <p  className={styles.notCardText}>Товары из ассортимента брендов закончились</p>
+                            </div>
                             <p className={styles.notCardCatText}>
                                 Но можно посмотреть подборки
                             </p>
                             <div className={styles.collectionsBlock}>
-                                {store.popular.collections.map((item) => (
+                                {store?.popular?.collections?.map((item) => (
                                     <div
                                         key={`${item.id}`}
                                         className={styles.collectionCard}
@@ -351,6 +434,11 @@ const TinderCards = observer(() => {
                 productId={selectedProduct?.id}
                 productName={selectedProduct?.name}
                 productInCollection={selectedProduct?.is_contained_in_user_collections}
+                onSaveSuccess={(isSaved) => {
+                    if (selectedProduct) {
+                        handleSaveSuccess(selectedProduct.id, isSaved);
+                    }
+                }}
             />
         </>
     );

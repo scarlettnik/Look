@@ -100,6 +100,18 @@
     font-size: 12px;
     font-weight: 400;
 }
+.swipeFeedback {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .notCardCatText {
     text-align: left;
     padding-bottom: 1vh;

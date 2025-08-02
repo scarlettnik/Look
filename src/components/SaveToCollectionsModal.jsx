@@ -7,13 +7,15 @@ import Modal from "./utils/Modal.jsx";
 import FullScreenButton from "./FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
+import AddList from "./AddList.jsx";
 
 const SaveToCollectionModal = observer(({
                                             isOpen,
                                             onClose,
                                             productId,
                                             productName,
-                                            productInCollection
+                                            productInCollection,
+                                            onSaveSuccess
                                         }) => {
     const store = useStore();
     const [searchQuery, setSearchQuery] = useState('');
@@ -21,7 +23,24 @@ const SaveToCollectionModal = observer(({
     const [isLoading, setIsLoading] = useState(false);
     const [initialCollections, setInitialCollections] = useState([]);
     const [defaultCollectionId, setDefaultCollectionId] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const createClose = () => {
+        setIsModalOpen(false);
+    };
+    const handleCreateCollection = async (name, coverUrl) => {
+        if (!name.trim()) return;
+        setIsModalOpen(false);
+        try {
+            const newCollection = await store.collectionStore.createCollection(name, coverUrl);
+        } catch (error) {
+            console.error('Create failed:', error);
+            alert('Не удалось создать коллекцию. Попробуйте снова.');
+        }
+    };
 
+    const createOpen = () => {
+        setIsModalOpen(true);
+    };
     useEffect(() => {
         if (isOpen && productId) {
             loadCollections();
@@ -100,6 +119,8 @@ const SaveToCollectionModal = observer(({
         setIsLoading(true);
 
         const requestData = [...selectedCollections];
+        const isSaved = requestData.length > 0;
+
 
         try {
             const response = await fetch(`https://api.lookvogue.ru/v1/product/${productId}/collections`, {
@@ -131,7 +152,9 @@ const SaveToCollectionModal = observer(({
                     }
                 }
             });
-
+            if (onSaveSuccess) {
+                onSaveSuccess(isSaved);
+            }
             onClose();
         } catch (error) {
             console.error('Ошибка при сохранении в коллекцию:', error);
@@ -196,13 +219,23 @@ const SaveToCollectionModal = observer(({
                         ))
                     ) : (
                         <div className={styles.noResults}>
-                            {searchQuery ? 'Ничего не найдено' : 'У вас пока нет коллекций'}
                         </div>
                     )}
+                    <div onClick={createOpen} style={{display: 'flex', alignItems: 'center', justifyContent: 'center',}}>
+                        <button className={styles.circleButton} >
+                            <img src="/subicons/blackadd.svg"/>
+                        </button>
+                        <p style={{fontSize: '12px', fontWeight: '400', paddingLeft: '10px'}}>
+                            Создать новую подборку
+                        </p>
+                    </div>
                 </div>
             </div>
-
+            <Modal isOpen={isModalOpen} onClose={createClose}>
+                <AddList onCreate={handleCreateCollection}/>
+            </Modal>
             <div className={styles.modalFooter}>
+
                 <FullScreenButton
                     onClick={handleSave}
                     disabled={isLoading}

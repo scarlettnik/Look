@@ -29,20 +29,22 @@ function AddList({
                  })  {
     console.log(coverImage)
     const [closetName, setClosetName] = useState('');
-    const [selectedCover, setSelectedCover] = useState(
-        `${coverImage}`
-    );
+    const [selectedCover, setSelectedCover] = useState(coverImage || '');
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const containerRef = useRef(null);
     const isKeyboardOpen = useIsKeyboardOpen()
 
+
+
+
     useEffect(() => {
         if (collection) {
             setClosetName(collection.name);
-            setSelectedCover(collection.url);
+            setSelectedCover(collection.cover_image_url || coverImage || '');
+        } else {
+            setSelectedCover(coverImage || coverImages[0].url);
         }
-    }, [collection]);
-
+    }, [collection, coverImage]);
 
     const handleSave = () => {
         if (!closetName.trim()) return;
@@ -54,7 +56,7 @@ function AddList({
         }
     };
 
-    console.log(selectedCover || coverImage)
+    console.log(selectedCover)
 
     useEffect(() => {
         if (!window.visualViewport) return;
@@ -95,11 +97,19 @@ function AddList({
 
                 <label className={styles.label}>Обложка</label>
                 <div className={styles.selectedCover}>
-                    <img src={selectedCover || coverImage} alt="Selected Cover"/>
+                    {selectedCover ? (
+                        <img
+                            src={selectedCover}
+                            alt="Selected cover"
+                            className={styles.previewImage}
+                        />
+                    ) : (
+                        <div className={styles.selectedCover} style={{backgroundColor: 'var(--light-gray)'}}/>
+                    )}
                 </div>
 
                 <div className={styles.coverGrid}>
-                    {coverImages.map((img) => (
+                {coverImages.map((img) => (
                         <div
                             key={img.url}
                             className={styles.coverThumbContainer}

@@ -16,7 +16,7 @@ const TinderCard = ({
                         setCardRef,
                         isOnboardingActive,
                         swipeConfig,
-                        onSaveClick
+                        onSaveClick={handleOpenSaveModal}
                     }) => {
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -49,9 +49,17 @@ const TinderCard = ({
             cardRef.current.style.transform = 'translateY(0)'; // Убрали opacity
         });
     };
+    console.log(isOnboardingActive)
+
+    useEffect(() => {
+        if (cardRef.current) {
+            setCardRef(card.id, cardRef.current);
+        }
+        return () => setCardRef(card.id, null);
+    }, [card.id, setCardRef]);
 
     const handleStart = (clientX, clientY) => {
-        if (isOnboardingActive || isExpanded) return;
+        if (isExpanded) return false;
 
         setStartPos({ x: clientX, y: clientY });
         setIsDragging(true);
@@ -60,6 +68,7 @@ const TinderCard = ({
         if (cardRef.current) {
             cardRef.current.style.transition = 'none';
         }
+        return true;
     };
 
     const handleMove = (clientX, clientY) => {
@@ -185,7 +194,6 @@ const TinderCard = ({
 
     useEffect(() => {
         if (!cardRef.current) return;
-        console.log(offset)
         let scale = 1 - Math.max(0, offset) * 0.03;
         let translateY = 0;
         let translateX = 0;
@@ -218,7 +226,9 @@ const TinderCard = ({
         <div
             ref={cardRef}
             id={card.id}
-            className={`${styles.card} ${isDragging ? styles.moving : ''}`}
+            className={`${styles.card} 
+            ${isDragging ? styles.moving : ''} 
+            ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
             onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleEnd}
@@ -234,6 +244,8 @@ const TinderCard = ({
 
             {isTopCard && (
                 <>
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}/>
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}/>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}
                         style={{
@@ -241,7 +253,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img src="/menuIcons/unactive/save.svg" alt="Save" style={{ width: '60px' }} />
+                        <img src="/menuIcons/unactive/save.svg" alt="Save" style={{width: '60px'}}/>
                     </div>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
@@ -250,7 +262,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img src="/subicons/close.svg" alt="Close" style={{ width: '60px' }} />
+                        <img src="/subicons/close.svg" alt="Close" style={{width: '60px'}}/>
                     </div>
                 </>
             )}
@@ -262,10 +274,18 @@ const TinderCard = ({
                         <div className={styles.manufacturer}>{card?.brand}</div>
                         <div className={styles.priceRow}>
                             <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
-                            <button className={styles.saveButton}>
+                            <button
+                                className={styles.saveButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSaveClick(card);
+                                }}
+                            >
                                 <img
-                                    src={"/menuIcons/unactive/save.svg"}
-
+                                    src={card.is_contained_in_user_collections
+                                        ? "/subicons/fullwhitebookmark.svg"
+                                        : "/subicons/whitebookmark.svg"}
+                                    alt={card.is_contained_in_user_collections ? "Сохранено" : "Сохранить"}
                                 />
                             </button>
                         </div>

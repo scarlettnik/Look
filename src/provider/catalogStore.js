@@ -10,7 +10,7 @@ class CatalogStore {
     isFetching = false;
     hasMore = true;
     authToken = AUTH_TOKEN;
-    currentSearchQuery = null;
+    currentSearchQuery = '';
     currentOffset = 0;
     limit = 50;
     currentFilters = {
@@ -24,7 +24,13 @@ class CatalogStore {
         makeAutoObservable(this);
         this.fetchCards(true); // initial load
     }
+    setLastSearchQuery = (query) => {
+        this.currentSearchQuery = query;
+    };
 
+    clearLastSearchQuery = () => {
+        this.currentSearchQuery = '';
+    };
     getUniqueKey = () => {
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {
             return crypto.randomUUID();
@@ -61,7 +67,6 @@ class CatalogStore {
                 max_price: this.currentFilters.max_price,
                 //categories: this.currentFilters.categories
             };
-            console.log(requestBody);
 
             const response = yield fetch(url.toString(), {
                 method: 'POST',

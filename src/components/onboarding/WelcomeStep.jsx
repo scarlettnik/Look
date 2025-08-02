@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from '../ui/OnboardingModal.module.css';
 import welcomstyle from '../ui/welcomStyle.module.css';
+import store from "../../store.js";
 
 const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -34,7 +35,6 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         { id: 3, image: '/starterscroller2.png', direction: 'resist' }
     ];
 
-    // Функция предзагрузки изображений
     const preloadImages = async () => {
         const totalImages = cards.length;
         let loadedCount = 0;
@@ -68,7 +68,11 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
 
     useEffect(() => {
         if (imagesLoaded) {
-            startAutoSwipe();
+            const timer = setTimeout(() => {
+                startAutoSwipe();
+            }, 500);
+
+            return () => clearTimeout(timer);
         }
     }, [imagesLoaded, currentIndex]);
 
@@ -214,7 +218,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
             <button
                 className={welcomstyle.starterButton}
                 onClick={onNext}
-                disabled={!imagesLoaded}
+                disabled={!imagesLoaded || !store.authStore.data}
             >
                 <div style={{ display: 'flex', alignItems: "center", justifyContent: 'center' }}>
                     Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />

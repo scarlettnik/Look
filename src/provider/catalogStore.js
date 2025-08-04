@@ -12,9 +12,8 @@ class CatalogStore {
     authToken = AUTH_TOKEN;
     currentSearchQuery = '';
     currentOffset = 0;
-    limit = 30;
+    limit = 10;
     currentFilters = {
-        sizes: [],
         categories: [],
         colors: [],
         brands: [],
@@ -64,7 +63,6 @@ class CatalogStore {
             url.searchParams.append('limit', this.limit);
             const requestBody = {
                 query: this.currentSearchQuery,
-                sizes: this.currentFilters.sizes,
                 categories: this.currentFilters.categories,
                 colors: this.currentFilters.colors,
                 brands: this.currentFilters.brands,
@@ -126,7 +124,7 @@ class CatalogStore {
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
         this.hasMore = true;
-        yield this.fetchCards(true);
+        yield this.fetchCards(true); // initialLoad = true
     });
 
     resetSearch = flow(function* () {

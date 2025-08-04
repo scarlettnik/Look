@@ -10,6 +10,7 @@ import {observer} from "mobx-react";
 import {useNavigate} from "react-router-dom";
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
+import Precomute from "./onboarding/Precomrute.jsx";
 
 const OnboardingModal = observer(() => {
     const store = useStore();
@@ -115,7 +116,7 @@ const OnboardingModal = observer(() => {
     const [isClosed, setIsClosed] = useState(false);
 
     const nextStep = () => {
-        setCurrentStep(prev => Math.min(prev + 1, 4));
+        setCurrentStep(prev => Math.min(prev + 1, 5));
     };
 
     const next = () => {
@@ -182,6 +183,17 @@ const OnboardingModal = observer(() => {
 
                 {currentStep === 4 && (
                     <SizeStep
+                        params={preferences}
+                        updateParam={updateParam}
+                        onNext={nextStep}
+                        onSkip={skipOnboarding}
+                        onBack={prevStep}
+
+                    />
+                )}
+
+                {currentStep === 5 && (
+                    <Precomute
                         params={preferences}
                         updateParam={updateParam}
                         onNext={completeOnboarding}

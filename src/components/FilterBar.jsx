@@ -1,16 +1,194 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
-import styles from "./ui/compilation.module.css";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
+import { useStore } from "../provider/StoreContext";
+import { filterProducts } from "./utils/incideFilter";
+import { BRANDS, SIZES, COLORS } from "../constants";
+import styles from "./ui/compilation.module.css";
+import filterStyles from "./ui/filterList.module.css";
 
-export const FilterBar = observer(({ filters, setFilters, catalogStore, products, onFilter }) => {
+import {PriceFilter} from "./utils/filters/PriceFilter.jsx";
+import {TypeFilter} from "./utils/filters/TypeFilter.jsx";
+import {useNavigate} from "react-router-dom";
+import {BrandFilter} from "./utils/filters/BrandFilter.jsx";
+import {SizeFilter} from "./utils/filters/SizeFilter.jsx";
+import {FiltersModal} from "./utils/FiltersModal.jsx";
+
+
+const AllFiltersModal = ({
+                             filters,
+                             applyAllFilters,
+                             onClose
+                         }) => {
+    const [localFilters, setLocalFilters] = useState({
+        size: [...(filters.size || [])],
+        brand: [...(filters.brand || [])],
+        price: { ...(filters.price || {}) },
+        type: [...(filters.type || [])],
+        color: [...(filters.color || [])]
+    });
+
+    const handleFilterChange = (filterName, value) => {
+        setLocalFilters(prev => ({
+            ...prev,
+            [filterName]: Array.isArray(prev[filterName])
+                ? prev[filterName].includes(value)
+                    ? prev[filterName].filter(v => v !== value)
+                    : [...prev[filterName], value]
+                : value
+        }));
+    };
+
+    const handlePriceChange = (min, max) => {
+        setLocalFilters(prev => ({
+            ...prev,
+            price: { min, max }
+        }));
+    };
+
+    const handleApply = () => {
+        const processedFilters = {
+            ...localFilters,
+            size: (localFilters.size || []).flatMap(size => {
+                if (size === 'NO SIZE') return ['NO SIZE'];
+                if (size.includes('/')) {
+                    const parts = size.split('/');
+                    const name = parts[0].trim();
+                    if (parts.length > 1) {
+                        const rangeParts = parts[1].split('-');
+                        const min = rangeParts[0]?.trim() || '';
+                        const max = rangeParts[1]?.trim() || '';
+                        return [name, min, max].filter(Boolean);
+                    }
+                    return [name];
+                }
+                return [size];
+            })
+        };
+
+        applyAllFilters(processedFilters);
+        onClose()
+    };
+
+    return (
+        <FiltersModal
+            title="Фильтры"
+            onClose={onClose}
+            onApply={handleApply}
+        >
+            <div className={filterStyles.section}>
+                <h3 className={filterStyles.sectionTitle}>Тип</h3>
+                <div className={filterStyles.gridOptions}>
+                    {['Одежда', 'Обувь', 'Аксессуары', 'Электроника'].map(type => (
+                        <button
+                            key={type}
+                            className={`${styles.optionButton} ${
+                                localFilters.type.includes(type) ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterChange('type', type)}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={filterStyles.section}>
+                <h3 className={filterStyles.sectionTitle}>Размер</h3>
+                <div className={filterStyles.gridOptions}>
+                    {SIZES.map(size => (
+                        <button
+                            key={size}
+                            className={`${styles.optionButton} ${
+                                localFilters.size.includes(size) ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterChange('size', size)}
+                        >
+                            {size === 'NO SIZE' ? 'Один размер' : size}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Бренд</h3>
+                <div className={styles.gridOptions}>
+                    {BRANDS.map(brand => (
+                        <button
+                            key={brand}
+                            className={`${styles.optionButton} ${
+                                localFilters.brand.includes(brand) ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterChange('brand', brand)}
+                        >
+                            {brand}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Цвет</h3>
+                <div className={styles.gridOptions}>
+                    {COLORS.map(color => (
+                        <button
+                            key={color}
+                            className={`${styles.optionButton} ${
+                                localFilters.color.includes(color) ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterChange('color', color)}
+                        >
+                            {color}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Цена</h3>
+                <div className={styles.priceInputGroup}>
+                    <input
+                        type="number"
+                        placeholder="от"
+                        value={localFilters.price.min || ''}
+                        onChange={(e) => handlePriceChange(
+                            e.target.value ? parseInt(e.target.value) : null,
+                            localFilters.price.max
+                        )}
+                    />
+                    <span>-</span>
+                    <input
+                        type="number"
+                        placeholder="до"
+                        value={localFilters.price.max || ''}
+                        onChange={(e) => handlePriceChange(
+                            localFilters.price.min,
+                            e.target.value ? parseInt(e.target.value) : null
+                        )}
+                    />
+                </div>
+            </div>
+        </FiltersModal>
+    );
+};
+
+
+
+
+
+
+export const FilterBar = observer(({
+                                       filters,
+                                       setFilters,
+                                       catalogStore,
+                                       products,
+                                       onFilter
+                                   }) => {
     const [activeFilter, setActiveFilter] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate();
-
+    const [isAllFiltersOpen, setIsAllFiltersOpen] = useState(false);
     const store = useStore();
-    console.log(store.help)
 
+    const navigate = useNavigate();
     const handleBack = () => navigate(-1);
 
     const openFilter = (filterName) => {
@@ -18,43 +196,27 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
         setIsModalOpen(true);
     };
 
+    const openAllFilters = () => {
+        setIsAllFiltersOpen(true);
+    };
+
     const closeFilter = () => {
         setIsModalOpen(false);
         setActiveFilter(null);
     };
 
-    const renderFilterModal = () => {
-        switch (activeFilter) {
-            case 'size': return <SizeFilter applyFilter={applyFilter} currentValue={filters.size} onClose={closeFilter} />;
-            case 'brand': return <BrandFilter applyFilter={applyFilter} currentValue={filters.brand} onClose={closeFilter}/>;
-            case 'price': return <PriceFilter applyFilter={applyFilter} currentValue={filters.price} onClose={closeFilter}/>;
-            case 'type': return <TypeFilter applyFilter={applyFilter} currentValue={filters.type} onClose={closeFilter}/>;
-            default: return null;
-        }
+    const closeAllFilters = () => {
+        setIsAllFiltersOpen(false);
     };
 
     const applyFilter = (value) => {
         if (activeFilter) {
             const updatedFilters = { ...filters };
 
-            switch (activeFilter) {
-                case 'size':
-                    updatedFilters.size = Array.isArray(value) ? value : [value];
-                    break;
-                case 'brand':
-                    updatedFilters.brand = Array.isArray(value) ? value : [value];
-                    break;
-                case 'price':
-                    updatedFilters.price = {
-                        min: value?.min || null,
-                        max: value?.max || null
-                    };
-                    break;
-                case 'type':
-                    updatedFilters.type = Array.isArray(value) ? value : [value];
-                    break;
-                default:
-                    return;
+            if (activeFilter === 'price') {
+                updatedFilters.price = value;
+            } else {
+                updatedFilters[activeFilter] = Array.isArray(value) ? value : [value];
             }
 
             setFilters(updatedFilters);
@@ -62,12 +224,19 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
             closeFilter();
         }
     };
+
+    const applyAllFilters = (newFilters) => {
+        setFilters(newFilters);
+        applyFilters(newFilters);
+    };
+
     const applyFilters = (updatedFilters) => {
         if (catalogStore) {
             const apiFilters = {
-                size: updatedFilters.size || [],
+                sizes: updatedFilters.size || [],
                 brands: updatedFilters.brand || [],
-                colors: updatedFilters.type || [],
+                colors: updatedFilters.color || [],
+                categories: updatedFilters.type || [],
                 min_price: updatedFilters.price?.min || null,
                 max_price: updatedFilters.price?.max || null
             };
@@ -78,27 +247,15 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
         }
     };
 
-
     const clearFilter = (filterName, e) => {
         e.stopPropagation();
 
         const updatedFilters = { ...filters };
 
-        switch (filterName) {
-            case 'size':
-                updatedFilters.size = [];
-                break;
-            case 'brand':
-                updatedFilters.brand = [];
-                break;
-            case 'price':
-                updatedFilters.price = { min: null, max: null };
-                break;
-            case 'type':
-                updatedFilters.type = [];
-                break;
-            default:
-                return;
+        if (filterName === 'price') {
+            updatedFilters.price = { min: null, max: null };
+        } else {
+            updatedFilters[filterName] = [];
         }
 
         setFilters(updatedFilters);
@@ -106,17 +263,26 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
     };
 
     const isFilterActive = (filterName) => {
-        switch (filterName) {
+        if (filterName === 'price') {
+            return filters.price?.min != null || filters.price?.max != null;
+        }
+        return filters[filterName]?.length > 0;
+    };
+
+    const renderFilterModal = () => {
+        switch (activeFilter) {
             case 'size':
-                return filters.size?.length > 0;
+                return <SizeFilter applyFilter={applyFilter} currentValue={filters.size} onClose={closeFilter} />;
             case 'brand':
-                return filters.brand?.length > 0;
+                return <BrandFilter applyFilter={applyFilter} currentValue={filters.brand} onClose={closeFilter} />;
             case 'price':
-                return filters.price?.min != null || filters.price?.max != null;
+                return <PriceFilter applyFilter={applyFilter} currentValue={filters.price} onClose={closeFilter} />;
             case 'type':
-                return filters.type?.length > 0;
+                return <TypeFilter applyFilter={applyFilter} currentValue={filters.type} onClose={closeFilter} />;
+            // case 'color':
+            //     return <ColorFilter applyFilter={applyFilter} currentValue={filters.color} onClose={closeFilter} />;
             default:
-                return false;
+                return null;
         }
     };
 
@@ -126,16 +292,17 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
                 <button onClick={handleBack} className={styles.filterButton}>
                     <img src='/subicons/arrowleft.svg' alt="Назад"/>
                 </button>
-                <button className={styles.filterButton}><img src='/subicons/filter.svg'/></button>
+                <button className={styles.filterButton} onClick={openAllFilters}>
+                    <img src='/subicons/filter.svg' alt="Фильтры"/>
+                </button>
 
                 {[
+                    {key: 'type', label: 'Тип'},
                     {key: 'size', label: 'Размер'},
                     {key: 'brand', label: 'Бренд'},
-                    {key: 'price', label: 'Цена'},
-                    {key: 'type', label: 'Тип'}
+                    {key: 'price', label: 'Цена'}
                 ].map(({key, label}) => {
                     const active = isFilterActive(key);
-
                     return (
                         <button
                             key={key}
@@ -157,211 +324,13 @@ export const FilterBar = observer(({ filters, setFilters, catalogStore, products
             </div>
 
             {isModalOpen && renderFilterModal()}
+            {isAllFiltersOpen && (
+                <AllFiltersModal
+                    filters={filters}
+                    applyAllFilters={applyAllFilters}
+                    onClose={closeAllFilters}
+                />
+            )}
         </>
     );
 });
-
-const SizeFilter = ({ applyFilter, currentValue, onClose }) => {
-    const [selected, setSelected] = useState(currentValue || []);
-
-    const toggleSize = (size) => {
-        setSelected(prev =>
-            prev.includes(size)
-                ? prev.filter(v => v !== size)
-                : [...prev, size]
-        );
-    };
-
-    const handleApply = () => {
-        const flattenedSizes = selected.flatMap(size => {
-            if (size === 'NO SIZE') return ['NO SIZE'];
-            if (size.includes('/')) {
-                const [name, range] = size.split('/').map(s => s.trim());
-                const [min, max] = range.split('-').map(s => s.trim());
-                return [name, min, max];
-            }
-            return [size];
-        });
-        console.log(flattenedSizes)
-
-        applyFilter(flattenedSizes);
-        onClose();
-    };
-    return (
-        <FullScreenModal
-            title="Размер"
-            onClose={onClose}
-            onApply={handleApply}
-            applyDisabled={!selected.length}
-        >
-            <div className={styles.gridOptions}>
-                {SIZES.map(size => (
-                    <button
-                        key={size}
-                        className={`${styles.optionButton} ${
-                            selected.includes(size) ? styles.selected : ''
-                        }`}
-                        onClick={() => toggleSize(size)}
-                    >
-                        {size === 'NO SIZE' ? 'Один размер' : size}
-                    </button>
-                ))}
-            </div>
-        </FullScreenModal>
-    );
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const BrandFilter = ({ applyFilter, currentValue, onClose }) => {
-    const [selected, setSelected] = useState(currentValue || []);
-    const store = useStore();
-
-    const toggle = (val) => setSelected(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
-
-    return (
-        <FullScreenModal title="Бренд" onClose={onClose} onApply={() => applyFilter(selected)} applyDisabled={!selected.length}>
-            <div className={styles.gridOptions}>
-                {store?.help?.metaData?.brands.map((brand, i) => (
-                    <button key={i} className={`${styles.optionButton} ${selected.includes(brand) ? styles.selected : ''}`} onClick={() => toggle(brand)}>
-                        {brand}
-                    </button>
-                ))}
-            </div>
-        </FullScreenModal>
-    );
-};
-
-const TypeFilter = ({ applyFilter, currentValue, onClose }) => {
-    const types = ['Одежда', 'Обувь', 'Аксессуары', 'Электроника'];
-    const [selected, setSelected] = useState(currentValue || []);
-
-    const toggle = (val) => setSelected(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
-
-    return (
-        <FullScreenModal title="Тип" onClose={onClose} onApply={() => applyFilter(selected)} applyDisabled={!selected.length}>
-            <div className={styles.gridOptions}>
-                {types.map((type, i) => (
-                    <button key={i} className={`${styles.optionButton} ${selected.includes(type) ? styles.selected : ''}`} onClick={() => toggle(type)}>
-                        {type}
-                    </button>
-                ))}
-            </div>
-        </FullScreenModal>
-    );
-};
-const PriceFilter = ({ applyFilter, currentValue, onClose }) => {
-    const [min, setMin] = useState(currentValue?.min || '');
-    const [max, setMax] = useState(currentValue?.max || '');
-
-    const quickOptions = [3000, 5000, 10000];
-    const selectedQuick = quickOptions.find((val) => !min && parseInt(max) === val);
-
-    const apply = () => {
-        applyFilter({
-            min: min ? parseInt(min) : null,
-            max: max ? parseInt(max) : null,
-        });
-    };
-
-    const selectQuickMax = (value) => {
-        setMin('');
-        setMax(value.toString());
-    };
-
-    return (
-        <FullScreenModal
-            title="Стоимость"
-            onClose={onClose}
-            onApply={apply}
-            applyDisabled={!min && !max}
-        >
-            <div className={styles.priceInputGroup}>
-                <div className={styles.inputWrapper}>
-                    <input
-                        className={styles.priceInput}
-                        type="number"
-                        placeholder="от"
-                        value={min}
-                        onChange={(e) => setMin(e.target.value)}
-                    />
-               </div>
-
-                <span>-</span>
-
-                <div className={styles.inputWrapper}>
-                    <input
-                        className={styles.priceInput}
-                        type="number"
-                        placeholder="до"
-                        value={max}
-                        onChange={(e) => setMax(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            <div className={styles.gridOptions}>
-                {quickOptions.map((option) => (
-                    <button
-                        key={option}
-                        className={`${styles.optionButton} ${selectedQuick === option ? styles.selected : ''}`}
-                        onClick={() => selectQuickMax(option)}
-                    >
-                        до {option.toLocaleString()} ₽
-                    </button>
-                ))}
-            </div>
-        </FullScreenModal>
-    );
-};
-
-import stylesM from './ui/fullScreenModal.module.css';
-import {filterProducts} from "./utils/incideFilter.js";
-import {BRANDS, SIZES} from "../constants.js";
-import {useStore} from "../provider/StoreContext.jsx";
-
-const FullScreenModal = ({ title, onClose, onApply, children, applyDisabled = false }) => {
-    return (
-        <div className={stylesM.modalOverlay}>
-            <div className={stylesM.modalContent}>
-                <div className={stylesM.modalHeader}>
-                    <p className={stylesM.label}>{title}</p>
-                    <button style={{    background: 'transparent'
-                    }} onClick={onClose}>
-                        <img src='/subicons/close.svg'/>
-                    </button>
-                </div>
-                <div className={stylesM.modalBody}>{children}</div>
-                <button
-                    className={stylesM.applyButton}
-                    onClick={onApply}
-                    disabled={applyDisabled}
-                >
-                    Показать
-                </button>
-            </div>
-        </div>
-    );
-}
-

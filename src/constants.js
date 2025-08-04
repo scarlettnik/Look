@@ -9,6 +9,10 @@ export const BRANDS = [
     'Gloria Jeans', 'Gucci', 'Nike', 'Puma', 'Love Republic'
 ];
 
+export const COLORS = [
+    'Черный', 'белый', 'Красный', 'Синий', 'Зеленый',
+    'Желтый', 'Розовый', 'Серый', 'Коричневый', 'Бежевый'
+];
 export const PRICE_RANGES = [
     { label: 'до 3 000 ₽', value: 3000 },
     { label: 'до 5 000 ₽', value: 5000 },

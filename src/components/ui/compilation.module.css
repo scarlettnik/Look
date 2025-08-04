@@ -85,7 +85,6 @@
     display: flex;
     justify-content: space-between;
     overflow-x: auto;
-    background-color: #fff;
     z-index: 1;
     position: sticky;
     top: 0;
@@ -232,8 +231,6 @@
     padding-bottom: 200px;
 
 }
-
-
 
 .itemContainer {
     position: relative;

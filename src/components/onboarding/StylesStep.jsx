@@ -4,12 +4,14 @@ import CustomCheckbox from "../CustomCheckbox";
 import FullScreenButton from "../FullScrinButton.jsx";
 
 const ClothStyles = [
-    { id: 1, name: "Классический", url: '/stylereference.png' },
+    { id: 1, name: "Классический", url: 'https://i.pinimg.com/1200x/8c/d5/26/8cd526983e858ba086b9d6116a165af1.jpg' },
     { id: 2, name: "Спортивный", url: '/stylereference.png' },
     { id: 3, name: "Повседневный", url: '/stylereference.png' },
     { id: 4, name: "Деловой", url: '/stylereference.png' },
     { id: 5, name: "Уличный", url: '/stylereference.png' },
     { id: 6, name: "Вечерний", url: '/stylereference.png' },
+    { id: 7, name: "Вечерний", url: '/stylereference.png' },
+    { id: 8, name: "Вечерний", url: '/stylereference.png' },
 ];
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {

@@ -14,6 +14,7 @@ class CatalogStore {
     currentOffset = 0;
     limit = 10;
     currentFilters = {
+        sizes: [],
         categories: [],
         colors: [],
         brands: [],
@@ -63,6 +64,7 @@ class CatalogStore {
             url.searchParams.append('limit', this.limit);
             const requestBody = {
                 query: this.currentSearchQuery,
+                sizes: this.currentFilters.sizes,
                 categories: this.currentFilters.categories,
                 colors: this.currentFilters.colors,
                 brands: this.currentFilters.brands,

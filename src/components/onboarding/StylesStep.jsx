@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../ui/OnboardingModal.module.css';
 import CustomCheckbox from "../CustomCheckbox";
 import FullScreenButton from "../FullScrinButton.jsx";
+import CustomSkeleton from "../utils/CustomSkeleton.jsx";
 
 const ClothStyles = [
     { id: 1, name: "Классический", url: 'https://i.pinimg.com/1200x/8c/d5/26/8cd526983e858ba086b9d6116a165af1.jpg' },
@@ -15,39 +16,64 @@ const ClothStyles = [
 ];
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
-    const handleStyleToggle = (styleId) => {
-        onUpdate('styles', styleId);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let loaded = 0;
+        ClothStyles.forEach(({ url }) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = img.onerror = () => {
+                loaded += 1;
+                if (loaded === ClothStyles.length) {
+                    setIsLoading(false);
+                }
+            };
+        });
+    }, []);
+
+    const handleStyleToggle = (styleName) => {
+        onUpdate('styles', styleName);
     };
 
     return (
         <div className={styles.onboardingStep}>
             <div className={styles.stepHeader}>
-                <button
-                    className={styles.backButton}
-                    onClick={onBack}
-                >
-                    <img src='/subicons/whitearrowleft.svg' alt="Назад"/>
+                <button className={styles.backButton} onClick={onBack}>
+                    <img src='/subicons/whitearrowleft.svg' alt="Назад" />
                 </button>
                 <p className={styles.stepTitle}>Выберите стили</p>
             </div>
+
             <div className={styles.scrollContainer}>
                 <div className={styles.styleGrid}>
-                    {ClothStyles.map(style => (
-                        <div
-                            key={style.id}
-                            className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
-                        >
-                            <img src={style.url} alt={style.name} className={styles.styleImage}/>
-                            <div className={styles.styleContent}>
-                                <CustomCheckbox
-                                    className={styles.styleCheckbox}
-                                    checked={selectedStyles.includes(style.name)}
-                                    onChange={() => handleStyleToggle(style.name)}
-                                />
-                                <span className={styles.styleName}>{style.name}</span>
+                    {isLoading ? (
+                        Array.from({ length: ClothStyles.length }).map((_, index) => (
+
+                            <CustomSkeleton
+                                key={index}
+                                className={styles.styleCard}
+                                style={{ height: '200px' }}
+                            />
+                        ))
+                    ) : (
+                        ClothStyles.map(style => (
+                            <div
+                                key={style.id}
+                                className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
+                            >
+                                <img src={style.url} alt={style.name} className={styles.styleImage} />
+                                <div className={styles.styleContent}>
+                                    <CustomCheckbox
+                                        className={styles.styleCheckbox}
+                                        checked={selectedStyles.includes(style.name)}
+                                        onChange={() => handleStyleToggle(style.name)}
+                                    />
+                                    <span className={styles.styleName}>{style.name}</span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -57,13 +83,11 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                     textColor='var(--black)'
                     className={`${styles.onboardingButton} ${styles.primary}`}
                     onClick={onNext}
+                    disabled={isLoading}
                 >
-                    Вперед
+                    {isLoading ? 'Загрузка...' : 'Вперед'}
                 </FullScreenButton>
-                <button
-                    className={styles.secondaryButton}
-                    onClick={onSkip}
-                >
+                <button className={styles.secondaryButton} onClick={onSkip}>
                     Пропустить
                 </button>
             </div>

@@ -59,7 +59,7 @@ export const PriceFilter = ({ applyFilter, currentValue, onClose }) => {
                         className={`${styles.optionButton} ${selectedQuick === option ? styles.selected : ''}`}
                         onClick={() => selectQuickMax(option)}
                     >
-                        до {option.toLocaleString()} ₽
+                        до {option.toLocaleString('ru-RU')} ₽
                     </button>
                 ))}
             </div>

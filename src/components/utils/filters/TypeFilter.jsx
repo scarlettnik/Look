@@ -1,6 +1,9 @@
 import React, {useState} from "react";
 import {FullScreenModal} from "../FullScreenModal.jsx";
 import styles from "../../ui/compilation.module.css";
+import filterStyles from "../../ui/filterList.module.css";
+import CustomCheckbox from "../../CustomCheckbox.jsx";
+import store from "../../../store.js";
 
 export const TypeFilter = ({ applyFilter, currentValue, onClose }) => {
     const [selected, setSelected] = useState(currentValue || []);
@@ -14,15 +17,17 @@ export const TypeFilter = ({ applyFilter, currentValue, onClose }) => {
             onApply={() => applyFilter(selected)}
             applyDisabled={!selected.length}
         >
-            <div className={styles.gridOptions}>
-                {['Одежда', 'Обувь', 'Аксессуары', 'Электроника'].map((type, i) => (
-                    <button
-                        key={i}
-                        className={`${styles.optionButton} ${selected.includes(type) ? styles.selected : ''}`}
-                        onClick={() => toggle(type)}
-                    >
+            <div className={filterStyles.typeOptions}>
+                {store?.help?.metaData?.categories.map((type, index) => (
+                    <label key={type} className={filterStyles.checkboxLabel}>
+                        <CustomCheckbox
+                            className={filterStyles.checkbox}
+                            id={`checkbox-${index}`}
+                            checked={selected.includes(type)}
+                            onChange={() => toggle(type)}
+                        />
                         {type}
-                    </button>
+                    </label>
                 ))}
             </div>
         </FullScreenModal>

@@ -8,6 +8,7 @@ import FullScreenButton from "./FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
 import AddList from "./AddList.jsx";
+import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 
 const SaveToCollectionModal = observer(({
                                             isOpen,
@@ -234,7 +235,7 @@ const SaveToCollectionModal = observer(({
             <Modal isOpen={isModalOpen} onClose={createClose}>
                 <AddList onCreate={handleCreateCollection}/>
             </Modal>
-            <div className={styles.modalFooter}>
+            <ButtonWrapper>
 
                 <FullScreenButton
                     onClick={handleSave}
@@ -243,7 +244,7 @@ const SaveToCollectionModal = observer(({
                 >
                     {isLoading ? 'Сохранение...' : 'Сохранить'}
                 </FullScreenButton>
-            </div>
+            </ButtonWrapper>
         </Modal>
     );
 });

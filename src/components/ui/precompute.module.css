@@ -1,12 +1,15 @@
 .wrapper {
-    position: relative;
+    position: fixed; /* или absolute */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 300px;
     height: 300px;
-    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 
 .spinner {
     position: absolute;
@@ -34,9 +37,10 @@
 
 .centerText {
     position: relative;
-    font-size: 32px;
+    font-size: 30px;
     font-weight: bold;
     z-index: 2;
+    color: var(--white);
 }
 
 @keyframes spin {

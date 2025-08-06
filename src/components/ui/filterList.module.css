@@ -93,14 +93,12 @@
 }
 .gridOptions {
     display: flex;
-    flex-wrap: nowrap;               /* запрещаем перенос строк */
+    flex-wrap: nowrap;
     gap: 10px;
-    overflow-x: auto;                /* горизонтальная прокрутка */
-    -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
-    padding-bottom: 5px;             /* немного отступа, чтобы скролл не перекрывал контент */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px;
 }
-
-
 
 .priceInputGroup {
     display: flex;
@@ -131,7 +129,7 @@
     border: none;
     cursor: pointer;
     border-radius: 30px;
-    margin: 20px auto;
+    margin: auto;
 }
 
 .applyButton:disabled {

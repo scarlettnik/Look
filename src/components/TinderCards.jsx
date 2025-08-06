@@ -263,25 +263,6 @@ const TinderCards = observer(() => {
         setIsOnboardingActive(true);
         setIsAnimating(true);
 
-        // 1. Создаем иконку фильтра динамически
-        const createFeedbackIcon = (side) => {
-            const icon = document.createElement('div');
-            icon.className = `${styles.swipeFeedback} ${styles[`swipeFeedback${side}`]} ${styles.onboardingIcon}`;
-            icon.innerHTML = `<img src="/subicons/filter.svg" alt="Filter" style="width:40px;height:40px"/>`;
-            return icon;
-        };
-
-        // 2. Добавляем иконку на карточку
-        const feedbackIcon = createFeedbackIcon(direction === 'right' ? 'Left' : 'Right');
-        cardRef.appendChild(feedbackIcon);
-
-        // 3. Показываем иконку с анимацией
-        setTimeout(() => {
-            feedbackIcon.style.opacity = '1';
-            feedbackIcon.style.transform = 'translateY(-50%) scale(1.2)';
-        }, 50);
-
-        // 4. Параметры анимации свайпа
         const params = {
             left: {
                 endX: -window.innerWidth * 0.7,
@@ -312,16 +293,13 @@ const TinderCards = observer(() => {
         cardRef.style.zIndex = '10000';
 
         setTimeout(() => {
-            // Удаляем иконку фильтра
-            feedbackIcon.style.opacity = '0';
-            feedbackIcon.style.transform = 'translateY(-50%) scale(0.5)';
+
 
             cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
             cardRef.style.transform = originalStyles.transform;
 
             setTimeout(() => {
                 // Окончательная очистка
-                cardRef.removeChild(feedbackIcon);
                 cardRef.style.transition = originalStyles.transition;
                 cardRef.style.zIndex = originalStyles.zIndex;
                 setIsOnboardingActive(false);
@@ -388,7 +366,7 @@ const TinderCards = observer(() => {
                                 Но можно посмотреть подборки
                             </p>
                             <div className={styles.collectionsBlock}>
-                                {store?.popular?.collections?.map((item) => (
+                                { store?.popular?.collections && store?.popular?.collections?.map((item) => (
                                     <div
                                         key={`${item.id}`}
                                         className={styles.collectionCard}

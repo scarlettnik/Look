@@ -1,7 +1,7 @@
 const ButtonWrapper = ({children}) => {
     const wrapperStyle = {
         position: 'fixed',
-        bottom: '60px',
+        bottom: '20px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

@@ -90,7 +90,7 @@ function AddList({
                 <label className={styles.label}>Название</label>
                 <input
                     type="text"
-                    value={closetName}
+                    value={closetName === '__FAVOURITES__' ? 'Все избранное' : closetName}
                     onChange={(e) => setClosetName(e.target.value)}
                     className={styles.input}
                 />

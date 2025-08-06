@@ -72,7 +72,6 @@ const Compilation = observer(() => {
                 return false;
             }
 
-
             if (filters.type.length > 0 && !filters.type.includes(product.type)) {
                 return false;
             }
@@ -200,7 +199,7 @@ export const Banner = observer(({ save, isSave = false, loading, id, onEnterEdit
                         e.target.src = '/placeholder-banner.jpg';
                     }}
                 />
-                <div className={styles.bannerText}>{save?.name}</div>
+                <div className={styles.bannerText}>{save?.name === '__FAVOURITES__' ? 'Все избранное' : save?.name}</div>
 
                 <button onClick={() => setIsShareOpen(true)}>
                     <img className={styles.shareIcon} src='/subicons/share.svg' alt="Поделиться"/>

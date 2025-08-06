@@ -68,7 +68,6 @@ const ProductPage = () => {
         setSelectedProduct(null);
     }, []);
 
-
     const loadProduct = async (productId) => {
         try {
             setLoading(true);
@@ -109,6 +108,12 @@ const ProductPage = () => {
     };
 
     if (error) return <div className={styles.error}>Ошибка загрузки товара: {error}</div>;
+
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpanded = () => setIsExpanded(prev => !prev);
+
+    const lines = product?.description?.split('\n') || [];
 
     return (
         <div className={styles.container}>
@@ -159,7 +164,8 @@ const ProductPage = () => {
                             <p style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                                 На сайт продавца <img src='/subicons/shoppingBag.svg' alt="Корзина"/>
                             </p>
-                        </FullScreenButton>                    </>
+                        </FullScreenButton>
+                    </>
                 ) : (
                     <>
                         <p className={styles.title}>{product?.name}</p>
@@ -185,6 +191,7 @@ const ProductPage = () => {
                                 }}
                             >
                                 <img
+                                    style={{backgroundColor:'transparent'}}
                                     className={styles.saveIcon}
                                     src={product.is_contained_in_user_collections
                                         ? "/menuIcons/active/save.svg"
@@ -194,11 +201,12 @@ const ProductPage = () => {
                             </button>
                         </div>
 
-                        <FullScreenButton>
-                            <p style={{display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center'}}>
-                                На сайт продавца <img src='/subicons/shoppingBag.svg' alt="Корзина"/>
+                        <FullScreenButton onClick={() => window.open(product?.original_url, '_blank')}>
+                            <p style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                                На сайт продавца <img src='/subicons/shoppingBag.svg' alt="Корзина" />
                             </p>
                         </FullScreenButton>
+
                     </>
                 )}
 
@@ -206,11 +214,28 @@ const ProductPage = () => {
                 {loading ? (
                     <CustomSkeleton style={{width: '100%', height: '80px', marginBottom: '24px'}} />
                 ) : (
-                    <p className={styles.description}>{product?.description}</p>
+                    <p className={styles.description}>
+                        <div>
+                            <div
+                                className={`${styles.description} ${!isExpanded ? styles.clamped : ''}`}
+                            >
+                                {lines.map((line, index) => (
+                                    <p key={index}>{line}</p>
+                                ))}
+                            </div>
+
+                            {lines.length > 4 && (
+                                <button onClick={toggleExpanded} className={styles.readMoreButton}>
+                                    {isExpanded ? 'Скрыть' : 'Подробнее'}
+                                </button>
+                            )}
+                        </div>
+
+                    </p>
                 )}
 
                 {loading ? (
-                    <CustomSkeleton style={{width: '100%', height: '80px', marginBottom: '24px'}} />
+                    <CustomSkeleton style={{width: '100%', height: '80px', marginBottom: '24px'}}/>
                 ) : (
                     product?.sizes && (
                         <>

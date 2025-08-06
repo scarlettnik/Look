@@ -2,10 +2,13 @@ import React, {useState} from "react";
 import {FullScreenModal} from "../FullScreenModal.jsx";
 import styles from "../../ui/compilation.module.css";
 import {BRANDS} from "../../../constants.js";
+import {useStore} from "../../../provider/StoreContext.jsx";
+import {observer} from "mobx-react";
 
-export const BrandFilter = ({ applyFilter, currentValue, onClose }) => {
+export const BrandFilter = observer(({ applyFilter, currentValue, onClose }) => {
     const [selected, setSelected] = useState(currentValue || []);
-
+    const store = useStore();
+    console.log("store", store);
     const toggle = (val) => setSelected(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
 
     return (
@@ -16,7 +19,7 @@ export const BrandFilter = ({ applyFilter, currentValue, onClose }) => {
             applyDisabled={!selected.length}
         >
             <div className={styles.gridOptions}>
-                {BRANDS.map((brand, i) => (
+                {store?.help?.metaData?.brands?.map((brand, i) => (
                     <button
                         key={i}
                         className={`${styles.optionButton} ${selected.includes(brand) ? styles.selected : ''}`}
@@ -28,4 +31,4 @@ export const BrandFilter = ({ applyFilter, currentValue, onClose }) => {
             </div>
         </FullScreenModal>
     );
-};
+});

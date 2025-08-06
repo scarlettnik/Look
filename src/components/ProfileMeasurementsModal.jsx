@@ -15,6 +15,7 @@ import {runInAction} from "mobx";
 
 const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     const store = useStore();
+    console.log("store", store);
     const [preferences, setPreferences] = useState({
         clothing_size: store.authStore.data?.preferences?.clothing_size || '',
         size_parameters: store.authStore.data?.preferences?.size_parameters || {

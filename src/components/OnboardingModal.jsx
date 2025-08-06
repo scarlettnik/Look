@@ -15,7 +15,7 @@ import Precomute from "./onboarding/Precomrute.jsx";
 const OnboardingModal = observer(() => {
     const store = useStore();
     const auth = useAuth();
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(3);
 
     const [preferences, setPreferences] = useState({
         gender: 'female',

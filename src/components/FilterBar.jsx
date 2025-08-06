@@ -85,7 +85,6 @@ const AllFiltersModal = observer(({
         handlePriceChange(null, value);
     };
 
-
     return (
         <FiltersModal
             title="Фильтры"
@@ -150,7 +149,7 @@ const AllFiltersModal = observer(({
                             className={`${filterStyles.optionButton} ${(selectedQuick === localFilters.price.max) && selectedQuick === option ? filterStyles.selected : ''}`}
                             onClick={() => selectQuickMax(option)}
                         >
-                            до {option.toLocaleString()} ₽
+                            до {option.toLocaleString('ru-RU')} ₽
                         </button>
                     ))}
                 </div>
@@ -159,7 +158,7 @@ const AllFiltersModal = observer(({
             <div className={filterStyles.section}>
                 <h3 className={filterStyles.sectionTitle}>Бренд</h3>
                 <div className={filterStyles.flexOptions}>
-                    {BRANDS.map(brand => (
+                    {store?.help?.metaData?.brands.map(brand => (
                         <button
                             key={brand}
                             className={`${filterStyles.optionButton} ${

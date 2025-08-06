@@ -108,8 +108,6 @@
     font-weight: 400;
     color: var(--black);
     line-height: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--light-gray);
 }
 .bar {
     display: flex;
@@ -154,6 +152,25 @@
     margin: 5px;
     border: 1px solid var(--light-gray);
 
+}
+.description {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.clamped {
+    -webkit-line-clamp: 4;
+}
+
+.readMoreButton {
+    margin-top: 8px;
+    background: none;
+    border: none;
+    color: var(--light-warm-gray);
+    cursor: pointer;
+    font-weight: 500;
+    float: right;
 }
 
 .colorsContainer {

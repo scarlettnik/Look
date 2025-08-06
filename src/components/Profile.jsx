@@ -65,6 +65,8 @@ export default function ProfilePage() {
     const [showDeleteProfileButton, setShowDeleteProfileButton] = useState(false);
     const timeoutRef = useRef(null);
     const [showMeasurements, setShowMeasurements] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
 
     useEffect(() => {
         return () => {
@@ -153,6 +155,11 @@ export default function ProfilePage() {
                 <ProfileMeasurementsModal
                     isOpen={showMeasurements}
                     onClose={() => setShowMeasurements(false)}
+                    onSuccess={() => {
+                        setShowMeasurements(false);
+                        setShowSuccessMessage(true);
+                        setTimeout(() => setShowSuccessMessage(false), 3000);
+                    }}
                     user={{
                         firstName: data?.first_name,
                         lastName: data?.last_name,
@@ -160,6 +167,12 @@ export default function ProfilePage() {
                     }}
                 />
             )}
+            {showSuccessMessage && (
+                <div className={styles.successMessage}>
+                    Изменения успешно применены!
+                </div>
+            )}
+
         </div>
     );
 }

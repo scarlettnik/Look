@@ -155,14 +155,7 @@
     border: 1px solid var(--light-gray);
 
 }
-.colorCircleWrapper {
-    display: flex;
-    flex-direction: row; /* Изменено с column на row */
-    align-items: center;
-    cursor: pointer;
-    overflow-x: auto; /* Добавлено для горизонтального скролла */
-    white-space: nowrap; /* Предотвращает перенос элементов */
-}
+
 .colorsContainer {
     width: 100%;
     overflow-x: auto;

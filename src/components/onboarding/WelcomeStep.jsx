@@ -163,23 +163,6 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     const easeInOut = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
-    if (!imagesLoaded) {
-        return (
-            <div className={styles.onboardingStep}>
-                <div className={welcomstyle.loadingContainer}>
-                    <div className={welcomstyle.loadingBar}>
-                        <div
-                            className={welcomstyle.loadingProgress}
-                            style={{ width: `${loadingProgress}%` }}
-                        ></div>
-                    </div>
-                    <p className={welcomstyle.loadingText}>
-                        Загрузка {loadingProgress}%
-                    </p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className={styles.onboardingStep}>

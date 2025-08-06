@@ -314,4 +314,14 @@
     transform: translateX(-75%);
 }
 
+.successMessage {
+    position: fixed;
+    bottom: 80px;
+    margin: auto;
+    background-color: var(--dark-warm-gray);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 20px;
+    z-index: 9999;
+}
 

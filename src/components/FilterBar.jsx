@@ -5,16 +5,16 @@ import { filterProducts } from "./utils/incideFilter";
 import { BRANDS, SIZES, COLORS } from "../constants";
 import styles from "./ui/compilation.module.css";
 import filterStyles from "./ui/filterList.module.css";
-
 import {PriceFilter} from "./utils/filters/PriceFilter.jsx";
 import {TypeFilter} from "./utils/filters/TypeFilter.jsx";
 import {useNavigate} from "react-router-dom";
 import {BrandFilter} from "./utils/filters/BrandFilter.jsx";
 import {SizeFilter} from "./utils/filters/SizeFilter.jsx";
 import {FiltersModal} from "./utils/FiltersModal.jsx";
+import CustomCheckbox from "./CustomCheckbox.jsx";
 
 
-const AllFiltersModal = ({
+const AllFiltersModal = observer(({
                              filters,
                              applyAllFilters,
                              onClose
@@ -26,7 +26,7 @@ const AllFiltersModal = ({
         type: [...(filters.type || [])],
         color: [...(filters.color || [])]
     });
-
+    const store = useStore();
     const handleFilterChange = (filterName, value) => {
         setLocalFilters(prev => ({
             ...prev,
@@ -69,6 +69,23 @@ const AllFiltersModal = ({
         onClose()
     };
 
+    const [showAll, setShowAll] = useState(false);
+
+    console.log('aaaa', store.help.metaData)
+
+    const types = store?.help?.metaData?.categories;
+    const displayedTypes = showAll ? types : types.slice(0, 4);
+
+    const [selectedQuick, setSelectedQuick] = useState(null);
+
+    const quickOptions = [1500, 3000, 5000, 10000];
+
+    const selectQuickMax = (value) => {
+        setSelectedQuick(value);
+        handlePriceChange(null, value);
+    };
+
+
     return (
         <FiltersModal
             title="Фильтры"
@@ -76,17 +93,81 @@ const AllFiltersModal = ({
             onApply={handleApply}
         >
             <div className={filterStyles.section}>
-                <h3 className={filterStyles.sectionTitle}>Тип</h3>
-                <div className={filterStyles.gridOptions}>
-                    {['Одежда', 'Обувь', 'Аксессуары', 'Электроника'].map(type => (
-                        <button
-                            key={type}
-                            className={`${styles.optionButton} ${
-                                localFilters.type.includes(type) ? styles.selected : ''
-                            }`}
-                            onClick={() => handleFilterChange('type', type)}
-                        >
+                <div className={filterStyles.sectionHeader}>
+                    <div className={filterStyles.genderLabels}>
+                        <span style={{color: 'var(--dark-warm-gray'}}>Женское</span>
+                        <span style={{color: 'var(--light-warm-gray'}}>Мужское</span>
+                    </div>
+                    <button
+                        className={filterStyles.showAllButton}
+                        onClick={() => setShowAll(prev => !prev)}
+                    >
+                        {showAll ? 'Скрыть' : 'Показать все'}
+                    </button>
+                </div>
+                <div className={filterStyles.typeOptions}>
+                    {displayedTypes.map((type, index) => (
+                        <label key={type} className={filterStyles.checkboxLabel}>
+                            <CustomCheckbox
+                                className={filterStyles.checkbox}
+                                id={`checkbox-${index}`}
+                                checked={localFilters.type.includes(type)}
+                                onChange={() => handleFilterChange('type', type)}
+                            />
                             {type}
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            <div className={filterStyles.section}>
+                <p className={filterStyles.sectionTitle}>Стоимость</p>
+                <div className={filterStyles.priceInputGroup}>
+                    <input
+                        type="number"
+                        placeholder="от"
+                        value={localFilters.price.min || ''}
+                        onChange={(e) => handlePriceChange(
+                            e.target.value ? parseInt(e.target.value) : null,
+                            localFilters.price.max
+                        )}
+                    />
+                    <span style={{marginTop: '10px'}}>-</span>
+                    <input
+                        type="number"
+                        placeholder="до"
+                        value={localFilters.price.max || ''}
+                        onChange={(e) => handlePriceChange(
+                            localFilters.price.min,
+                            e.target.value ? parseInt(e.target.value) : null
+                        )}
+                    />
+                </div>
+                <div className={filterStyles.gridOptions}>
+                    {quickOptions.map((option) => (
+                        <button
+                            key={option}
+                            className={`${filterStyles.optionButton} ${(selectedQuick === localFilters.price.max) && selectedQuick === option ? filterStyles.selected : ''}`}
+                            onClick={() => selectQuickMax(option)}
+                        >
+                            до {option.toLocaleString()} ₽
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className={filterStyles.section}>
+                <h3 className={filterStyles.sectionTitle}>Бренд</h3>
+                <div className={filterStyles.flexOptions}>
+                    {BRANDS.map(brand => (
+                        <button
+                            key={brand}
+                            className={`${filterStyles.optionButton} ${
+                                localFilters.brand.includes(brand) ? filterStyles.selected : ''
+                            }`}
+                            onClick={() => handleFilterChange('brand', brand)}
+                        >
+                            {brand}
                         </button>
                     ))}
                 </div>
@@ -98,8 +179,8 @@ const AllFiltersModal = ({
                     {SIZES.map(size => (
                         <button
                             key={size}
-                            className={`${styles.optionButton} ${
-                                localFilters.size.includes(size) ? styles.selected : ''
+                            className={`${filterStyles.optionButton} ${
+                                localFilters.size.includes(size) ? filterStyles.selected : ''
                             }`}
                             onClick={() => handleFilterChange('size', size)}
                         >
@@ -109,71 +190,45 @@ const AllFiltersModal = ({
                 </div>
             </div>
 
-            <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Бренд</h3>
-                <div className={styles.gridOptions}>
-                    {BRANDS.map(brand => (
-                        <button
-                            key={brand}
-                            className={`${styles.optionButton} ${
-                                localFilters.brand.includes(brand) ? styles.selected : ''
-                            }`}
-                            onClick={() => handleFilterChange('brand', brand)}
-                        >
-                            {brand}
-                        </button>
-                    ))}
-                </div>
-            </div>
 
-            <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Цвет</h3>
-                <div className={styles.gridOptions}>
-                    {COLORS.map(color => (
+            <div className={filterStyles.section}>
+                <h3 className={filterStyles.sectionTitle}>
+                    Цвет
+                    {localFilters.color.length > 0 && (
+                        <span
+                              className={filterStyles.colorTitle}
+                              style={{marginLeft: '10px'}}>
+                              {localFilters.color.slice(0, 2).join(', ')}
+                              {localFilters.color.length > 2 && ` и еще ${localFilters.color.length - 2}`}
+                        </span>
+                    )}
+                </h3>
+
+
+                <div className={filterStyles.gridOptions}>
+                    {Object.keys(store?.help?.metaData.colors || {}).map(color => (
                         <button
                             key={color}
-                            className={`${styles.optionButton} ${
-                                localFilters.color.includes(color) ? styles.selected : ''
-                            }`}
+                            style={{backgroundColor: "transparent"}}
                             onClick={() => handleFilterChange('color', color)}
                         >
-                            {color}
+                            <span
+                                className={`${filterStyles.colorCircle} ${
+                                    localFilters.color.includes(color) ? filterStyles.selected : ''
+                                }`}
+                                style={{
+                                    backgroundColor: store.help.metaData.colors[color],
+                                }}
+                            ></span>
                         </button>
                     ))}
                 </div>
+
             </div>
 
-            <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>Цена</h3>
-                <div className={styles.priceInputGroup}>
-                    <input
-                        type="number"
-                        placeholder="от"
-                        value={localFilters.price.min || ''}
-                        onChange={(e) => handlePriceChange(
-                            e.target.value ? parseInt(e.target.value) : null,
-                            localFilters.price.max
-                        )}
-                    />
-                    <span>-</span>
-                    <input
-                        type="number"
-                        placeholder="до"
-                        value={localFilters.price.max || ''}
-                        onChange={(e) => handlePriceChange(
-                            localFilters.price.min,
-                            e.target.value ? parseInt(e.target.value) : null
-                        )}
-                    />
-                </div>
-            </div>
         </FiltersModal>
     );
-};
-
-
-
-
+});
 
 
 export const FilterBar = observer(({
@@ -211,7 +266,7 @@ export const FilterBar = observer(({
 
     const applyFilter = (value) => {
         if (activeFilter) {
-            const updatedFilters = { ...filters };
+            const updatedFilters = {...filters};
 
             if (activeFilter === 'price') {
                 updatedFilters.price = value;

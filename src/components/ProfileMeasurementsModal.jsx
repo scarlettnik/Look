@@ -13,17 +13,17 @@ import styles from './ui/profile.module.css';
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
 
-const ProfileMeasurementsModal = observer(({ isOpen, onClose }) => {
+const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     const store = useStore();
     const [preferences, setPreferences] = useState({
-        clothing_size: store.authStore.data?.preferences?.clothing_size || 'M',
+        clothing_size: store.authStore.data?.preferences?.clothing_size || '',
         size_parameters: store.authStore.data?.preferences?.size_parameters || {
             breast: 90,
             waist: 60,
             hip: 90
         },
         wearing_styles: store.authStore.data?.preferences?.wearing_styles || [],
-        age: store.authStore.data?.preferences?.age || 25 // ← добавили
+        age: store.authStore.data?.preferences?.age || 25
     });
 
     const { data } = useAuth();
@@ -31,7 +31,6 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    console.log(preferences)
 
     useEffect(() => {
         console.log("Current clothing_size:", preferences.clothing_size);
@@ -99,8 +98,11 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose }) => {
                     };
                 }
             });
-
             onClose();
+            onSuccess();
+
+
+
         } catch (error) {
             console.error('Update error:', error);
             setError('Failed to save changes');
@@ -182,6 +184,7 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose }) => {
                     </FullScreenButton>
                 </ButtonWrapper>
             </div>
+
         </div>
     );
 });

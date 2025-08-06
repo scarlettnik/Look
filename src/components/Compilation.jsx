@@ -25,7 +25,8 @@ const Compilation = observer(() => {
         size: [],
         brand: [],
         price: { min: null, max: null },
-        type: []
+        type: [],
+        color: []
     });
 
     useEffect(() => {
@@ -61,12 +62,16 @@ const Compilation = observer(() => {
                 return false;
             }
 
-            if (filters.price.min !== null && product.price < filters.price.min) {
+            if (filters.price.min !== null && product.discount_price < filters.price.min) {
                 return false;
             }
-            if (filters.price.max !== null && product.price > filters.price.max) {
+            if (filters.price.max !== null && product.discount_price > filters.price.max) {
                 return false;
             }
+            if (filters.color.length > 0 && !filters.color.includes(product.color_name)) {
+                return false;
+            }
+
 
             if (filters.type.length > 0 && !filters.type.includes(product.type)) {
                 return false;

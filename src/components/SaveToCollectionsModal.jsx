@@ -235,8 +235,7 @@ const SaveToCollectionModal = observer(({
             <Modal isOpen={isModalOpen} onClose={createClose}>
                 <AddList onCreate={handleCreateCollection}/>
             </Modal>
-            <ButtonWrapper>
-
+            <ButtonWrapper bottom='20px'>
                 <FullScreenButton
                     onClick={handleSave}
                     disabled={isLoading}

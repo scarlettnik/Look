@@ -1,14 +1,21 @@
-const ButtonWrapper = ({children}) => {
+import React from 'react';
+
+
+const ButtonWrapper= ({
+                                                         children,
+                                                         bottom = '60px',
+                                                         style = {}
+                                                     }) => {
     const wrapperStyle = {
         position: 'fixed',
-        bottom: '20px',
+        bottom: bottom,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         zIndex: 1001,
         left: 0,
         right: 0,
-
+        ...style
     };
 
     return (

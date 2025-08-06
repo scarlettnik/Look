@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../ui/precompute.module.css';
 import FullScreenButton from "../FullScrinButton.jsx";
+import ButtonWrapper from "../utils/ButtonWrapper.jsx";
 
 const Precompute = ({onNext}) => {
     const [count, setCount] = useState(1);
@@ -17,7 +18,11 @@ const Precompute = ({onNext}) => {
 
     return (
         <>
-            <p>
+            <p style={{
+                color: 'var(--white)',
+                fontSize:'24px',
+                marginTop: '20px'
+            }}>
                 Собираем гардероб, <br/>секундочку...
             </p>
         <div className={styles.wrapper}>
@@ -40,14 +45,17 @@ const Precompute = ({onNext}) => {
                 ))}
             </div>
             <div className={styles.centerText}>{count}%</div>
-            <FullScreenButton
-                color='var(--beige)'
-                textColor='var(--black)'
-                onClick={onNext}
-            >
-                Далее
-            </FullScreenButton>
+
         </div>
+            <ButtonWrapper>
+                <FullScreenButton
+                    color='var(--beige)'
+                    textColor='var(--black)'
+                    onClick={onNext}
+                >
+                    Далее
+                </FullScreenButton>
+            </ButtonWrapper>
             </>
     );
 };

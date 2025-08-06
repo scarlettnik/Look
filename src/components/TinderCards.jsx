@@ -62,13 +62,11 @@ const TinderCards = observer(() => {
 
     const handleSaveSuccess = useCallback((productId, isSaved) => {
         runInAction(() => {
-            // Обновляем состояние в catalogStore
             const card = store.catalogStore.cards.find(c => c.id === productId);
             if (card) {
                 card.is_contained_in_user_collections = isSaved;
             }
 
-            // Обновляем состояние в popularStore (если товар есть там)
             store.popular.popular.forEach(item => {
                 if (item.products) {
                     const product = item.products.find(p => p.id === productId);
@@ -121,6 +119,11 @@ const TinderCards = observer(() => {
         }
     }, [store?.catalogStore.cards?.length]);
 
+    useEffect(() => {
+        if (store?.authStore.data) {
+            store.popular.fetchCollections();
+        }
+    }, [store?.authStore.data]);
 
 
     const sendInteraction = async (productId, action) => {
@@ -186,7 +189,7 @@ const TinderCards = observer(() => {
         }, duration/2);
     }, [swipeConfig]);
 
-
+    console.log(store)
     const updateSwipeFeedback = useCallback((dx, dy) => {
         const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
         const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
@@ -240,6 +243,7 @@ const TinderCards = observer(() => {
             runInAction(() => {
                 if (store.authStore.data) {
                     store.authStore.data.preferences = {
+                        ...store.authStore.data.preferences,
                         complete_onboarding: true
                     };
                 }
@@ -308,6 +312,8 @@ const TinderCards = observer(() => {
         }, 800);
     }, [store.catalogStore.cards, isAnimating]);
 
+    console.log(store?.popular?.collections)
+
     return (
         <>
 
@@ -360,13 +366,13 @@ const TinderCards = observer(() => {
                     {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
                         <div className={styles.emptyState}>
                             <div className={styles.notCard}>
-                                <p  className={styles.notCardText}>Товары из ассортимента брендов закончились</p>
+                                <p className={styles.notCardText}>Товары из ассортимента брендов закончились</p>
                             </div>
                             <p className={styles.notCardCatText}>
                                 Но можно посмотреть подборки
                             </p>
                             <div className={styles.collectionsBlock}>
-                                { store?.popular?.collections && store?.popular?.collections?.map((item) => (
+                                {(store?.popular?.collections || []).map((item) => (
                                     <div
                                         key={`${item.id}`}
                                         className={styles.collectionCard}
@@ -378,9 +384,9 @@ const TinderCards = observer(() => {
                                             alt={item.name}
                                         />
                                         <p className={styles.collectionTitle}>{item.name}</p>
-                                    </div>))}
+                                    </div>
+                                ))}
                             </div>
-
                         </div>
                     )}
                 </div>

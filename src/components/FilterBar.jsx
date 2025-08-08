@@ -347,20 +347,19 @@ export const FilterBar = observer(({
     return (
         <div className={styles.headerContainer}>
             {isCardsPage ? (
-                <button style={{paddingLeft: '3vw'}} onClick={onUndo}
+                <button onClick={onUndo} style={{zIndex: '100000'}}
                         className={`${styles.filterButton} ${undoHighlight ? styles.highlightedButton : ''}`}>
                     <img src={undoHighlight ? '/subicons/arrowleftwhite.svg' : '/subicons/arrowleft.svg'}
                          alt="Назад"/>
                 </button>
             ) : (
-                <button style={{paddingLeft: '3vw'}} onClick={handleBack} className={styles.filterButton}>
+                <button onClick={handleBack} className={styles.filterButton}>
                     <img src='/subicons/arrowleft.svg' alt="Назад"/>
                 </button>
             )}
-
-
             <div className={styles.filterBar}>
-                <button  className={styles.filterButton} onClick={openAllFilters}>
+
+                <button className={styles.filterButton} onClick={openAllFilters}>
                     <img src='/subicons/filter.svg' alt="Фильтры"/>
                 </button>
 

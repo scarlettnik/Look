@@ -265,10 +265,10 @@
 
 .filterBar {
     display: flex;
-    flex-grow: 1;
     overflow-x: auto;
     scrollbar-width: none;
 }
+
 .filterBar {
     padding: 8px 3vw;
     width: 94vw;

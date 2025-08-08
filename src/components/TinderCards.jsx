@@ -11,6 +11,7 @@ import {runInAction} from "mobx";
 import {Onboarding} from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import {useNavigate} from "react-router-dom";
+import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
@@ -310,6 +311,54 @@ const TinderCards = observer(() => {
 
     console.log(store?.popular?.collections)
 
+
+
+    const [imagesLoaded, setImagesLoaded] = useState(false);
+    const cardsRef = useRef(store?.catalogStore?.cards || []);
+
+    useEffect(() => {
+        // Сбрасываем флаг загрузки при изменении карточек
+        if (store?.catalogStore?.cards !== cardsRef.current) {
+            setImagesLoaded(false);
+            cardsRef.current = store?.catalogStore?.cards;
+        }
+
+        if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
+            const imageElements = document.querySelectorAll('.tinder-card-image');
+
+            // Если нет изображений - сразу считаем загруженными
+            if (imageElements.length === 0) {
+                setImagesLoaded(true);
+                return;
+            }
+
+            let loadedCount = 0;
+
+            const handleImageLoad = () => {
+                loadedCount++;
+                if (loadedCount === imageElements.length) {
+                    setImagesLoaded(true);
+                }
+            };
+
+            imageElements.forEach(img => {
+                if (img.complete) {
+                    handleImageLoad();
+                } else {
+                    img.addEventListener('load', handleImageLoad);
+                    img.addEventListener('error', handleImageLoad);
+                }
+            });
+
+            return () => {
+                imageElements.forEach(img => {
+                    img.removeEventListener('load', handleImageLoad);
+                    img.removeEventListener('error', handleImageLoad);
+                });
+            };
+        }
+    }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
+
     return (
         <>
 
@@ -334,11 +383,16 @@ const TinderCards = observer(() => {
                 />
 
                 <div className={styles.cardsContainer}>
-                    {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
-                        <div
+                    {store.catalogStore.loading || !imagesLoaded && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                        <CustomSkeleton
                             key={`skeleton-${i}`}
-                            className={styles.skeleton}
-                            style={{zIndex: SKELETON_COUNT - i}}
+                            style={{
+                                width: '92vw',
+                                height: '70vh',
+                                position: 'absolute',
+                                zIndex: SKELETON_COUNT - i,
+                                borderRadius: '8px'
+                            }}
                         />
                     ))}
 

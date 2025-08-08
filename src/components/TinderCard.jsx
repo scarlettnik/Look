@@ -265,7 +265,6 @@ const TinderCard = ({
                     </div>
                 </>
             )}
-icons (11)
             <div className={styles.cardContent}>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>

@@ -13,6 +13,7 @@ import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import {useNavigate} from "react-router-dom";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
+const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const INITIAL_CARDS_COUNT = 3;
 const SKELETON_COUNT = 3;
 
@@ -149,6 +150,7 @@ const TinderCards = observer(() => {
         if (direction === 'down') return;
 
         const action = direction === 'right' ? 'like' : 'dislike';
+
         sendInteraction(card.id, action);
 
         const duration = direction === 'up'
@@ -185,6 +187,7 @@ const TinderCards = observer(() => {
 
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
+        const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
         const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
 
         let direction = null;
@@ -226,8 +229,7 @@ const TinderCards = observer(() => {
                 },
                 body: JSON.stringify({
                     preferences: {
-                        ...store.authStore.data.preferences,
-                        complete_onboarding: false
+                        complete_onboarding: true
                     }
                 })
             });
@@ -238,7 +240,7 @@ const TinderCards = observer(() => {
                 if (store.authStore.data) {
                     store.authStore.data.preferences = {
                         ...store.authStore.data.preferences,
-                        complete_onboarding: false
+                        complete_onboarding: true
                     };
                 }
             });
@@ -306,12 +308,13 @@ const TinderCards = observer(() => {
         }, 800);
     }, [store.catalogStore.cards, isAnimating]);
 
+    console.log(store?.popular?.collections)
 
     return (
         <>
 
             <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
-                <button onClick={() => handleSaveChanges()}>ТЫК</button>
+                {/*<button onClick={() => handleSaveChanges()}>ТЫК</button>*/}
 
                 <SearchHeader
                     onSearch={(searchRequest) => {
@@ -320,12 +323,10 @@ const TinderCards = observer(() => {
                     }}
                     onClearSearch={() => store.catalogStore.resetSearch()}
                 />
-
                 <FilterBar
                     onUndo={() => {
                         store.catalogStore.undoSwipe();
                     }}
-                    undoHighlight={undoButtonHighlight}
                     filters={filters}
                     setFilters={setFilters}
                     catalogStore={store.catalogStore}

@@ -68,11 +68,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
 
     useEffect(() => {
         if (imagesLoaded) {
-            const timer = setTimeout(() => {
                 startAutoSwipe();
-            }, 200);
-
-            return () => clearTimeout(timer);
         }
     }, [imagesLoaded, currentIndex]);
 

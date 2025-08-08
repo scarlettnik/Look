@@ -383,7 +383,7 @@ const TinderCards = observer(() => {
                 />
 
                 <div className={styles.cardsContainer}>
-                    {store.catalogStore.loading || !imagesLoaded && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                    {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
                         <CustomSkeleton
                             key={`skeleton-${i}`}
                             style={{

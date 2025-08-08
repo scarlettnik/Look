@@ -12,7 +12,7 @@ class CatalogStore {
     authToken = AUTH_TOKEN;
     currentSearchQuery = '';
     currentOffset = 0;
-    limit = 30;
+    limit = 10;
     currentFilters = {
         sizes: [],
         categories: [],

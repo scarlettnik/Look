@@ -11,7 +11,6 @@ import {runInAction} from "mobx";
 import {Onboarding} from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import {useNavigate} from "react-router-dom";
-import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const INITIAL_CARDS_COUNT = 3;
@@ -57,68 +56,6 @@ const TinderCards = observer(() => {
         price: {},
         type: []
     });
-
-
-
-
-
-    const [imagesLoaded, setImagesLoaded] = useState(false);
-    const cardsRef = useRef(store?.catalogStore?.cards || []);
-
-    useEffect(() => {
-        // Сбрасываем флаг загрузки при изменении карточек
-        if (store?.catalogStore?.cards !== cardsRef.current) {
-            setImagesLoaded(false);
-            cardsRef.current = store?.catalogStore?.cards;
-        }
-
-        if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
-            const imageElements = document.querySelectorAll('.tinder-card-image');
-
-            // Если нет изображений - сразу считаем загруженными
-            if (imageElements.length === 0) {
-                setImagesLoaded(true);
-                return;
-            }
-
-            let loadedCount = 0;
-
-            const handleImageLoad = () => {
-                loadedCount++;
-                if (loadedCount === imageElements.length) {
-                    setImagesLoaded(true);
-                }
-            };
-
-            imageElements.forEach(img => {
-                if (img.complete) {
-                    handleImageLoad();
-                } else {
-                    img.addEventListener('load', handleImageLoad);
-                    img.addEventListener('error', handleImageLoad);
-                }
-            });
-
-            return () => {
-                imageElements.forEach(img => {
-                    img.removeEventListener('load', handleImageLoad);
-                    img.removeEventListener('error', handleImageLoad);
-                });
-            };
-        }
-    }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
-
-
-
-
-
-
-
-
-
-
-
-
 
     const handleSaveSuccess = useCallback((productId, isSaved) => {
         runInAction(() => {
@@ -290,7 +227,7 @@ const TinderCards = observer(() => {
                 body: JSON.stringify({
                     preferences: {
                         ...store.authStore.data.preferences,
-                        complete_onboarding: true
+                        complete_onboarding: false
                     }
                 })
             });
@@ -301,7 +238,7 @@ const TinderCards = observer(() => {
                 if (store.authStore.data) {
                     store.authStore.data.preferences = {
                         ...store.authStore.data.preferences,
-                        complete_onboarding: true
+                        complete_onboarding: false
                     };
                 }
             });
@@ -374,6 +311,7 @@ const TinderCards = observer(() => {
         <>
 
             <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
+                <button onClick={() => handleSaveChanges()}>ТЫК</button>
 
                 <SearchHeader
                     onSearch={(searchRequest) => {
@@ -394,16 +332,11 @@ const TinderCards = observer(() => {
                 />
 
                 <div className={styles.cardsContainer}>
-                    {(store.catalogStore.loading || !imagesLoaded) && Array(SKELETON_COUNT).fill(0).map((_, i) => (
-                        <CustomSkeleton
+                    {store.catalogStore.loading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                        <div
                             key={`skeleton-${i}`}
-                            style={{
-                                width: '92vw',
-                                height: '70vh',
-                                position: 'absolute',
-                                zIndex: SKELETON_COUNT - i,
-                                borderRadius: '8px'
-                            }}
+                            className={styles.skeleton}
+                            style={{zIndex: SKELETON_COUNT - i}}
                         />
                     ))}
 
@@ -427,6 +360,7 @@ const TinderCards = observer(() => {
                             onSaveClick={handleOpenSaveModal}
                         />
                     ))}
+
                     {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
                         <div className={styles.emptyState}>
                             <div className={styles.notCard}>

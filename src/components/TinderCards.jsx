@@ -327,6 +327,7 @@ const TinderCards = observer(() => {
                     onUndo={() => {
                         store.catalogStore.undoSwipe();
                     }}
+                    undoHighlight = {undoButtonHighlight}
                     filters={filters}
                     setFilters={setFilters}
                     catalogStore={store.catalogStore}

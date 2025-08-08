@@ -10,7 +10,7 @@ const Precompute = ({onNext}) => {
     useEffect(() => {
         const interval = setInterval(() => {
             setCount((prev) => (prev < 100 ? prev + 1 : 100));
-        }, 60);
+        }, 40);
 
         return () => clearInterval(interval);
     }, []);
@@ -52,6 +52,7 @@ const Precompute = ({onNext}) => {
                     color='var(--beige)'
                     textColor='var(--black)'
                     onClick={onNext}
+                    disabled={count < 100}
                 >
                     Далее
                 </FullScreenButton>

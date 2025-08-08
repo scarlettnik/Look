@@ -2,7 +2,7 @@ const FullScreenButton = ({
                           children,
                           color = "var(--black)",
                           textColor = "var(--white)",
-                          onClick
+                          onClick, disabled
                       }) => {
     const buttonStyle = {
         backgroundColor: color,
@@ -22,7 +22,7 @@ const FullScreenButton = ({
     };
 
     return (
-        <button style={buttonStyle} onClick={onClick}>
+        <button style={buttonStyle} disabled={disabled} onClick={onClick}>
             {children}
         </button>
     );

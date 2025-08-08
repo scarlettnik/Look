@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../provider/StoreContext.jsx';
 import styles from './ui/saveToCollectionsModal.module.css';
@@ -9,6 +9,8 @@ import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
 import AddList from "./AddList.jsx";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
+import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
+
 
 const SaveToCollectionModal = observer(({
                                             isOpen,
@@ -25,9 +27,12 @@ const SaveToCollectionModal = observer(({
     const [initialCollections, setInitialCollections] = useState([]);
     const [defaultCollectionId, setDefaultCollectionId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const isKeyboardOpen = useIsKeyboardOpen()
+
     const createClose = () => {
         setIsModalOpen(false);
     };
+
     const handleCreateCollection = async (name, coverUrl) => {
         if (!name.trim()) return;
         setIsModalOpen(false);
@@ -47,9 +52,6 @@ const SaveToCollectionModal = observer(({
             loadCollections();
         }
     }, [isOpen, productId]);
-
-    console.log(productId)
-    console.log(productName);
 
     const loadCollections = async () => {
         try {
@@ -166,84 +168,90 @@ const SaveToCollectionModal = observer(({
 
     if (!isOpen) return null;
 
+    console.log(window.innerHeight)
     return (
         <Modal height={'90vh'} isOpen={isOpen} onClose={onClose}>
-            <div className={styles.scrollWrapper}>
-                <div className={styles.modalHeader}>
-                    <p>Добавить в подборку</p>
-                </div>
+            <div >
+                <div className={styles.scrollWrapper}>
+                    <div className={styles.modalHeader}>
+                        <p>Добавить в подборку</p>
+                    </div>
 
-                <div className={styles.searchContainer}>
+                    <div className={styles.searchContainer}>
                     <span className={styles.searchIcon} role="button" tabIndex={0}>
                         <img src="/subicons/search.svg" alt="Search"/>
                     </span>
 
-                    <input
-                        type="text"
-                        placeholder="Поиск по подборкам"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className={styles.searchInput}
-                    />
+                        <input
+                            type="text"
+                            placeholder="Поиск по подборкам"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={styles.searchInput}
+                        />
 
-                    {searchQuery && (
-                        <span
-                            className={styles.clearIcon}
-                            onClick={() => setSearchQuery('')}
-                            role="button"
-                            tabIndex={0}
-                        >
+                        {searchQuery && (
+                            <span
+                                className={styles.clearIcon}
+                                onClick={() => setSearchQuery('')}
+                                role="button"
+                                tabIndex={0}
+                            >
                             <img src="/subicons/close.svg" alt="Clear"/>
                         </span>
-                    )}
-                </div>
-
-                <div className={styles.collectionsList}>
-                    {filteredCollections.length > 0 ? (
-                        filteredCollections.map(collection => (
-                            <div key={collection.id} className={styles.collectionItem}>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
-                                    <img
-                                        className={styles.collectionImg}
-                                        src={collection?.cover_image_url}
-                                        alt={collection.name}
-                                    />
-                                    <span>{collection.name}</span>
-                                </div>
-                                <CustomCheckbox
-                                    id={collection.id}
-                                    checked={selectedCollections.includes(collection.id)}
-                                    onChange={() => handleCollectionToggle(collection.id)}
-                                    className={styles.hiddenCheckbox}
-                                />
-                            </div>
-                        ))
-                    ) : (
-                        <div className={styles.noResults}>
-                        </div>
-                    )}
-                    <div onClick={createOpen} style={{display: 'flex', alignItems: 'center', justifyContent: 'center',}}>
-                        <button className={styles.circleButton} >
-                            <img src="/subicons/blackadd.svg"/>
-                        </button>
-                        <p style={{fontSize: '12px', fontWeight: '400', paddingLeft: '10px'}}>
-                            Создать новую подборку
-                        </p>
+                        )}
                     </div>
+
+                    <div className={styles.collectionsList}>
+                        {filteredCollections.length > 0 ? (
+                            filteredCollections.map(collection => (
+                                <div key={collection.id} className={styles.collectionItem}>
+                                    <div style={{display: 'flex', alignItems: 'center'}}>
+                                        <img
+                                            className={styles.collectionImg}
+                                            src={collection?.cover_image_url}
+                                            alt={collection.name}
+                                        />
+                                        <span>{collection.name}</span>
+                                    </div>
+                                    <CustomCheckbox
+                                        id={collection.id}
+                                        checked={selectedCollections.includes(collection.id)}
+                                        onChange={() => handleCollectionToggle(collection.id)}
+                                        className={styles.hiddenCheckbox}
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            <div className={styles.noResults}>
+                            </div>
+                        )}
+                        <div onClick={createOpen}
+                             style={{display: 'flex', alignItems: 'center', justifyContent: 'center',}}>
+                            <button className={styles.circleButton}>
+                                <img src="/subicons/blackadd.svg"/>
+                            </button>
+                            <p style={{fontSize: '12px', fontWeight: '400', paddingLeft: '10px'}}>
+                                Создать новую подборку
+                            </p>
+                        </div>
+                    </div>
+                    {!isKeyboardOpen &&
+                        <ButtonWrapper bottom='20px'>
+                            <FullScreenButton
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className={styles.saveButton}
+                            >
+                                {isLoading ? 'Сохранение...' : 'Сохранить'}
+                            </FullScreenButton>
+                        </ButtonWrapper>}
                 </div>
+                <Modal isOpen={isModalOpen} onClose={createClose}>
+                    <AddList onCreate={handleCreateCollection}/>
+                </Modal>
+
             </div>
-            <Modal isOpen={isModalOpen} onClose={createClose}>
-                <AddList onCreate={handleCreateCollection}/>
-            </Modal>
-            <ButtonWrapper bottom='20px'>
-                <FullScreenButton
-                    onClick={handleSave}
-                    disabled={isLoading}
-                    className={styles.saveButton}
-                >
-                    {isLoading ? 'Сохранение...' : 'Сохранить'}
-                </FullScreenButton>
-            </ButtonWrapper>
         </Modal>
     );
 });

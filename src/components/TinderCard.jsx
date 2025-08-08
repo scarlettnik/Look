@@ -40,16 +40,15 @@ const TinderCard = ({
         if (!cardRef.current) return;
 
         cardRef.current.style.transition = 'none';
-        cardRef.current.style.transform = 'translateY(20px)'; // Убрали opacity
+        cardRef.current.style.transform = 'translateY(20px)';
 
         requestAnimationFrame(() => {
             cardRef.current.style.transition = `
       transform 300ms cubic-bezier(0.18, 0.89, 0.32, 1.28)
     `;
-            cardRef.current.style.transform = 'translateY(0)'; // Убрали opacity
+            cardRef.current.style.transform = 'translateY(0)';
         });
     };
-    console.log(isOnboardingActive)
 
     useEffect(() => {
         if (cardRef.current) {
@@ -253,7 +252,7 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img src="/menuIcons/unactive/save.svg" alt="Save" style={{width: '60px'}}/>
+                        <img src="/subicons/darklike.svg" alt="Save" style={{width: '80px'}}/>
                     </div>
                     <div
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
@@ -262,11 +261,11 @@ const TinderCard = ({
                             transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
                         }}
                     >
-                        <img src="/subicons/close.svg" alt="Close" style={{width: '60px'}}/>
+                        <img src="/subicons/darkdislike.svg" alt="Close" style={{width: '80px'}}/>
                     </div>
                 </>
             )}
-
+icons (11)
             <div className={styles.cardContent}>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>

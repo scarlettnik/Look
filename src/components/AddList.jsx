@@ -35,8 +35,6 @@ function AddList({
     const isKeyboardOpen = useIsKeyboardOpen()
 
 
-
-
     useEffect(() => {
         if (collection) {
             setClosetName(collection.name);

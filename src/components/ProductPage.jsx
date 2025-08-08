@@ -57,8 +57,6 @@ const ProductPage = () => {
             throw err;
         }
     };
-
-    console.log(id)
     const handleOpenSaveModal = useCallback((product) => {
         setSelectedProduct(product);
         setIsSaveModalOpen(true);
@@ -200,11 +198,16 @@ const ProductPage = () => {
                                 />
                             </button>
                         </div>
-
-                        <FullScreenButton onClick={() => window.open(product?.original_url, '_blank')}>
-                            <p style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                        <FullScreenButton onClick={() => {
+                            if (window.Telegram?.WebApp?.openLink) {
+                                window.Telegram.WebApp.openLink(product?.original_url);
+                            } else {
+                                window.open(product?.original_url, '_blank');
+                            }
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                                 На сайт продавца <img src='/subicons/shoppingBag.svg' alt="Корзина" />
-                            </p>
+                            </div>
                         </FullScreenButton>
 
                     </>
@@ -214,7 +217,7 @@ const ProductPage = () => {
                 {loading ? (
                     <CustomSkeleton style={{width: '100%', height: '80px', marginBottom: '24px'}} />
                 ) : (
-                    <p className={styles.description}>
+                    <span className={styles.description}>
                         <div>
                             <div
                                 className={`${styles.description} ${!isExpanded ? styles.clamped : ''}`}
@@ -231,7 +234,7 @@ const ProductPage = () => {
                             )}
                         </div>
 
-                    </p>
+                    </span>
                 )}
 
                 {loading ? (

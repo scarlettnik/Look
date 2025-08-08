@@ -158,9 +158,9 @@ const Save = observer(() => {
           className={styles.cards}
           style={{ marginBottom: deleteMode ? "120px" : "0px" }}
         >
-          {filteredSaves?.map((save) => (
+          {filteredSaves?.map((save, index) => (
               <div key={save.id} className={styles.cardContainer}>
-                {deleteMode && (
+                {deleteMode && index > 0 && (
                    <div>
                      <CustomCheckbox
                          id={`save-${save.id}`}

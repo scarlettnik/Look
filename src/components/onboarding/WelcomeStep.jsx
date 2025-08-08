@@ -70,7 +70,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         if (imagesLoaded) {
             const timer = setTimeout(() => {
                 startAutoSwipe();
-            }, 500);
+            }, 200);
 
             return () => clearTimeout(timer);
         }

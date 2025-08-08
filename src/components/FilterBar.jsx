@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../provider/StoreContext";
 import { filterProducts } from "./utils/incideFilter";
-import { BRANDS, SIZES, COLORS } from "../constants";
+import { SIZES } from "../constants";
 import styles from "./ui/compilation.module.css";
 import filterStyles from "./ui/filterList.module.css";
 import {PriceFilter} from "./utils/filters/PriceFilter.jsx";
@@ -235,12 +235,13 @@ export const FilterBar = observer(({
                                        setFilters,
                                        catalogStore,
                                        products,
-                                       onFilter
+                                       onFilter,
+                                       onUndo,
+                                       undoHighlight
                                    }) => {
     const [activeFilter, setActiveFilter] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAllFiltersOpen, setIsAllFiltersOpen] = useState(false);
-    const store = useStore();
 
     const navigate = useNavigate();
     const handleBack = () => navigate(-1);
@@ -340,13 +341,26 @@ export const FilterBar = observer(({
         }
     };
 
+    const isCardsPage = location.pathname.includes('cards');
+
+
     return (
-        <>
-            <div className={styles.filterBar}>
-                <button onClick={handleBack} className={styles.filterButton}>
+        <div className={styles.headerContainer}>
+            {isCardsPage ? (
+                <button style={{paddingLeft: '3vw'}} onClick={onUndo}
+                        className={`${styles.filterButton} ${undoHighlight ? styles.highlightedButton : ''}`}>
+                    <img src={undoHighlight ? '/subicons/arrowleftwhite.svg' : '/subicons/arrowleft.svg'}
+                         alt="Назад"/>
+                </button>
+            ) : (
+                <button style={{paddingLeft: '3vw'}} onClick={handleBack} className={styles.filterButton}>
                     <img src='/subicons/arrowleft.svg' alt="Назад"/>
                 </button>
-                <button className={styles.filterButton} onClick={openAllFilters}>
+            )}
+
+
+            <div className={styles.filterBar}>
+                <button  className={styles.filterButton} onClick={openAllFilters}>
                     <img src='/subicons/filter.svg' alt="Фильтры"/>
                 </button>
 
@@ -385,6 +399,6 @@ export const FilterBar = observer(({
                     onClose={closeAllFilters}
                 />
             )}
-        </>
+        </div>
     );
 });

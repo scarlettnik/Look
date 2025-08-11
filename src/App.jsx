@@ -17,6 +17,7 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 import AccountDeleted from "./components/AccountDeleted.jsx";
 import PopularCollection from "./components/PopularCollection.jsx";
 import { useEffect } from 'react';
+import {AUTH_TOKEN} from "./constants.js";
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function AppContent() {
     const [searchParams] = useSearchParams();
     const startParam = searchParams.get('startapp');
     const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
+    console.log(AUTH_TOKEN)
 
     useEffect(() => {
         if (!isTWA) return;

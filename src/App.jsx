@@ -36,7 +36,6 @@ function AppContent() {
     const [searchParams] = useSearchParams();
     const startParam = searchParams.get('startapp');
     const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
-    console.log(AUTH_TOKEN)
 
     useEffect(() => {
         if (!isTWA) return;

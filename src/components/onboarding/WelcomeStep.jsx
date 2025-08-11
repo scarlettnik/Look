@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import styles from '../ui/OnboardingModal.module.css';
 import welcomstyle from '../ui/welcomStyle.module.css';
 import store from "../../store.js";
+import {AUTH_TOKEN} from "../../constants.js";
 
 const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -201,6 +202,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
             >
                 <div style={{ display: 'flex', alignItems: "center", justifyContent: 'center' }}>
                     Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />
+                    {AUTH_TOKEN}
                 </div>
             </button>
         </div>

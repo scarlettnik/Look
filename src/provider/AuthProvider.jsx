@@ -7,7 +7,6 @@ const AuthContext = createContext();
 export const AuthProvider = observer(({ children }) => {
     const { authStore } = useStore();
 
-    // Добавляем проверку на существование authStore и postData
     useEffect(() => {
         if (authStore && typeof authStore.postData === 'function' && !authStore.hasFetched) {
             authStore.postData();

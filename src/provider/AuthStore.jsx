@@ -11,7 +11,7 @@ class AuthStore {
         makeAutoObservable(this);
     }
 
-    async postData() {  // Переименовали initialize в postData для согласованности
+    async postData() {
         if (this.hasFetched || this.loading) return;
 
         this.loading = true;
@@ -44,19 +44,6 @@ class AuthStore {
                 this.loading = false;
             });
         }
-    }
-
-    setUserData(newData) {
-        runInAction(() => {
-            this.data = {
-                ...this.data,
-                ...newData,
-                preferences: {
-                    ...this.data?.preferences,
-                    ...newData.preferences
-                }
-            };
-        });
     }
 
 }

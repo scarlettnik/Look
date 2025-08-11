@@ -12,7 +12,7 @@ class CatalogStore {
     authToken = AUTH_TOKEN;
     currentSearchQuery = '';
     currentOffset = 0;
-    limit = 10;
+    limit = 30;
     currentFilters = {
         sizes: [],
         categories: [],
@@ -22,6 +22,8 @@ class CatalogStore {
         max_price: null
     };
     lastSearchQuery = null;
+    lastAppliedFilters = null;
+
 
     constructor() {
         makeAutoObservable(this);
@@ -43,6 +45,9 @@ class CatalogStore {
 
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
+    };
+    getCurrentFilters = () => {
+        return this.lastAppliedFilters || this.currentFilters;
     };
 
     clearLastSearchQuery = () => {
@@ -88,7 +93,12 @@ class CatalogStore {
             const pendingCards = newCards.map(card => ({
                 ...card,
                 _pending: true,
-                _key: this.getUniqueKey()
+                _key: this.getUniqueKey(),
+                style: {
+                    opacity: 0,
+                    transform: 'translateY(0)',
+                    transition: 'all 300ms ease-out'
+                }
             }));
 
             this.cards = [...this.cards, ...pendingCards];
@@ -100,7 +110,7 @@ class CatalogStore {
                     style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 800ms ease-out`
+                        transition: `all 200ms ease-out`
                     }
                 }));
             }, 50);
@@ -113,6 +123,7 @@ class CatalogStore {
             this.loading = false;
         }
     });
+
 
     checkPreload = () => {
         if (this.cards.length <= this.preloadThreshold &&
@@ -140,21 +151,11 @@ class CatalogStore {
             ...this.currentFilters,
             ...newFilters
         };
+        this.lastAppliedFilters = JSON.parse(JSON.stringify(this.currentFilters));
         this.hasMore = true;
         yield this.fetchCards(true);
     });
 
-    resetFilters = flow(function* () {
-        this.currentFilters = {
-            categories: [],
-            colors: [],
-            brands: [],
-            min_price: null,
-            max_price: null
-        };
-        this.hasMore = true;
-        yield this.fetchCards(true);
-    });
 
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
@@ -199,7 +200,7 @@ class CatalogStore {
                     style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 800ms ease-out`
+                        transition: `all 200ms ease-out`
                     }
                 } : c
             );

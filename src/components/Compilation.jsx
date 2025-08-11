@@ -21,6 +21,7 @@ const Compilation = observer(() => {
     const [isSave, setIsSave] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
 
+    // Инициализация фильтров
     const [filters, setFilters] = useState({
         size: [],
         brand: [],
@@ -37,10 +38,18 @@ const Compilation = observer(() => {
 
     const { currentCollection: save, loading } = collectionStore;
 
+    // Функция для применения фильтров
+    const applyFilters = (updatedFilters) => {
+        // Можно добавить дополнительную логику здесь при необходимости
+        console.log("Filters applied:", updatedFilters);
+    };
+
+    // Мемоизированный список отфильтрованных продуктов
     const filteredProducts = useMemo(() => {
         if (!save?.products) return [];
 
         return save.products.filter(product => {
+            // Фильтрация по размеру
             if (filters.size.length > 0) {
                 const productSizes = product.sizes || [];
                 const hasSizeMatch = productSizes.some(productSize => {
@@ -58,20 +67,26 @@ const Compilation = observer(() => {
                 if (!hasSizeMatch) return false;
             }
 
+            // Фильтрация по бренду
             if (filters.brand.length > 0 && !filters.brand.includes(product.brand)) {
                 return false;
             }
 
-            if (filters.price.min !== null && product.discount_price < filters.price.min) {
+            // Фильтрация по цене
+            const productPrice = product.discount_price || product.price;
+            if (filters.price.min !== null && productPrice < filters.price.min) {
                 return false;
             }
-            if (filters.price.max !== null && product.discount_price > filters.price.max) {
+            if (filters.price.max !== null && productPrice > filters.price.max) {
                 return false;
             }
+
+            // Фильтрация по цвету
             if (filters.color.length > 0 && !filters.color.includes(product.color_name)) {
                 return false;
             }
 
+            // Фильтрация по типу
             if (filters.type.length > 0 && !filters.type.includes(product.type)) {
                 return false;
             }
@@ -98,11 +113,15 @@ const Compilation = observer(() => {
                     loading={loading}
                     onEnterEditMode={() => setIsEditMode(true)}
                 />
+
+                {/* Обновленный FilterBar с локальными фильтрами */}
                 <FilterBar
                     filters={filters}
                     setFilters={setFilters}
                     products={save?.products || []}
+                    onFilter={applyFilters}  // Передаем функцию для обработки фильтров
                 />
+
                 <ItemGrid
                     items={filteredProducts}
                     loading={loading}
@@ -338,7 +357,7 @@ const ItemGrid = observer(({ items, loading, isEditMode, onDeleteItems, onCancel
 
                         </div>
                     )}
-                    <Link to={`/product/${item?.id}`} className={styles.itemLink}>
+                    <Link to={`product/${item?.id}`} className={styles.itemLink}>
                         <img
                             src={item?.image_urls?.[0]}
                             alt={item.name}

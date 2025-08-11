@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { BackButton } from '@twa-dev/sdk/react';
+import { BrowserRouter as Router, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { BackButton, WebApp } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
 import Profile from "./components/Profile.jsx";
@@ -16,26 +16,38 @@ import { StoreProvider } from './provider/StoreContext.jsx';
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import AccountDeleted from "./components/AccountDeleted.jsx";
 import PopularCollection from "./components/PopularCollection.jsx";
-
+import { useEffect } from 'react';
 
 function App() {
     return (
-
-            <StoreProvider>
-                <AuthProvider>
-                    <Router>
-                        <AppContent />
-                    </Router>
-                </AuthProvider>
-            </StoreProvider>
-
+        <StoreProvider>
+            <AuthProvider>
+                <Router>
+                    <AppContent />
+                </Router>
+            </AuthProvider>
+        </StoreProvider>
     );
 }
 
 function AppContent() {
     const navigate = useNavigate();
-    const auth = useAuth()
-    console.log(auth)
+    const [searchParams] = useSearchParams();
+    const startParam = searchParams.get('startapp');
+    const isTWA = window.Telegram?.WebApp?.platform !== 'unknown';
+
+    useEffect(() => {
+        if (isTWA) {
+            WebApp.expand();
+            WebApp.enableClosingConfirmation();
+
+            if (startParam && startParam.startsWith('collection_')) {
+                const collectionId = startParam.split('_')[1];
+                navigate(`/collection/${collectionId}`);
+            }
+        }
+    }, [isTWA, startParam, navigate]);
+
     return (
         <div>
             {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)}/>}
@@ -47,7 +59,7 @@ function AppContent() {
                 <Route path="/profile" element={<Profile/>}/>
                 <Route path="/save" element={<Save/>}/>
                 <Route path="/save/:id" element={<Compilation/>}/>
-                <Route path="/collection/:id" element={<Compilation/>}/>
+                <Route path="/collection/:id" element={<Compilation isTWA={isTWA}/>}/>
                 <Route path="/save/:id/product/:id" element={<ProductPage/>}/>
                 <Route path="/trands/product/:id" element={<ProductPage/>}/>
                 <Route path='/shoppingcard' element={<ShoppingCard/>}/>

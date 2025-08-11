@@ -52,12 +52,15 @@ const TinderCards = observer(() => {
     const navigate = useNavigate()
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
 
-    const [filters, setFilters] = useState({
-        size: [],
-        brand: [],
-        price: {},
-        type: []
-    });
+    const [filters, setFilters] = useState(() => ({
+        size: store.catalogStore.getCurrentFilters().sizes || [],
+        brand: store.catalogStore.getCurrentFilters().brands || [],
+        price: {
+            min: store.catalogStore.getCurrentFilters().min_price || null,
+            max: store.catalogStore.getCurrentFilters().max_price || null
+        },
+        type: store.catalogStore.getCurrentFilters().categories || []
+    }));
 
     const handleSaveSuccess = useCallback((productId, isSaved) => {
         runInAction(() => {
@@ -388,7 +391,7 @@ const TinderCards = observer(() => {
                             key={`skeleton-${i}`}
                             style={{
                                 width: '92vw',
-                                height: '70vh',
+                                height: 'calc(100% - 60px - 2vh)',
                                 position: 'absolute',
                                 zIndex: SKELETON_COUNT - i,
                                 borderRadius: '8px'

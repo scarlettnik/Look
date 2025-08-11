@@ -9,7 +9,6 @@
 
 .cardsContainer {
     flex-grow: 1;
-    padding-top: 2vh;
     text-align: center;
     display: flex;
     justify-content: center;

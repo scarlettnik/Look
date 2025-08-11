@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
+import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
 const TinderCard = ({
                         card,
@@ -220,6 +221,16 @@ const TinderCard = ({
   `;
         cardRef.current.style.zIndex = zIndex;
     }, [position, zIndex, offset, topCardPosition]);
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    useEffect(() => {
+        if (cardRef.current) {
+            // Применяем стили из карточки
+            Object.entries(card.style || {}).forEach(([key, value]) => {
+                cardRef.current.style[key] = value;
+            });
+        }
+    }, [card.style]);
 
     return (
         <div
@@ -238,7 +249,20 @@ const TinderCard = ({
             style={{ zIndex }}
         >
             <div onClick={() => navigate(`/product/${card.id}`)}>
-                <img className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
+                {!imageLoaded && (
+                    <CustomSkeleton
+                        style={{
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            zIndex: 2,
+                            borderRadius: '8px'
+                        }}
+                    />
+                )}
+                <img  onLoad={() => setImageLoaded(true)}
+                      onError={() => setImageLoaded(true)}
+                      className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
             </div>
 
             {isTopCard && (

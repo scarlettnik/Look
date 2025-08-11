@@ -12,27 +12,24 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
     const searchRef = useRef(null);
     const inputRef = useRef(null);
 
-
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setIsSearchActive(false);
+                closeSearch();
             }
         };
 
-        if (isSearchActive) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isSearchActive]);
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Enter' && isSearchActive) {
                 handleSearch();
+                closeSearch();
             }
         };
 
@@ -51,6 +48,11 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
             setSuggestions([]);
         }
     }, [searchQuery, isSearchActive]);
+
+    const closeSearch = () => {
+        setIsSearchActive(false);
+        inputRef.current?.blur();
+    };
 
     const fetchSuggestions = async () => {
         setIsLoading(true);
@@ -80,22 +82,21 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
 
     const handleSuggestionClick = (suggestion) => {
         setSearchQuery(suggestion);
-        inputRef.current?.focus();
         handleSearch(suggestion);
+        closeSearch();
     };
+
     const handleSearch = (query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
             const searchRequest = { query: trimmedQuery };
-            console.log(trimmedQuery)
             store.catalogStore.setLastSearchQuery(trimmedQuery);
 
             if (onSearch) {
                 onSearch(searchRequest);
             }
 
-            setIsSearchActive(false);
-            setSuggestions([]);
+            closeSearch();
         }
     };
 
@@ -103,15 +104,16 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         setSearchQuery('');
         setSuggestions([]);
         store.catalogStore.clearLastSearchQuery();
-        inputRef.current?.focus();
         onClearSearch?.();
+        closeSearch()
     };
+
     return (
         <>
             {isSearchActive && (
                 <div
                     className={styles.searchOverlay}
-                    onClick={() => setIsSearchActive(false)}
+                    onClick={closeSearch}
                 />
             )}
 
@@ -121,7 +123,10 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                         <div className={styles.searchHeader}>
                             <span
                                 className={styles.searchIcon}
-                                onClick={() => handleSearch()}
+                                onClick={() => {
+                                    handleSearch();
+                                    closeSearch();
+                                }}
                                 role="button"
                                 tabIndex={0}
                             >
@@ -136,11 +141,6 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                                 className={styles.searchInput}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onFocus={() => setIsSearchActive(true)}
-                                onBlur={() => {
-                                    if (!searchQuery) {
-                                        setIsSearchActive(false);
-                                    }
-                                }}
                                 aria-haspopup="listbox"
                                 aria-expanded={isSearchActive && suggestions.length > 0}
                             />

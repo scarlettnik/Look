@@ -20,14 +20,14 @@ import {
 } from 'react-share';
 import styles from '../ui/share.module.css';
 import FullScreenButton from "../FullScrinButton.jsx";
-import {HOSTNAME} from "../../constants.js";
+import {BOTNAME} from "../../constants.js";
 
 const Share = ({ id }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(`${HOSTNAME}/collection/${id}`);
+            await navigator.clipboard.writeText(`https://t.me/${BOTNAME}?startapp=collection_${id}`);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
@@ -54,7 +54,7 @@ const Share = ({ id }) => {
                 <div className={styles.scrollContent}>
                     {shareButtons.map(({ Button, Icon, name }) => (
                         <div className={styles.scrollItem} key={name}>
-                            <Button url={`${HOSTNAME}/collection/${id}`}>
+                            <Button url={`https://t.me/${BOTNAME}?startapp=collection_${id}`}>
                                 <div className={styles.iconContainer}>
                                     <Icon size={64} round />
                                     <span className={styles.iconLabel}>{name}</span>

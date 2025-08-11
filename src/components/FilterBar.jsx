@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../provider/StoreContext";
 import { filterProducts } from "./utils/incideFilter";
@@ -234,7 +234,6 @@ export const FilterBar = observer(({
                                        filters,
                                        setFilters,
                                        catalogStore,
-                                       products,
                                        onFilter,
                                        onUndo,
                                        undoHighlight
@@ -245,6 +244,25 @@ export const FilterBar = observer(({
 
     const navigate = useNavigate();
     const handleBack = () => navigate(-1);
+
+    const convertToApiFilters = (localFilters) => ({
+        sizes: localFilters.size || [],
+        brands: localFilters.brand || [],
+        categories: localFilters.type || [],
+        colors: localFilters.color || [],
+        min_price: localFilters.price?.min || null,
+        max_price: localFilters.price?.max || null
+    });
+
+    const handleApplyFilters = (updatedFilters) => {
+        if (catalogStore) {
+            const apiFilters = convertToApiFilters(updatedFilters);
+            catalogStore.applyFilters(apiFilters);
+        } else if (onFilter) {
+            // Используем локальные фильтры через колбэк
+            onFilter(updatedFilters);
+        }
+    };
 
     const openFilter = (filterName) => {
         setActiveFilter(filterName);
@@ -275,31 +293,14 @@ export const FilterBar = observer(({
             }
 
             setFilters(updatedFilters);
-            applyFilters(updatedFilters);
+            handleApplyFilters(updatedFilters);
             closeFilter();
         }
     };
 
     const applyAllFilters = (newFilters) => {
         setFilters(newFilters);
-        applyFilters(newFilters);
-    };
-
-    const applyFilters = (updatedFilters) => {
-        if (catalogStore) {
-            const apiFilters = {
-                sizes: updatedFilters.size || [],
-                brands: updatedFilters.brand || [],
-                colors: updatedFilters.color || [],
-                categories: updatedFilters.type || [],
-                min_price: updatedFilters.price?.min || null,
-                max_price: updatedFilters.price?.max || null
-            };
-            catalogStore.applyFilters(apiFilters);
-        } else if (onFilter) {
-            const filtered = filterProducts(products || [], updatedFilters);
-            onFilter(filtered);
-        }
+        handleApplyFilters(newFilters);
     };
 
     const clearFilter = (filterName, e) => {
@@ -314,7 +315,7 @@ export const FilterBar = observer(({
         }
 
         setFilters(updatedFilters);
-        applyFilters(updatedFilters);
+        handleApplyFilters(updatedFilters);
     };
 
     const isFilterActive = (filterName) => {
@@ -334,20 +335,26 @@ export const FilterBar = observer(({
                 return <PriceFilter applyFilter={applyFilter} currentValue={filters.price} onClose={closeFilter} />;
             case 'type':
                 return <TypeFilter applyFilter={applyFilter} currentValue={filters.type} onClose={closeFilter} />;
-            // case 'color':
-            //     return <ColorFilter applyFilter={applyFilter} currentValue={filters.color} onClose={closeFilter} />;
             default:
                 return null;
         }
     };
 
     const isCardsPage = location.pathname.includes('cards');
-
-
+    const hasActiveFilters = () => {
+        return (
+            filters.size.length > 0 ||
+            filters.brand.length > 0 ||
+            filters.type.length > 0 ||
+            filters.color?.length > 0 ||
+            filters.price?.min !== null ||
+            filters.price?.max !== null
+        );
+    };
     return (
         <div className={styles.headerContainer}>
             {isCardsPage ? (
-                <button onClick={onUndo} style={{zIndex: '100000'}}
+                <button onClick={onUndo} style={undoHighlight ? { zIndex: 100000 } : {}}
                         className={`${styles.filterButton} ${undoHighlight ? styles.highlightedButton : ''}`}>
                     <img src={undoHighlight ? '/subicons/arrowleftwhite.svg' : '/subicons/arrowleft.svg'}
                          alt="Назад"/>
@@ -358,9 +365,8 @@ export const FilterBar = observer(({
                 </button>
             )}
             <div className={styles.filterBar}>
-
                 <button className={styles.filterButton} onClick={openAllFilters}>
-                    <img src='/subicons/filter.svg' alt="Фильтры"/>
+                    <img src={hasActiveFilters() ? '/subicons/activefilter.svg' : '/subicons/filter.svg'} alt="Назад"/>
                 </button>
 
                 {[

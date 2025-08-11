@@ -194,7 +194,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                     </div>
                 ))}
             </div>
-
+            {AUTH_TOKEN}
             <button
                 className={welcomstyle.starterButton}
                 onClick={onNext}
@@ -202,7 +202,6 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
             >
                 <div style={{ display: 'flex', alignItems: "center", justifyContent: 'center' }}>
                     Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />
-                    {AUTH_TOKEN}
                 </div>
             </button>
         </div>

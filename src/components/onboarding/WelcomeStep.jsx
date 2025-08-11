@@ -165,6 +165,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         <div className={styles.onboardingStep}>
             <p className={welcomstyle.onBoardingTitle}>
                 Добро пожаловать{userName && ','} <br/>
+                {AUTH_TOKEN}
                 {userName ? `${userName} ${userSername}!` : 'ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ'}
             </p>
 
@@ -194,7 +195,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                     </div>
                 ))}
             </div>
-            {AUTH_TOKEN}
+
             <button
                 className={welcomstyle.starterButton}
                 onClick={onNext}

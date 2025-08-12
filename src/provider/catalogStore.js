@@ -188,7 +188,7 @@ class CatalogStore {
             ...restoredCard,
             style: {
                 opacity: 0,
-                zIndex: 1001
+                zIndex: 100001
             }
         }, ...this.cards];
 

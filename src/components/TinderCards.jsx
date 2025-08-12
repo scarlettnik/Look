@@ -51,6 +51,7 @@ const TinderCards = observer(() => {
     const containerRef = useRef(null);
     const navigate = useNavigate()
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
+    const [topCardPosition, setTopCardPosition] = useState({ x: 0, y: 0 });
 
     const [filters, setFilters] = useState(() => ({
         size: store?.catalogStore?.getCurrentFilters().sizes || [],
@@ -61,7 +62,6 @@ const TinderCards = observer(() => {
         },
         type: store?.catalogStore?.getCurrentFilters().categories || []
     }));
-
 
     const handleSaveSuccess = useCallback((productId, isSaved) => {
         runInAction(() => {
@@ -207,6 +207,7 @@ const TinderCards = observer(() => {
         }
 
         setSwipeProgress({ direction, opacity });
+        setTopCardPosition({ x: dx, y: dy });
     }, []);
 
 
@@ -406,7 +407,7 @@ const TinderCards = observer(() => {
                             card={card}
                             onSwipe={handleSwipe}
                             updateSwipeFeedback={updateSwipeFeedback}
-                            zIndex={store.catalogStore.cards.length - index}
+                            zIndex={10000- index}
                             offset={index}
                             swipeConfig={swipeConfig}
                             isExpanded={expandedCardId === card.id}
@@ -418,6 +419,7 @@ const TinderCards = observer(() => {
                             setCardRef={setCardRef}
                             isOnboardingActive={showOnboarding && index === 0}
                             onSaveClick={handleOpenSaveModal}
+                            topCardPosition={index === 0 ? null : topCardPosition}
                         />
                     ))}
 

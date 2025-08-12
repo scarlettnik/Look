@@ -198,34 +198,41 @@ const TinderCard = ({
         let translateY = 0;
         let translateX = 0;
 
-        if (offset === 0 && topCardPosition) {
-            const progress = Math.min(1,
+        if (offset > 0 && topCardPosition) {
+            const progress = Math.min(
+                1,
                 Math.max(
                     Math.abs(topCardPosition.x) / (window.innerWidth * 0.5),
                     Math.abs(topCardPosition.y) / (window.innerHeight * 0.5)
-                ));
+                )
+            );
 
-            scale += 0.03 * progress;
-            translateY += -5 * progress;
+            const influenceFactor = 1 - (offset - 1) * 0.3;
 
-            if (topCardPosition.x !== 0) {
-                const direction = topCardPosition.x > 0 ? 1 : -1;
-                translateX = direction * 5 * progress;
+            if (influenceFactor > 0) {
+                scale += 0.03 * progress * influenceFactor;
+                translateY += -5 * progress * influenceFactor;
+
+                if (topCardPosition.x !== 0) {
+                    const direction = topCardPosition.x > 0 ? 1 : -1;
+                    translateX = direction * 5 * progress * influenceFactor;
+                }
             }
         }
 
         cardRef.current.style.transform = `
-    translate(${position.x + translateX}px, ${position.y + translateY}px)
-    rotate(${position.rotate}deg)
-    scale(${scale})
-  `;
+      translate(${position.x + translateX}px, ${position.y + translateY}px)
+      rotate(${position.rotate}deg)
+      scale(${scale})
+    `;
         cardRef.current.style.zIndex = zIndex;
     }, [position, zIndex, offset, topCardPosition]);
+
+
     const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         if (cardRef.current) {
-            // Применяем стили из карточки
             Object.entries(card.style || {}).forEach(([key, value]) => {
                 cardRef.current.style[key] = value;
             });

@@ -12,9 +12,8 @@ class CatalogStore {
     authToken = AUTH_TOKEN;
     currentSearchQuery = '';
     currentOffset = 0;
-    limit = 30;
+    limit = 10;
     currentFilters = {
-        sizes: [],
         categories: [],
         colors: [],
         brands: [],
@@ -22,8 +21,6 @@ class CatalogStore {
         max_price: null
     };
     lastSearchQuery = null;
-    lastAppliedFilters = null;
-
 
     constructor() {
         makeAutoObservable(this);
@@ -46,9 +43,6 @@ class CatalogStore {
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
     };
-    getCurrentFilters = () => {
-        return this.lastAppliedFilters || this.currentFilters;
-    };
 
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
@@ -69,7 +63,6 @@ class CatalogStore {
             url.searchParams.append('limit', this.limit);
             const requestBody = {
                 query: this.currentSearchQuery,
-                sizes: this.currentFilters.sizes,
                 categories: this.currentFilters.categories,
                 colors: this.currentFilters.colors,
                 brands: this.currentFilters.brands,
@@ -93,12 +86,7 @@ class CatalogStore {
             const pendingCards = newCards.map(card => ({
                 ...card,
                 _pending: true,
-                _key: this.getUniqueKey(),
-                style: {
-                    opacity: 0,
-                    transform: 'translateY(0)',
-                    transition: 'all 300ms ease-out'
-                }
+                _key: this.getUniqueKey()
             }));
 
             this.cards = [...this.cards, ...pendingCards];
@@ -110,7 +98,7 @@ class CatalogStore {
                     style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 200ms ease-out`
+                        transition: `all 800ms ease-out`
                     }
                 }));
             }, 50);
@@ -123,7 +111,6 @@ class CatalogStore {
             this.loading = false;
         }
     });
-
 
     checkPreload = () => {
         if (this.cards.length <= this.preloadThreshold &&
@@ -151,11 +138,21 @@ class CatalogStore {
             ...this.currentFilters,
             ...newFilters
         };
-        this.lastAppliedFilters = JSON.parse(JSON.stringify(this.currentFilters));
         this.hasMore = true;
         yield this.fetchCards(true);
     });
 
+    resetFilters = flow(function* () {
+        this.currentFilters = {
+            categories: [],
+            colors: [],
+            brands: [],
+            min_price: null,
+            max_price: null
+        };
+        this.hasMore = true;
+        yield this.fetchCards(true);
+    });
 
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
@@ -200,7 +197,7 @@ class CatalogStore {
                     style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 200ms ease-out`
+                        transition: `all 800ms ease-out`
                     }
                 } : c
             );

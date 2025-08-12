@@ -257,7 +257,7 @@ export const FilterBar = observer(({
     const handleApplyFilters = (updatedFilters) => {
         if (catalogStore) {
             const apiFilters = convertToApiFilters(updatedFilters);
-            catalogStore.applyFilters(apiFilters);
+           // 0 catalogStore.applyFilters(apiFilters);
         } else if (onFilter) {
             // Используем локальные фильтры через колбэк
             onFilter(updatedFilters);

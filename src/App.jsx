@@ -34,33 +34,33 @@ function App() {
 function AppContent() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const startParam = searchParams.get('startapp');
-    const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
-
-    useEffect(() => {
-        if (!isTWA) return;
-
-        const tgWebApp = window.Telegram.WebApp;
-        tgWebApp.expand();
-        tgWebApp.enableClosingConfirmation();
-
-        if (startParam && startParam.startsWith('collection_')) {
-            const collectionId = startParam.split('_')[1];
-            navigate(`/collection/${collectionId}`, { replace: true });
-        }
-
-        tgWebApp.onEvent('backButtonClicked', () => {
-            if (window.history.state?.idx > 0) {
-                navigate(-1);
-            } else {
-                tgWebApp.close();
-            }
-        });
-
-        return () => {
-            tgWebApp.offEvent('backButtonClicked');
-        };
-    }, [isTWA, startParam, navigate]);
+    // const startParam = searchParams.get('startapp');
+    // const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
+    //
+    // useEffect(() => {
+    //     if (!isTWA) return;
+    //
+    //     const tgWebApp = window.Telegram.WebApp;
+    //     tgWebApp.expand();
+    //     tgWebApp.enableClosingConfirmation();
+    //
+    //     if (startParam && startParam.startsWith('collection_')) {
+    //         const collectionId = startParam.split('_')[1];
+    //         navigate(`/collection/${collectionId}`, { replace: true });
+    //     }
+    //
+    //     tgWebApp.onEvent('backButtonClicked', () => {
+    //         if (window.history.state?.idx > 0) {
+    //             navigate(-1);
+    //         } else {
+    //             tgWebApp.close();
+    //         }
+    //     });
+    //
+    //     return () => {
+    //         tgWebApp.offEvent('backButtonClicked');
+    //     };
+    // }, [isTWA, startParam, navigate]);
 
     return (
         <div>
@@ -73,14 +73,14 @@ function AppContent() {
                 <Route path="/profile" element={<Profile/>}/>
                 <Route path="/save" element={<Save/>}/>
                 <Route path="/save/:id" element={<Compilation/>}/>
-                <Route path="/collection/:id" element={<Compilation isTWA={isTWA}/>}/>
+                <Route path="/collection/:id" element={<Compilation/>}/>
                 <Route path="/save/:id/product/:id" element={<ProductPage/>}/>
                 <Route path="/trands/product/:id" element={<ProductPage/>}/>
                 <Route path='/shoppingcard' element={<ShoppingCard/>}/>
                 <Route path='/pref' element={<Preferences/>}/>
                 <Route path='/trands' element={<Comparing/>}/>
                 <Route path='/trands/:id' element={<PopularCollection/>}/>
-                <Route path='/trands/collection/:id' element={<Compilation isTWA={isTWA}/>}/>
+                <Route path='/trands/collection/:id' element={<Compilation/>}/>
                 <Route path='/prod' element={<Product/>}/>
                 <Route path='/cloth' element={<AddToCloset/>}/>
                 <Route path="/account-deleted" element={<AccountDeleted />} />

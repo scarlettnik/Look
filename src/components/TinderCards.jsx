@@ -52,14 +52,25 @@ const TinderCards = observer(() => {
     const navigate = useNavigate()
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
 
+    // const [filters, setFilters] = useState(() => ({
+    //     size: store?.catalogStore?.getCurrentFilters().sizes || [],
+    //     brand: store?.catalogStore?.getCurrentFilters().brands || [],
+    //     price: {
+    //         min: store?.catalogStore?.getCurrentFilters().min_price || null,
+    //         max: store?.catalogStore?.getCurrentFilters().max_price || null
+    //     },
+    //     type: store?.catalogStore?.getCurrentFilters().categories || []
+    // }));
+
+
     const [filters, setFilters] = useState(() => ({
-        size: store.catalogStore.getCurrentFilters().sizes || [],
-        brand: store.catalogStore.getCurrentFilters().brands || [],
+        size: [],
+        brand: [],
         price: {
-            min: store.catalogStore.getCurrentFilters().min_price || null,
-            max: store.catalogStore.getCurrentFilters().max_price || null
+            min: null,
+            max: null
         },
-        type: store.catalogStore.getCurrentFilters().categories || []
+        type: []
     }));
 
     const handleSaveSuccess = useCallback((productId, isSaved) => {

@@ -94,12 +94,7 @@ class CatalogStore {
             const pendingCards = newCards.map(card => ({
                 ...card,
                 _pending: true,
-                _key: this.getUniqueKey(),
-                style: {
-                    opacity: 0,
-                    transform: 'translateY(0)',
-                    transition: 'all 300ms ease-out'
-                }
+                _key: this.getUniqueKey()
             }));
 
             this.cards = [...this.cards, ...pendingCards];

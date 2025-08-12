@@ -27,7 +27,7 @@ class CatalogStore {
 
     constructor() {
         makeAutoObservable(this);
-        this.fetchCards(true);
+        this.fetchCards(true); // initial load
     }
 
     getUniqueKey = () => {
@@ -46,7 +46,6 @@ class CatalogStore {
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
     };
-
     getCurrentFilters = () => {
         return this.lastAppliedFilters || this.currentFilters;
     };
@@ -125,6 +124,7 @@ class CatalogStore {
         }
     });
 
+
     checkPreload = () => {
         if (this.cards.length <= this.preloadThreshold &&
             this.hasMore &&
@@ -151,21 +151,11 @@ class CatalogStore {
             ...this.currentFilters,
             ...newFilters
         };
+        this.lastAppliedFilters = JSON.parse(JSON.stringify(this.currentFilters));
         this.hasMore = true;
         yield this.fetchCards(true);
     });
 
-    resetFilters = flow(function* () {
-        this.currentFilters = {
-            categories: [],
-            colors: [],
-            brands: [],
-            min_price: null,
-            max_price: null
-        };
-        this.hasMore = true;
-        yield this.fetchCards(true);
-    });
 
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
@@ -210,7 +200,7 @@ class CatalogStore {
                     style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 800ms ease-out`
+                        transition: `all 200ms ease-out`
                     }
                 } : c
             );

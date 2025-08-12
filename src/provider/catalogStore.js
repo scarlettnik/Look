@@ -12,9 +12,8 @@ class CatalogStore {
     authToken = AUTH_TOKEN;
     currentSearchQuery = '';
     currentOffset = 0;
-    limit = 30;
+    limit = 10;
     currentFilters = {
-        sizes: [],
         categories: [],
         colors: [],
         brands: [],
@@ -22,8 +21,6 @@ class CatalogStore {
         max_price: null
     };
     lastSearchQuery = null;
-    lastAppliedFilters = null;
-
 
     constructor() {
         makeAutoObservable(this);
@@ -46,14 +43,10 @@ class CatalogStore {
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
     };
-    getCurrentFilters = () => {
-        return this.lastAppliedFilters || this.currentFilters;
-    };
 
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
     };
-
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching) return;
 

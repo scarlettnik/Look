@@ -23,11 +23,11 @@ class CatalogStore {
     };
     lastSearchQuery = null;
     lastAppliedFilters = null;
-
+    isAnimating = false;
 
     constructor() {
         makeAutoObservable(this);
-        this.fetchCards(true); // initial load
+        this.fetchCards(true);
     }
 
     getUniqueKey = () => {
@@ -54,7 +54,7 @@ class CatalogStore {
         this.lastSearchQuery = null;
     };
     fetchCards = flow(function* (initialLoad = false) {
-        if (!this.hasMore || this.isFetching) return;
+        if (!this.hasMore || this.isFetching || this.isAnimating) return;
 
         try {
             this.isFetching = true;
@@ -124,16 +124,6 @@ class CatalogStore {
         }
     });
 
-
-    checkPreload = () => {
-        if (this.cards.length <= this.preloadThreshold &&
-            this.hasMore &&
-            !this.isFetching &&
-            !this.preloadInProgress) {
-            this.fetchCards();
-        }
-    };
-
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
         this.hasMore = true;
@@ -158,7 +148,8 @@ class CatalogStore {
 
 
     handleSwipe = (direction, card) => {
-        if (direction === 'down') return;
+        this.isAnimating = true
+        if (direction === 'down' ) return;
 
         this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
         this.cards = this.cards.filter(c => c.id !== card.id);
@@ -166,8 +157,9 @@ class CatalogStore {
         if (direction === 'up') {
             this.basket = [...this.basket, card];
         }
+        this.isAnimating = false
 
-        if (this.cards.length < 7 && this.hasMore && !this.isFetching) {
+        if (this.cards.length < 7 && this.hasMore && !this.isFetching && !this.isAnimating) {
             this.fetchCards();
         }
     };

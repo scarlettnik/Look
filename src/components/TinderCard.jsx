@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
@@ -28,28 +28,6 @@ const TinderCard = ({
     const startTime = useRef(0);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!cardRef.current) return;
-
-        cardRef.current.style.opacity = '1';
-        if (isPending) {
-            animateAppearance();
-        }
-    }, [isPending]);
-
-    const animateAppearance = () => {
-        if (!cardRef.current) return;
-
-        cardRef.current.style.transition = 'none';
-        cardRef.current.style.transform = 'translateY(20px)';
-
-        requestAnimationFrame(() => {
-            cardRef.current.style.transition = `
-      transform 300ms cubic-bezier(0.18, 0.89, 0.32, 1.28)
-    `;
-            cardRef.current.style.transform = 'translateY(0)';
-        });
-    };
 
     useEffect(() => {
         if (cardRef.current) {
@@ -130,50 +108,22 @@ const TinderCard = ({
         return null;
     };
 
-    const animateSwipe = (direction, velocity) => {
+
+    const animateSwipe = (direction) => {
         if (!cardRef.current) return;
+        cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
 
-        const directionConfig = {
-            left: {
-                targetX: -window.innerWidth * 2,
-                targetY: 0,
-                rotation: -swipeConfig.horizontal.rotationAngle,
-                duration: swipeConfig.horizontal.animationDuration
-            },
-            right: {
-                targetX: window.innerWidth * 2,
-                targetY: 0,
-                rotation: swipeConfig.horizontal.rotationAngle,
-                duration: swipeConfig.horizontal.animationDuration
-            },
-            up: {
-                targetX: 0,
-                targetY: -window.innerHeight * 2,
-                rotation: 0,
-                duration: swipeConfig.verticalUp.animationDuration
-            },
-            down: {
-                targetX: 0,
-                targetY: window.innerHeight * 2,
-                rotation: 0,
-                duration: swipeConfig.verticalDown.animationDuration
-            }
-        };
+        if (direction === 'left') {
+            cardRef.current.style.transform = 'translateX(-100vw) rotate(-30deg)';
+        } else if (direction === 'right') {
+            cardRef.current.style.transform = 'translateX(100vw) rotate(30deg)';
+        } else if (direction === 'up') {
+            cardRef.current.style.transform = 'translateY(-100vh)';
+        }
 
-        const { targetX, targetY, rotation, duration } = directionConfig[direction];
-
-        const dynamicDuration = Math.min(
-            duration,
-            duration / (Math.abs(velocity.x) + Math.abs(velocity.y) + 0.1)
-        );
-
-        cardRef.current.style.transition = `all ${dynamicDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-        cardRef.current.style.transform = `
-      translate(${targetX}px, ${targetY}px)
-      rotate(${rotation}deg)
-    `;
-
-        setTimeout(() => onSwipe(direction, card), 50);
+        setTimeout(() => {
+            onSwipe(direction, card);
+        }, 50);
     };
 
     const resetPosition = () => {

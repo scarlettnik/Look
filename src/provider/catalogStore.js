@@ -1,4 +1,4 @@
-import { makeAutoObservable, flow } from "mobx";
+import { makeAutoObservable, flow, runInAction } from "mobx";
 import { AUTH_TOKEN } from "../constants.js";
 
 class CatalogStore {
@@ -26,7 +26,12 @@ class CatalogStore {
     isAnimating = false;
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            fetchCards: flow,
+            fetchCardsWithSearch: flow,
+            resetSearch: flow,
+            applyFilters: flow
+        });
         this.fetchCards(true);
     }
 
@@ -53,6 +58,7 @@ class CatalogStore {
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
     };
+
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching || this.isAnimating) return;
 
@@ -61,7 +67,7 @@ class CatalogStore {
             if (initialLoad) {
                 this.loading = true;
                 this.currentOffset = 0;
-                this.cards = [];
+                this.cards.replace([]);
             }
 
             const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
@@ -76,7 +82,6 @@ class CatalogStore {
                 min_price: this.currentFilters.min_price,
                 max_price: this.currentFilters.max_price,
             };
-            console.log(requestBody);
 
             const response = yield fetch(url.toString(), {
                 method: 'POST',
@@ -87,47 +92,58 @@ class CatalogStore {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const newCards = yield response.json();
-            this.hasMore = newCards.length >= this.limit;
-            this.currentOffset += newCards.length;
 
-            const pendingCards = newCards.map(card => ({
-                ...card,
-                _pending: true,
-                _key: this.getUniqueKey(),
-                style: {
-                    opacity: 0,
-                    transform: 'translateY(0)',
-                    transition: 'all 300ms ease-out'
-                }
-            }));
+            runInAction(() => {
+                this.hasMore = newCards.length >= this.limit;
+                this.currentOffset += newCards.length;
 
-            this.cards = [...this.cards, ...pendingCards];
-
-            setTimeout(() => {
-                this.cards = this.cards.map(c => ({
-                    ...c,
-                    _pending: false,
+                const pendingCards = newCards.map(card => ({
+                    ...card,
+                    _pending: true,
+                    _key: this.getUniqueKey(),
                     style: {
-                        transform: 'translate(0, 0) rotate(0deg)',
-                        opacity: 1,
-                        transition: `all 200ms ease-out`
+                        opacity: 0,
+                        transform: 'translateY(0)',
+                        transition: 'all 300ms ease-out'
                     }
                 }));
-            }, 50);
+
+                // Мутируем массив, добавляя новые карточки
+                this.cards.push(...pendingCards);
+
+                setTimeout(() => {
+                    runInAction(() => {
+                        this.cards.forEach(c => {
+                            if (c._pending) {
+                                c._pending = false;
+                                c.style = {
+                                    transform: 'translate(0, 0) rotate(0deg)',
+                                    opacity: 1,
+                                    transition: `all 200ms ease-out`
+                                };
+                            }
+                        });
+                    });
+                }, 50);
+            });
 
         } catch (err) {
-            this.error = err.message;
-            console.error("Card loading error:", err);
+            runInAction(() => {
+                this.error = err.message;
+                console.error("Card loading error:", err);
+            });
         } finally {
-            this.isFetching = false;
-            this.loading = false;
+            runInAction(() => {
+                this.isFetching = false;
+                this.loading = false;
+            });
         }
     });
 
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
         this.hasMore = true;
-        yield this.fetchCards(true); // initialLoad = true
+        yield this.fetchCards(true);
     });
 
     resetSearch = flow(function* () {
@@ -148,8 +164,7 @@ class CatalogStore {
 
 
     handleSwipe = (direction, card) => {
-        this.isAnimating = true
-        if (direction === 'down' ) return;
+        if (direction === 'down') return;
 
         this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
         this.cards = this.cards.filter(c => c.id !== card.id);
@@ -157,9 +172,8 @@ class CatalogStore {
         if (direction === 'up') {
             this.basket = [...this.basket, card];
         }
-        this.isAnimating = false
 
-        if (this.cards.length < 7 && this.hasMore && !this.isFetching && !this.isAnimating) {
+        if (this.cards.length < 7 && this.hasMore && !this.isFetching) {
             this.fetchCards();
         }
     };
@@ -173,29 +187,27 @@ class CatalogStore {
         const restoredCard = {
             ...card,
             _pending: true,
-            _key: this.getUniqueKey()
-        };
-
-        this.cards = [ {
-            ...restoredCard,
+            _key: this.getUniqueKey(),
             style: {
                 opacity: 0,
                 zIndex: 100001
             }
-        }, ...this.cards];
+        };
+
+        this.cards.unshift(restoredCard);
 
         setTimeout(() => {
-            this.cards = this.cards.map(c =>
-                c.id === restoredCard.id ? {
-                    ...c,
-                    _pending: false,
-                    style: {
+            runInAction(() => {
+                const cardToAnimate = this.cards.find(c => c.id === restoredCard.id);
+                if (cardToAnimate) {
+                    cardToAnimate._pending = false;
+                    cardToAnimate.style = {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
                         transition: `all 200ms ease-out`
-                    }
-                } : c
-            );
+                    };
+                }
+            });
         }, 50);
 
         this.swipeHistory = this.swipeHistory.slice(1);

@@ -142,16 +142,11 @@ const TinderCard = ({
         cardRef.current.addEventListener('transitionend', onTransitionEnd);
     };
 
-
     useEffect(() => {
         if (!cardRef.current) return;
-
         let scale = 1 - Math.max(0, offset) * 0.03;
         let translateY = 0;
         let translateX = 0;
-
-        const initialOffset = isTopCard ? window.innerHeight * 0.2 : 0;
-
 
         if (offset > 0 && topCardPosition) {
             const progress = Math.min(
@@ -174,20 +169,13 @@ const TinderCard = ({
                 }
             }
         }
-        cardRef.current.style.transition = `
-        transform ${offset === 0 ? '500ms' : '300ms'} cubic-bezier(0.23, 1, 0.32, 1),
-        opacity 300ms ease
-    `;
 
         cardRef.current.style.transform = `
-        translate(${position.x + translateX}px, ${position.y + translateY - initialOffset}px)
-        rotate(${position.rotate}deg)
-        scale(${scale})
+      translate(${position.x + translateX}px, ${position.y + translateY}px)
+      rotate(${position.rotate}deg)
+      scale(${scale})
     `;
-
         cardRef.current.style.zIndex = zIndex;
-        cardRef.current.style.opacity = '1';
-
     }, [position, zIndex, offset, topCardPosition]);
 
 

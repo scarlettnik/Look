@@ -1,4 +1,4 @@
-import { makeAutoObservable, flow } from "mobx";
+import {makeAutoObservable, flow, runInAction} from "mobx";
 import { AUTH_TOKEN } from "../constants.js";
 
 class CatalogStore {
@@ -25,7 +25,7 @@ class CatalogStore {
 
     constructor() {
         makeAutoObservable(this);
-        this.fetchCards(true); // initial load
+        this.fetchCards(true);
     }
 
     getUniqueKey = () => {
@@ -95,7 +95,7 @@ class CatalogStore {
                 _key: this.getUniqueKey()
             }));
 
-            this.cards = [...this.cards, ...pendingCards];
+            this.cards.push(...pendingCards);
 
             setTimeout(() => {
                 this.cards = this.cards.map(c => ({
@@ -175,29 +175,27 @@ class CatalogStore {
         const restoredCard = {
             ...card,
             _pending: true,
-            _key: this.getUniqueKey()
-        };
-
-        this.cards = [ {
-            ...restoredCard,
+            _key: this.getUniqueKey(),
             style: {
                 opacity: 0,
-                zIndex: 1001
+                zIndex: 100001
             }
-        }, ...this.cards];
+        };
+
+        this.cards.unshift(restoredCard);
 
         setTimeout(() => {
-            this.cards = this.cards.map(c =>
-                c.id === restoredCard.id ? {
-                    ...c,
-                    _pending: false,
-                    style: {
+            runInAction(() => {
+                const cardToAnimate = this.cards.find(c => c.id === restoredCard.id);
+                if (cardToAnimate) {
+                    cardToAnimate._pending = false;
+                    cardToAnimate.style = {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 800ms ease-out`
-                    }
-                } : c
-            );
+                        transition: `all 200ms ease-out`
+                    };
+                }
+            });
         }, 50);
 
         this.swipeHistory = this.swipeHistory.slice(1);

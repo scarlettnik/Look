@@ -129,6 +129,8 @@ const TinderCards = observer(() => {
     }, [store?.authStore.data]);
 
 
+
+
     const sendInteraction = async (productId, action) => {
         try {
             const response = await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {

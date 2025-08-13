@@ -1,4 +1,4 @@
-import { makeAutoObservable, flow, runInAction } from "mobx";
+import { makeAutoObservable, flow } from "mobx";
 import { AUTH_TOKEN } from "../constants.js";
 
 class CatalogStore {
@@ -22,17 +22,10 @@ class CatalogStore {
         max_price: null
     };
     lastSearchQuery = null;
-    lastAppliedFilters = null;
-    isAnimating = false;
 
     constructor() {
-        makeAutoObservable(this, {
-            fetchCards: flow,
-            fetchCardsWithSearch: flow,
-            resetSearch: flow,
-            applyFilters: flow
-        });
-        this.fetchCards(true);
+        makeAutoObservable(this);
+        this.fetchCards(true); // initial load
     }
 
     getUniqueKey = () => {
@@ -51,37 +44,34 @@ class CatalogStore {
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
     };
-    getCurrentFilters = () => {
-        return this.lastAppliedFilters || this.currentFilters;
-    };
 
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
     };
-
     fetchCards = flow(function* (initialLoad = false) {
-        if (!this.hasMore || this.isFetching || this.isAnimating) return;
+        if (!this.hasMore || this.isFetching) return;
 
         try {
             this.isFetching = true;
             if (initialLoad) {
                 this.loading = true;
                 this.currentOffset = 0;
-                this.cards.replace([]);
+                this.cards = [];
             }
 
             const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
             url.searchParams.append('offset', this.currentOffset);
             url.searchParams.append('limit', this.limit);
             const requestBody = {
-                query: this.currentSearchQuery,
                 sizes: this.currentFilters.sizes,
+                query: this.currentSearchQuery,
                 categories: this.currentFilters.categories,
                 colors: this.currentFilters.colors,
                 brands: this.currentFilters.brands,
                 min_price: this.currentFilters.min_price,
                 max_price: this.currentFilters.max_price,
             };
+            console.log(requestBody);
 
             const response = yield fetch(url.toString(), {
                 method: 'POST',
@@ -92,51 +82,35 @@ class CatalogStore {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const newCards = yield response.json();
+            this.hasMore = newCards.length >= this.limit;
+            this.currentOffset += newCards.length;
 
-            runInAction(() => {
-                this.hasMore = newCards.length >= this.limit;
-                this.currentOffset += newCards.length;
+            const pendingCards = newCards.map(card => ({
+                ...card,
+                _pending: true,
+                _key: this.getUniqueKey()
+            }));
 
-                const pendingCards = newCards.map(card => ({
-                    ...card,
-                    _pending: true,
-                    _key: this.getUniqueKey(),
+            this.cards = [...this.cards, ...pendingCards];
+
+            setTimeout(() => {
+                this.cards = this.cards.map(c => ({
+                    ...c,
+                    _pending: false,
                     style: {
-                        opacity: 0,
-                        transform: 'translateY(0)',
-                        transition: 'all 300ms ease-out'
+                        transform: 'translate(0, 0) rotate(0deg)',
+                        opacity: 1,
+                        transition: `all 800ms ease-out`
                     }
                 }));
-
-                // Мутируем массив, добавляя новые карточки
-                this.cards.push(...pendingCards);
-
-                setTimeout(() => {
-                    runInAction(() => {
-                        this.cards.forEach(c => {
-                            if (c._pending) {
-                                c._pending = false;
-                                c.style = {
-                                    transform: 'translate(0, 0) rotate(0deg)',
-                                    opacity: 1,
-                                    transition: `all 200ms ease-out`
-                                };
-                            }
-                        });
-                    });
-                }, 50);
-            });
+            }, 50);
 
         } catch (err) {
-            runInAction(() => {
-                this.error = err.message;
-                console.error("Card loading error:", err);
-            });
+            this.error = err.message;
+            console.error("Card loading error:", err);
         } finally {
-            runInAction(() => {
-                this.isFetching = false;
-                this.loading = false;
-            });
+            this.isFetching = false;
+            this.loading = false;
         }
     });
 
@@ -157,11 +131,21 @@ class CatalogStore {
             ...this.currentFilters,
             ...newFilters
         };
-        this.lastAppliedFilters = JSON.parse(JSON.stringify(this.currentFilters));
         this.hasMore = true;
         yield this.fetchCards(true);
     });
 
+    resetFilters = flow(function* () {
+        this.currentFilters = {
+            categories: [],
+            colors: [],
+            brands: [],
+            min_price: null,
+            max_price: null
+        };
+        this.hasMore = true;
+        yield this.fetchCards(true);
+    });
 
     handleSwipe = (direction, card) => {
         if (direction === 'down') return;
@@ -187,27 +171,29 @@ class CatalogStore {
         const restoredCard = {
             ...card,
             _pending: true,
-            _key: this.getUniqueKey(),
-            style: {
-                opacity: 0,
-                zIndex: 100001
-            }
+            _key: this.getUniqueKey()
         };
 
-        this.cards.unshift(restoredCard);
+        this.cards = [ {
+            ...restoredCard,
+            style: {
+                opacity: 0,
+                zIndex: 1001
+            }
+        }, ...this.cards];
 
         setTimeout(() => {
-            runInAction(() => {
-                const cardToAnimate = this.cards.find(c => c.id === restoredCard.id);
-                if (cardToAnimate) {
-                    cardToAnimate._pending = false;
-                    cardToAnimate.style = {
+            this.cards = this.cards.map(c =>
+                c.id === restoredCard.id ? {
+                    ...c,
+                    _pending: false,
+                    style: {
                         transform: 'translate(0, 0) rotate(0deg)',
                         opacity: 1,
-                        transition: `all 200ms ease-out`
-                    };
-                }
-            });
+                        transition: `all 800ms ease-out`
+                    }
+                } : c
+            );
         }, 50);
 
         this.swipeHistory = this.swipeHistory.slice(1);

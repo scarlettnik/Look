@@ -45,6 +45,10 @@ class CatalogStore {
         this.lastSearchQuery = query;
     };
 
+    getCurrentFilters = () => {
+        return this.lastAppliedFilters || this.currentFilters;
+    };
+
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
     };

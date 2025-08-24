@@ -1,42 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
 const TinderCard = React.memo(({
-                        card,
-                        onSwipe,
-                        updateSwipeFeedback,
-                        zIndex,
-                        offset,
-                        isPending,
-                        isTopCard,
-                        topCardPosition,
-                        swipeProgress,
-                        isExpanded,
-                        setCardRef,
-                        isOnboardingActive,
-                        swipeConfig,
-                        onSaveClick={handleOpenSaveModal}
-                    }) => {
+                                   card,
+                                   onSwipe,
+                                   updateSwipeFeedback,
+                                   zIndex,
+                                   offset,
+                                   isTopCard,
+                                   topCardPosition,
+                                   swipeProgress,
+                                   isExpanded,
+                                   setCardRef,
+                                   isOnboardingActive,
+                                   swipeConfig,
+                                   onSaveClick
+                               }) => {
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     const cardRef = useRef(null);
     const animationFrame = useRef(null);
     const startTime = useRef(0);
     const navigate = useNavigate();
 
-
-    useEffect(() => {
-        if (cardRef.current) {
-            setCardRef(card.id, cardRef.current);
-        }
-        return () => setCardRef(card.id, null);
-    }, [card.id, setCardRef]);
-
-    const handleStart = (clientX, clientY) => {
+    // Мемоизированные обработчики
+    const handleStart = useCallback((clientX, clientY) => {
         if (isExpanded) return false;
 
         setStartPos({ x: clientX, y: clientY });
@@ -47,9 +40,9 @@ const TinderCard = React.memo(({
             cardRef.current.style.transition = 'none';
         }
         return true;
-    };
+    }, [isExpanded]);
 
-    const handleMove = (clientX, clientY) => {
+    const handleMove = useCallback((clientX, clientY) => {
         if (!isDragging) return;
 
         cancelAnimationFrame(animationFrame.current);
@@ -68,9 +61,9 @@ const TinderCard = React.memo(({
                 updateSwipeFeedback(deltaX, deltaY);
             }
         });
-    };
+    }, [isDragging, startPos, isTopCard, updateSwipeFeedback, swipeConfig]);
 
-    const handleEnd = () => {
+    const handleEnd = useCallback(() => {
         if (!isDragging) return;
 
         setIsDragging(false);
@@ -82,7 +75,7 @@ const TinderCard = React.memo(({
         const velocity = {
             x: (position.x / (deltaTime || 1)) * swipeConfig.physics.power * swipeConfig.horizontal.speedMultiplier,
             y: (position.y / (deltaTime || 1)) * swipeConfig.physics.power *
-                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0) // Умножаем на 0 для свайпа вниз
+                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0)
         };
 
         const direction = getSwipeDirection(velocity, innerWidth, innerHeight);
@@ -92,8 +85,9 @@ const TinderCard = React.memo(({
         } else {
             resetPosition();
         }
-    };
-    const getSwipeDirection = (velocity, screenWidth, screenHeight) => {
+    }, [isDragging, position, swipeConfig]);
+
+    const getSwipeDirection = useCallback((velocity, screenWidth, screenHeight) => {
         const isHorizontalFast = Math.abs(velocity.x) > swipeConfig.physics.velocityThreshold;
 
         if (Math.abs(position.x) > screenWidth * swipeConfig.horizontal.threshold || isHorizontalFast) {
@@ -106,10 +100,9 @@ const TinderCard = React.memo(({
         }
 
         return null;
-    };
+    }, [position, swipeConfig]);
 
-
-    const animateSwipe = (direction) => {
+    const animateSwipe = useCallback((direction) => {
         if (!cardRef.current) return;
         cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
 
@@ -124,9 +117,9 @@ const TinderCard = React.memo(({
         setTimeout(() => {
             onSwipe(direction, card);
         }, 50);
-    };
+    }, [card, onSwipe]);
 
-    const resetPosition = () => {
+    const resetPosition = useCallback(() => {
         if (!cardRef.current) return;
 
         cardRef.current.style.transition = `all ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
@@ -140,10 +133,19 @@ const TinderCard = React.memo(({
         };
 
         cardRef.current.addEventListener('transitionend', onTransitionEnd);
-    };
+    }, [isTopCard, swipeConfig, updateSwipeFeedback]);
+
+    // Эффекты
+    useEffect(() => {
+        if (cardRef.current) {
+            setCardRef(card.id, cardRef.current);
+        }
+        return () => setCardRef(card.id, null);
+    }, [card.id, setCardRef]);
 
     useEffect(() => {
         if (!cardRef.current) return;
+
         let scale = 1 - Math.max(0, offset) * 0.03;
         let translateY = 0;
         let translateX = 0;
@@ -171,23 +173,46 @@ const TinderCard = React.memo(({
         }
 
         cardRef.current.style.transform = `
-      translate(${position.x + translateX}px, ${position.y + translateY}px)
-      rotate(${position.rotate}deg)
-      scale(${scale})
-    `;
+            translate(${position.x + translateX}px, ${position.y + translateY}px)
+            rotate(${position.rotate}deg)
+            scale(${scale})
+        `;
         cardRef.current.style.zIndex = zIndex;
     }, [position, zIndex, offset, topCardPosition]);
 
-
-    const [imageLoaded, setImageLoaded] = useState(false);
-
     useEffect(() => {
-        if (cardRef.current) {
-            Object.entries(card.style || {}).forEach(([key, value]) => {
+        if (cardRef.current && card.style) {
+            Object.entries(card.style).forEach(([key, value]) => {
                 cardRef.current.style[key] = value;
             });
         }
     }, [card.style]);
+
+    // Обработчики событий
+    const handleTouchStart = useCallback((e) => {
+        handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, [handleStart]);
+
+    const handleTouchMove = useCallback((e) => {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, [handleMove]);
+
+    const handleMouseDown = useCallback((e) => {
+        handleStart(e.clientX, e.clientY);
+    }, [handleStart]);
+
+    const handleMouseMove = useCallback((e) => {
+        handleMove(e.clientX, e.clientY);
+    }, [handleMove]);
+
+    const handleCardClick = useCallback(() => {
+        navigate(`/product/${card.id}`);
+    }, [card.id, navigate]);
+
+    const handleSaveButtonClick = useCallback((e) => {
+        e.stopPropagation();
+        onSaveClick(card);
+    }, [card, onSaveClick]);
 
     return (
         <div
@@ -196,16 +221,16 @@ const TinderCard = React.memo(({
             className={`${styles.card} 
             ${isDragging ? styles.moving : ''} 
             ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
-            onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
             onTouchEnd={handleEnd}
-            onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
-            onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
             onMouseUp={handleEnd}
             onMouseLeave={handleEnd}
             style={{ zIndex }}
         >
-            <div onClick={() => navigate(`/product/${card.id}`)}>
+            <div onClick={handleCardClick}>
                 {!imageLoaded && (
                     <CustomSkeleton
                         style={{
@@ -217,9 +242,13 @@ const TinderCard = React.memo(({
                         }}
                     />
                 )}
-                <img  onLoad={() => setImageLoaded(true)}
-                      onError={() => setImageLoaded(true)}
-                      className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
+                <img
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                    className={styles.cardImage}
+                    src={card.image_urls[0]}
+                    alt={card.name}
+                />
             </div>
 
             {isTopCard && (
@@ -255,10 +284,7 @@ const TinderCard = React.memo(({
                             <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
                             <button
                                 className={styles.saveButton}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onSaveClick(card);
-                                }}
+                                onClick={handleSaveButtonClick}
                             >
                                 <img
                                     src={card.is_contained_in_user_collections
@@ -272,6 +298,18 @@ const TinderCard = React.memo(({
                 </div>
             </div>
         </div>
+    );
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.card.id === nextProps.card.id &&
+        prevProps.zIndex === nextProps.zIndex &&
+        prevProps.offset === nextProps.offset &&
+        prevProps.isTopCard === nextProps.isTopCard &&
+        prevProps.isExpanded === nextProps.isExpanded &&
+        prevProps.isOnboardingActive === nextProps.isOnboardingActive &&
+        prevProps.swipeProgress.direction === nextProps.swipeProgress.direction &&
+        prevProps.swipeProgress.opacity === nextProps.swipeProgress.opacity &&
+        JSON.stringify(prevProps.topCardPosition) === JSON.stringify(nextProps.topCardPosition)
     );
 });
 

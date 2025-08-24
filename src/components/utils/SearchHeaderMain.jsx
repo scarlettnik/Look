@@ -1,60 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from '../ui/search.module.css';
 import { AUTH_TOKEN } from "../../constants.js";
-import {useStore} from "../../provider/StoreContext.jsx";
+import { useStore } from "../../provider/StoreContext.jsx";
 
 export const SearchHeader = ({ onSearch, onClearSearch }) => {
     const [isSearchActive, setIsSearchActive] = useState(false);
     const store = useStore();
-    const [searchQuery, setSearchQuery] = useState(store?.catalogStore?.currentSearchQuery);
+    const [searchQuery, setSearchQuery] = useState(store?.catalogStore?.currentSearchQuery || '');
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     const searchRef = useRef(null);
     const inputRef = useRef(null);
+    const prevIsSearchActive = useRef(isSearchActive);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                closeSearch();
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Enter' && isSearchActive) {
-                handleSearch();
-                closeSearch();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isSearchActive, searchQuery]);
-
-    useEffect(() => {
-        if (searchQuery && isSearchActive) {
-            const timer = setTimeout(() => {
-                fetchSuggestions(searchQuery);
-            }, 100);
-
-            return () => clearTimeout(timer);
-        } else {
-            setSuggestions([]);
-        }
-    }, [searchQuery, isSearchActive]);
-
-    const closeSearch = () => {
+    // Мемоизированные обработчики
+    const closeSearch = useCallback(() => {
         setIsSearchActive(false);
         inputRef.current?.blur();
-    };
+    }, []);
 
-    const fetchSuggestions = async () => {
+    const fetchSuggestions = useCallback(async (query) => {
+        if (!query.trim()) {
+            setSuggestions([]);
+            return;
+        }
+
         setIsLoading(true);
         try {
             const response = await fetch('https://api.lookvogue.ru/v1/catalog/search/suggestions', {
@@ -63,7 +34,7 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                     "Authorization": `tma ${AUTH_TOKEN}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ query: searchQuery })
+                body: JSON.stringify({ query })
             });
 
             if (!response.ok) {
@@ -78,15 +49,15 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
-    const handleSuggestionClick = (suggestion) => {
+    const handleSuggestionClick = useCallback((suggestion) => {
         setSearchQuery(suggestion);
         handleSearch(suggestion);
         closeSearch();
-    };
+    }, [closeSearch]);
 
-    const handleSearch = (query = searchQuery) => {
+    const handleSearch = useCallback((query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
             const searchRequest = { query: trimmedQuery };
@@ -98,15 +69,58 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
 
             closeSearch();
         }
-    };
+    }, [searchQuery, store.catalogStore, onSearch, closeSearch]);
 
-    const handleClearInput = () => {
+    const handleClearInput = useCallback(() => {
         setSearchQuery('');
         setSuggestions([]);
         store.catalogStore.clearLastSearchQuery();
         onClearSearch?.();
-        closeSearch()
-    };
+        closeSearch();
+    }, [store.catalogStore, onClearSearch, closeSearch]);
+
+    // Эффекты
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                closeSearch();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [closeSearch]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter' && isSearchActive) {
+                handleSearch();
+                closeSearch();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isSearchActive, searchQuery, handleSearch, closeSearch]);
+
+    useEffect(() => {
+        if (searchQuery && isSearchActive) {
+            const timer = setTimeout(() => {
+                fetchSuggestions(searchQuery);
+            }, 100);
+
+            return () => clearTimeout(timer);
+        } else {
+            setSuggestions([]);
+        }
+    }, [searchQuery, isSearchActive, fetchSuggestions]);
+
+    useEffect(() => {
+        // Сохраняем предыдущее состояние для анимации
+        prevIsSearchActive.current = isSearchActive;
+    }, [isSearchActive]);
 
     return (
         <>
@@ -114,6 +128,9 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                 <div
                     className={styles.searchOverlay}
                     onClick={closeSearch}
+                    style={{
+                        animation: `${styles.fadeIn} 0.2s ease-in-out`
+                    }}
                 />
             )}
 
@@ -162,6 +179,9 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
                         <div
                             className={styles.suggestionsWrapper}
                             role="listbox"
+                            style={{
+                                animation: `${styles.slideIn} 0.2s ease-in-out`
+                            }}
                         >
                             {isLoading ? (
                                 <div className={styles.suggestionItem}>Загрузка...</div>

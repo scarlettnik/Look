@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
-const TinderCard = ({
+const TinderCard = React.memo(({
                         card,
                         onSwipe,
                         updateSwipeFeedback,
@@ -273,6 +273,6 @@ const TinderCard = ({
             </div>
         </div>
     );
-};
+});
 
 export default TinderCard;

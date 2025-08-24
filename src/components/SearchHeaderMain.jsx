@@ -1,23 +1,49 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './ui/search.module.css';
-import { AUTH_TOKEN } from "./../constants.js";
-import { useStore } from "./../provider/StoreContext.jsx";
+import { AUTH_TOKEN } from "../constants.js";
+import { useStore } from "../provider/StoreContext.jsx";
 
-const SearchHeaderMain = ({ onSearch, onClearSearch }) => {
-    const [isSearchActive, setIsSearchActive] = useState(false);
+const SearchHeaderMain = ({
+                              onSearch,
+                              onClearSearch,
+                              isSearchActive: externalIsSearchActive,
+                              onSearchActiveChange
+                          }) => {
     const store = useStore();
     const [searchQuery, setSearchQuery] = useState(store?.catalogStore?.currentSearchQuery || '');
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [internalIsSearchActive, setInternalIsSearchActive] = useState(false);
 
     const searchRef = useRef(null);
     const inputRef = useRef(null);
+    const debounceTimer = useRef(null);
 
+    // Определяем активное состояние поиска
+    const isSearchActive = externalIsSearchActive !== undefined ? externalIsSearchActive : internalIsSearchActive;
+
+    const setIsSearchActive = useCallback((value) => {
+        if (externalIsSearchActive !== undefined) {
+            onSearchActiveChange?.(value);
+        } else {
+            setInternalIsSearchActive(value);
+        }
+    }, [externalIsSearchActive, onSearchActiveChange]);
+
+    // Закрытие поиска
     const closeSearch = useCallback(() => {
         setIsSearchActive(false);
         inputRef.current?.blur();
-    }, []);
+        setSuggestions([]);
+    }, [setIsSearchActive]);
 
+    // Открытие поиска
+    const openSearch = useCallback(() => {
+        setIsSearchActive(true);
+        inputRef.current?.focus();
+    }, [setIsSearchActive]);
+
+    // Получение подсказок с дебаунсингом
     const fetchSuggestions = useCallback(async (query) => {
         if (!query.trim()) {
             setSuggestions([]);
@@ -49,26 +75,24 @@ const SearchHeaderMain = ({ onSearch, onClearSearch }) => {
         }
     }, []);
 
+    // Обработчик выбора подсказки
     const handleSuggestionClick = useCallback((suggestion) => {
         setSearchQuery(suggestion);
         handleSearch(suggestion);
-        closeSearch();
-    }, [closeSearch]);
+    }, []);
 
+    // Основной поиск
     const handleSearch = useCallback((query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
-            const searchRequest = { query: trimmedQuery };
+            setSearchQuery(trimmedQuery);
             store.catalogStore.setLastSearchQuery(trimmedQuery);
-
-            if (onSearch) {
-                onSearch(searchRequest);
-            }
-
-            closeSearch();
+            onSearch?.({ query: trimmedQuery });
         }
+        closeSearch();
     }, [searchQuery, store.catalogStore, onSearch, closeSearch]);
 
+    // Очистка поиска
     const handleClearInput = useCallback(() => {
         setSearchQuery('');
         setSuggestions([]);
@@ -77,7 +101,16 @@ const SearchHeaderMain = ({ onSearch, onClearSearch }) => {
         closeSearch();
     }, [store.catalogStore, onClearSearch, closeSearch]);
 
-    // Эффекты
+    // Обработчик клика по иконке поиска
+    const handleSearchIconClick = useCallback(() => {
+        if (searchQuery.trim()) {
+            handleSearch();
+        } else {
+            openSearch();
+        }
+    }, [searchQuery, handleSearch, openSearch]);
+
+    // Эффект для обработки кликов вне области поиска
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -85,35 +118,89 @@ const SearchHeaderMain = ({ onSearch, onClearSearch }) => {
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        if (isSearchActive) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [closeSearch]);
+    }, [isSearchActive, closeSearch]);
 
+    // Эффект для обработки клавиши Enter
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Enter' && isSearchActive) {
+            if (e.key === 'Enter' && isSearchActive && document.activeElement === inputRef.current) {
                 handleSearch();
-                closeSearch();
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isSearchActive, searchQuery, handleSearch, closeSearch]);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isSearchActive, searchQuery, handleSearch]);
 
+    // Эффект для дебаунсинга подсказок
     useEffect(() => {
-        if (searchQuery && isSearchActive) {
-            const timer = setTimeout(() => {
-                fetchSuggestions(searchQuery);
-            }, 100);
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
 
-            return () => clearTimeout(timer);
+        if (searchQuery && isSearchActive) {
+            debounceTimer.current = setTimeout(() => {
+                fetchSuggestions(searchQuery);
+            }, 300);
         } else {
             setSuggestions([]);
         }
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
     }, [searchQuery, isSearchActive, fetchSuggestions]);
+
+    // Эффект для синхронизации с store
+    useEffect(() => {
+        if (store?.catalogStore?.currentSearchQuery !== searchQuery) {
+            setSearchQuery(store?.catalogStore?.currentSearchQuery || '');
+        }
+    }, [store?.catalogStore?.currentSearchQuery]);
+
+    // Рендер подсказок
+    const renderSuggestions = () => {
+        if (!isSearchActive) return null;
+
+        if (isLoading) {
+            return <div className={styles.suggestionItem}>Загрузка...</div>;
+        }
+
+        if (suggestions.length > 0) {
+            return suggestions.map((suggestion, index) => (
+                <div
+                    key={index}
+                    className={styles.suggestionItem}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    role="option"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSuggestionClick(suggestion);
+                        }
+                    }}
+                >
+                    {suggestion}
+                </div>
+            ));
+        }
+
+        if (searchQuery && !isLoading) {
+            return <div className={styles.suggestionItem}>Ничего не найдено</div>;
+        }
+
+        return null;
+    };
+
 
     return (
         <>

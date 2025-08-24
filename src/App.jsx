@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
+import { useEffect } from 'react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
 import Profile from "./components/Profile.jsx";
@@ -16,7 +17,6 @@ import { StoreProvider } from './provider/StoreContext.jsx';
 import OnboardingModal from "./components/OnboardingModal.jsx";
 import AccountDeleted from "./components/AccountDeleted.jsx";
 import PopularCollection from "./components/PopularCollection.jsx";
-import { useEffect } from 'react';
 
 function App() {
     return (
@@ -36,9 +36,6 @@ function AppContent() {
     const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
     const startParamFromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
 
-    console.log('10');
-    console.log('start_param from initData:', startParamFromInitData);
-
     useEffect(() => {
         if (!isTWA) return;
 
@@ -51,22 +48,23 @@ function AppContent() {
             navigate(`/trands/collection/${collectionId}`, { replace: true });
         }
 
-        tgWebApp.onEvent('backButtonClicked', () => {
+        const backButtonClickHandler = () => {
             if (window.history.state?.idx > 0) {
                 navigate(-1);
             } else {
                 tgWebApp.close();
             }
-        });
+        };
+
+        tgWebApp.onEvent('backButtonClicked', backButtonClickHandler);
 
         return () => {
-            tgWebApp.offEvent('backButtonClicked');
+            tgWebApp.offEvent('backButtonClicked', backButtonClickHandler);
         };
     }, [isTWA, startParamFromInitData, navigate]);
 
     return (
         <div>
-            {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/add" element={<AddList/>}/>
                 <Route path="/cards" element={<TinderCards/>}/>

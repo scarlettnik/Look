@@ -38,7 +38,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
             <div className={styles.scrollContainer}>
                 <div className={styles.styleGrid}>
                     {isLoading ? (
-                        Array.from({ length: ClothStyles.length }).map((_, index) => (
+                        Array.from({ length: CLOTH_STYLES.length }).map((_, index) => (
 
                             <CustomSkeleton
                                 key={index}
@@ -47,7 +47,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                             />
                         ))
                     ) : (
-                        ClothStyles.map(style => (
+                        CLOTH_STYLES.map(style => (
                             <div
                                 key={style.id}
                                 className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}

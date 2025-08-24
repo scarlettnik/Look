@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
@@ -8,7 +8,7 @@ import Save from "./components/Save.jsx";
 import Preferences from "./components/Preferences.jsx";
 import ShoppingCard from "./components/ShoppingCard.jsx";
 import Compilation from "./components/Compilation.jsx";
-import {AuthProvider, useAuth} from "./provider/AuthProvider.jsx";
+import { AuthProvider } from "./provider/AuthProvider.jsx";
 import Product from "./components/Product.jsx";
 import AddList from "./components/AddList.jsx";
 import AddToCloset from "./components/AddToCloset.jsx";
@@ -17,7 +17,6 @@ import OnboardingModal from "./components/OnboardingModal.jsx";
 import AccountDeleted from "./components/AccountDeleted.jsx";
 import PopularCollection from "./components/PopularCollection.jsx";
 import { useEffect } from 'react';
-import {AUTH_TOKEN} from "./constants.js";
 
 function App() {
     return (
@@ -33,34 +32,37 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    // const startParam = searchParams.get('startapp');
-    // const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
-    //
-    // useEffect(() => {
-    //     if (!isTWA) return;
-    //
-    //     const tgWebApp = window.Telegram.WebApp;
-    //     tgWebApp.expand();
-    //     tgWebApp.enableClosingConfirmation();
-    //
-    //     if (startParam && startParam.startsWith('collection_')) {
-    //         const collectionId = startParam.split('_')[1];
-    //         navigate(`/collection/${collectionId}`, { replace: true });
-    //     }
-    //
-    //     tgWebApp.onEvent('backButtonClicked', () => {
-    //         if (window.history.state?.idx > 0) {
-    //             navigate(-1);
-    //         } else {
-    //             tgWebApp.close();
-    //         }
-    //     });
-    //
-    //     return () => {
-    //         tgWebApp.offEvent('backButtonClicked');
-    //     };
-    // }, [isTWA, startParam, navigate]);
+
+    const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const startParamFromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+
+    console.log('10');
+    console.log('start_param from initData:', startParamFromInitData);
+
+    useEffect(() => {
+        if (!isTWA) return;
+
+        const tgWebApp = window.Telegram.WebApp;
+        tgWebApp.expand();
+        tgWebApp.enableClosingConfirmation();
+
+        if (startParamFromInitData && startParamFromInitData.startsWith('collection_')) {
+            const collectionId = startParamFromInitData.split('_')[1];
+            navigate(`/trands/collection/${collectionId}`, { replace: true });
+        }
+
+        tgWebApp.onEvent('backButtonClicked', () => {
+            if (window.history.state?.idx > 0) {
+                navigate(-1);
+            } else {
+                tgWebApp.close();
+            }
+        });
+
+        return () => {
+            tgWebApp.offEvent('backButtonClicked');
+        };
+    }, [isTWA, startParamFromInitData, navigate]);
 
     return (
         <div>

@@ -53,7 +53,7 @@ function AppContent() {
 
     return (
         <div>
-            <BackButton onClick={() => navigate(-1)} />
+            {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/add" element={<AddList/>}/>
                 <Route path="/cards" element={<TinderCards/>}/>

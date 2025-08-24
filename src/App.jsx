@@ -42,29 +42,18 @@ function AppContent() {
         const tgWebApp = window.Telegram.WebApp;
         tgWebApp.expand();
         tgWebApp.enableClosingConfirmation();
+    }, [isTWA]);
 
+    useEffect(() => {
         if (startParamFromInitData && startParamFromInitData.startsWith('collection_')) {
             const collectionId = startParamFromInitData.split('_')[1];
             navigate(`/trands/collection/${collectionId}`, { replace: true });
         }
-
-        const backButtonClickHandler = () => {
-            if (window.history.state?.idx > 0) {
-                navigate(-1);
-            } else {
-                tgWebApp.close();
-            }
-        };
-
-        tgWebApp.onEvent('backButtonClicked', backButtonClickHandler);
-
-        return () => {
-            tgWebApp.offEvent('backButtonClicked', backButtonClickHandler);
-        };
-    }, [isTWA, startParamFromInitData, navigate]);
+    }, [startParamFromInitData, navigate]);
 
     return (
         <div>
+            <BackButton onClick={() => navigate(-1)} />
             <Routes>
                 <Route path="/add" element={<AddList/>}/>
                 <Route path="/cards" element={<TinderCards/>}/>

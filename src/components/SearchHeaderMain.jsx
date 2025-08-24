@@ -35,11 +35,6 @@ const SearchHeaderMain = ({
         setSuggestions([]);
     }, [setIsSearchActive]);
 
-    const openSearch = useCallback(() => {
-        setIsSearchActive(true);
-        inputRef.current?.focus();
-    }, [setIsSearchActive]);
-
     const fetchSuggestions = useCallback(async (query) => {
         if (!query.trim()) {
             setSuggestions([]);
@@ -118,7 +113,6 @@ const SearchHeaderMain = ({
         };
 
         document.addEventListener('keydown', handleKeyDown);
-        setIsSearchActive(false);
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isSearchActive, searchQuery, handleSearch]);
 
@@ -147,6 +141,7 @@ const SearchHeaderMain = ({
             setSearchQuery(store?.catalogStore?.currentSearchQuery || '');
         }
     }, [store?.catalogStore?.currentSearchQuery]);
+
 
     return (
         <>

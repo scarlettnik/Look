@@ -1,7 +1,7 @@
-import SizeStep from "./onboarding/SizeStep.jsx";
-import StylesStep from "./onboarding/StylesStep.jsx";
-import AboutStep from "./onboarding/AboutStep.jsx";
-import WelcomeStep from "./onboarding/WelcomeStep.jsx";
+import SizeStep from "./utils/onboarding/SizeStep.jsx";
+import StylesStep from "./utils/onboarding/StylesStep.jsx";
+import AboutStep from "./utils/onboarding/AboutStep.jsx";
+import WelcomeStep from "./utils/onboarding/WelcomeStep.jsx";
 import {useStore} from "../provider/StoreContext.jsx";
 import {useAuth} from "../provider/AuthProvider.jsx";
 import {useState} from "react";
@@ -10,7 +10,7 @@ import {observer} from "mobx-react";
 import {useNavigate} from "react-router-dom";
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
-import Precomute from "./onboarding/Precomrute.jsx";
+import Precomute from "./utils/onboarding/Precomrute.jsx";
 
 const OnboardingModal = observer(() => {
     const store = useStore();

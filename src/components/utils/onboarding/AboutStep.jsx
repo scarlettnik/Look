@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import styles from '../ui/aboutStep.module.css';
-import FullScreenButton from "../FullScrinButton.jsx";
-import titleStyle from '../ui/OnboardingModal.module.css'
+import styles from '../../ui/aboutStep.module.css';
+import FullScreenButton from "../../FullScrinButton.jsx";
+import titleStyle from '../../ui/OnboardingModal.module.css'
 
 const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
     const sliderRef = useRef(null);

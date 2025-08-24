@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import styles from '../ui/OnboardingModal.module.css';
-import welcomstyle from '../ui/welcomStyle.module.css';
-import store from "../../store.js";
+import styles from '../../ui/OnboardingModal.module.css';
+import welcomstyle from '../../ui/welcomStyle.module.css';
+import store from "../../../store.js";
 
 const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [currentIndex, setCurrentIndex] = useState(0);

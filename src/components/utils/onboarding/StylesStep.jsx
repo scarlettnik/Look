@@ -1,31 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../ui/OnboardingModal.module.css';
-import CustomCheckbox from "../CustomCheckbox";
-import FullScreenButton from "../FullScrinButton.jsx";
-import CustomSkeleton from "../utils/CustomSkeleton.jsx";
-
-const ClothStyles = [
-    { id: 1, name: "Классический", url: 'https://i.pinimg.com/1200x/8c/d5/26/8cd526983e858ba086b9d6116a165af1.jpg' },
-    { id: 2, name: "Спортивный", url: '/stylereference.png' },
-    { id: 3, name: "Повседневный", url: '/stylereference.png' },
-    { id: 4, name: "Деловой", url: '/stylereference.png' },
-    { id: 5, name: "Уличный", url: '/stylereference.png' },
-    { id: 6, name: "Вечерний", url: '/stylereference.png' },
-    { id: 7, name: "Вечерний", url: '/stylereference.png' },
-    { id: 8, name: "Вечерний", url: '/stylereference.png' },
-];
+import styles from '../../ui/OnboardingModal.module.css';
+import CustomCheckbox from "../../CustomCheckbox.jsx";
+import FullScreenButton from "../../FullScrinButton.jsx";
+import CustomSkeleton from "../CustomSkeleton.jsx";
+import {CLOTH_STYLES} from "../../../constants.js";
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         let loaded = 0;
-        ClothStyles.forEach(({ url }) => {
+        CLOTH_STYLES.forEach(({ url }) => {
             const img = new Image();
             img.src = url;
             img.onload = img.onerror = () => {
                 loaded += 1;
-                if (loaded === ClothStyles.length) {
+                if (loaded === CLOTH_STYLES.length) {
                     setIsLoading(false);
                 }
             };

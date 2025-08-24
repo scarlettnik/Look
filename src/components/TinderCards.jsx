@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import styles from './ui/TinderCards.module.css';
 import Sidebar from './Sidebar';
 import TinderCard from "./TinderCard.jsx";
-import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
 import { FilterBar } from "./FilterBar.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
 import { AUTH_TOKEN } from "../constants.js";
@@ -12,6 +11,7 @@ import { Onboarding } from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import { useNavigate } from "react-router-dom";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
+import SearchHeaderMain from "./SearchHeaderMain.jsx";
 
 const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
 const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
@@ -415,7 +415,7 @@ const TinderCards = observer(() => {
     return (
         <>
             <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
-                <SearchHeader
+                <SearchHeaderMain
                     onSearch={(searchRequest) => {
                         store.catalogStore.fetchCardsWithSearch(searchRequest);
                     }}

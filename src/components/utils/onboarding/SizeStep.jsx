@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../ui/OnboardingModal.module.css';
-import FullScreenButton from "../FullScrinButton.jsx";
-import SizeGrid from "../SizeGrid.jsx";
-import ParamsTab from "../ParamsTab.jsx";
-import FitOptions from "../FitOptions.jsx";
+import styles from '../../ui/OnboardingModal.module.css';
+import FullScreenButton from "../../FullScrinButton.jsx";
+import SizeGrid from "../../SizeGrid.jsx";
+import ParamsTab from "../../ParamsTab.jsx";
+import FitOptions from "../../FitOptions.jsx";
 
 const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => {
     const [activeTab, setActiveTab] = useState("size");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../ui/precompute.module.css';
-import FullScreenButton from "../FullScrinButton.jsx";
-import ButtonWrapper from "../utils/ButtonWrapper.jsx";
+import styles from '../../ui/precompute.module.css';
+import FullScreenButton from "../../FullScrinButton.jsx";
+import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const Precompute = ({onNext}) => {
     const [count, setCount] = useState(1);

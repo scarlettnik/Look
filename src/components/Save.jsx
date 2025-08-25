@@ -121,6 +121,8 @@ const Save = observer(() => {
     };
   }, [isModalOpen]);
 
+  console.log(filteredSaves)
+
   return (
     <>
       <div
@@ -158,7 +160,7 @@ const Save = observer(() => {
           className={styles.cards}
           style={{ marginBottom: deleteMode ? "120px" : "0px" }}
         >
-          {filteredSaves?.map((save, index) => (
+          {filteredSaves && filteredSaves.length > 0 ? (filteredSaves?.map((save, index) => (
               <div key={save.id} className={styles.cardContainer}>
                 {deleteMode && index > 0 && (
                    <div>
@@ -182,7 +184,13 @@ const Save = observer(() => {
                   </h3>
                 </Link>
               </div>
-          ))}
+          ))) : (
+            <div style={{width:'94vw', backgroundColor: 'var(--ultralight-gray)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2vw', borderRadius: '8px'}}>
+              <p style={{fontSize: '16px'}}>
+                Нет доступных товаров
+              </p>
+            </div>
+        )}
         </div>
         <Modal isOpen={isModalOpen} onClose={createClose}>
           <AddList onCreate={handleCreateCollection} />

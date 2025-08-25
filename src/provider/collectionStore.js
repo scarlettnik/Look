@@ -27,6 +27,9 @@ class CollectionStore {
             });
             const data = await response.json();
             this.currentCollection = data;
+            if (!response.ok) {
+                this.error = true;
+            }
         } catch (error) {
             this.error = error.message;
         } finally {
@@ -87,8 +90,6 @@ class CollectionStore {
             if (!response.ok) {
                 throw new Error('Failed to delete collections');
             }
-
-            // Обновляем данные в authStore
             if (this.rootStore.authStore.data?.collections) {
                 this.rootStore.authStore.data.collections =
                     this.rootStore.authStore.data.collections.filter(

@@ -70,6 +70,7 @@ function AppContent() {
                 <Route path='/trands' element={<Comparing/>}/>
                 <Route path='/trands/:id' element={<PopularCollection/>}/>
                 <Route path='/trands/collection/:id' element={<Compilation/>}/>
+                <Route path='/trands/collection/:id/product/:id' element={<ProductPage/>}/>
                 <Route path='/prod' element={<Product/>}/>
                 <Route path='/cloth' element={<AddToCloset/>}/>
                 <Route path="/account-deleted" element={<AccountDeleted />} />

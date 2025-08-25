@@ -20,8 +20,6 @@ const Compilation = observer(() => {
     const { collectionStore } = useStore();
     const [isSave, setIsSave] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-
-    // Инициализация фильтров
     const [filters, setFilters] = useState({
         size: [],
         brand: [],
@@ -36,20 +34,16 @@ const Compilation = observer(() => {
         collectionStore.loadCollection(id, isSaveCollection);
     }, [id, location.pathname, collectionStore]);
 
-    const { currentCollection: save, loading } = collectionStore;
+    const { currentCollection: save, loading, error } = collectionStore;
 
-    // Функция для применения фильтров
     const applyFilters = (updatedFilters) => {
-        // Можно добавить дополнительную логику здесь при необходимости
         console.log("Filters applied:", updatedFilters);
     };
 
-    // Мемоизированный список отфильтрованных продуктов
     const filteredProducts = useMemo(() => {
         if (!save?.products) return [];
 
         return save.products.filter(product => {
-            // Фильтрация по размеру
             if (filters.size.length > 0) {
                 const productSizes = product.sizes || [];
                 const hasSizeMatch = productSizes.some(productSize => {
@@ -66,13 +60,9 @@ const Compilation = observer(() => {
 
                 if (!hasSizeMatch) return false;
             }
-
-            // Фильтрация по бренду
             if (filters.brand.length > 0 && !filters.brand.includes(product.brand)) {
                 return false;
             }
-
-            // Фильтрация по цене
             const productPrice = product.discount_price || product.price;
             if (filters.price.min !== null && productPrice < filters.price.min) {
                 return false;
@@ -80,13 +70,9 @@ const Compilation = observer(() => {
             if (filters.price.max !== null && productPrice > filters.price.max) {
                 return false;
             }
-
-            // Фильтрация по цвету
             if (filters.color.length > 0 && !filters.color.includes(product.color_name)) {
                 return false;
             }
-
-            // Фильтрация по типу
             if (filters.type.length > 0 && !filters.type.includes(product.type)) {
                 return false;
             }
@@ -103,6 +89,34 @@ const Compilation = observer(() => {
         }
     };
 
+    console.log(error)
+    if (error) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.errorContainer}>
+                    <div className={styles.errorContent}>
+                        <div className={styles.errorIcon}>
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#666" strokeWidth="2"/>
+                                <path d="M15 9L9 15" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
+                                <path d="M9 9L15 15" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
+                            </svg>
+                        </div>
+
+                        <h1 className={styles.errorTitle}>Ничего не найдено</h1>
+
+                        <p className={styles.errorDescription}>
+                            К сожалению, мы не смогли найти то, что вы искали.
+                            Возможно, страница была удалена или перемещена.
+                        </p>
+
+                    </div>
+                </div>
+                <Sidebar />
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.scrollContent}>
@@ -113,13 +127,11 @@ const Compilation = observer(() => {
                     loading={loading}
                     onEnterEditMode={() => setIsEditMode(true)}
                 />
-
-                {/* Обновленный FilterBar с локальными фильтрами */}
                 <FilterBar
                     filters={filters}
                     setFilters={setFilters}
                     products={save?.products || []}
-                    onFilter={applyFilters}  // Передаем функцию для обработки фильтров
+                    onFilter={applyFilters}
                 />
 
                 <ItemGrid
@@ -314,6 +326,16 @@ const ItemGrid = observer(({ items, loading, isEditMode, onDeleteItems, onCancel
                         style={{ height: '200px' }}
                     />
                 ))}
+            </div>
+        );
+    }
+
+    if (!loading && (!items || items.length === 0)) {
+        return (
+            <div style={{width:'92vw', margin: '2vw', backgroundColor: 'var(--beige)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2vw', borderRadius: '8px'}}>
+                <p style={{fontSize: '16px'}}>
+                    Нет доступных товаров
+                </p>
             </div>
         );
     }

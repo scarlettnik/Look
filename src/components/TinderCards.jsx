@@ -1,47 +1,22 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import styles from './ui/TinderCards.module.css';
 import Sidebar from './Sidebar';
 import TinderCard from "./TinderCard.jsx";
-import { SearchHeader } from "./utils/SearchHeaderMain.jsx";
 import { FilterBar } from "./FilterBar.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
-import {AUTH_TOKEN} from "../constants.js";
+import {
+    AUTH_TOKEN,
+    INITIAL_CARDS_COUNT, SKELETON_COUNT,
+    SWIPE_CONFIG,
+    VERTICAL_SWIPE_THRESHOLD_RATIO
+} from "../constants.js";
 import {runInAction} from "mobx";
 import {Onboarding} from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import {useNavigate} from "react-router-dom";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import SearchHeaderMain from "./SearchHeaderMain.jsx";
-
-const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
-const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
-const INITIAL_CARDS_COUNT = 3;
-const SKELETON_COUNT = 3;
-
-const swipeConfig = {
-    horizontal: {
-        threshold: 0.15,
-        speedMultiplier: 0.8,
-        rotationAngle: 25,
-        animationDuration: 800
-    },
-    verticalUp: {
-        threshold: 0.1,
-        speedMultiplier: 0.8,
-        animationDuration: 1000
-    },
-    verticalDown: {
-        threshold: 1000000000000000000,
-        speedMultiplier: 0.2,
-        animationDuration: 5000
-    },
-    physics: {
-        velocityThreshold: 0.9,
-        power: 0.2,
-        deceleration: 0.95
-    }
-};
 
 const TinderCards = observer(() => {
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
@@ -168,14 +143,14 @@ const TinderCards = observer(() => {
         sendInteraction(card.id, action);
 
         const duration = direction === 'up'
-            ? swipeConfig.verticalUp.animationDuration
-            : swipeConfig.horizontal.animationDuration;
+            ? SWIPE_CONFIG.verticalUp.animationDuration
+            : SWIPE_CONFIG.horizontal.animationDuration;
 
         const cardElement = document.getElementById(card.id);
         if (cardElement) {
             const rotation = direction === 'right'
-                ? swipeConfig.horizontal.rotationAngle
-                : -swipeConfig.horizontal.rotationAngle;
+                ? SWIPE_CONFIG.horizontal.rotationAngle
+                : -SWIPE_CONFIG.horizontal.rotationAngle;
 
             cardElement.style.transition = `all ${duration}ms linear`;
 
@@ -197,11 +172,10 @@ const TinderCards = observer(() => {
         setTimeout(() => {
             store.catalogStore.handleSwipe(direction, card);
         }, duration/2);
-    }, [swipeConfig]);
+    }, [SWIPE_CONFIG]);
 
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
-        const swipeThreshold = window.innerWidth * HORIZONTAL_SWIPE_THRESHOLD_RATIO;
         const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
 
         let direction = null;
@@ -422,7 +396,7 @@ const TinderCards = observer(() => {
                             updateSwipeFeedback={updateSwipeFeedback}
                             zIndex={10000- index}
                             offset={index}
-                            swipeConfig={swipeConfig}
+                            swipeConfig={SWIPE_CONFIG}
                             isExpanded={expandedCardId === card.id}
                             onExpand={() => setExpandedCardId(card.id)}
                             onCollapse={() => setExpandedCardId(null)}

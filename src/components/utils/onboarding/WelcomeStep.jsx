@@ -32,7 +32,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     const cards = [
         { id: 1, image: '/starterscroller.png', direction: 'right' },
         { id: 2, image: '/starterscroller2.png', direction: 'left' },
-        { id: 3, image: '/starterscroller2.png', direction: 'resist' }
+        { id: 3, image: '/starterscroller3.png', direction: 'resist' }
     ];
 
     const preloadImages = async () => {
@@ -197,7 +197,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
             <button
                 className={welcomstyle.starterButton}
                 onClick={onNext}
-                disabled={!imagesLoaded || !store.authStore.data}
+                disabled={!store.authStore.data}
             >
                 <div style={{ display: 'flex', alignItems: "center", justifyContent: 'center' }}>
                     Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />

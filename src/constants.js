@@ -7,7 +7,7 @@ export const getAuthToken = () => {
 export const AUTH_TOKEN = 'user=%7B%22id%22%3A1671274831%2C%22first_name%22%3A%22%D0%A1%D0%BE%D1%84%D1%8C%D1%8F%22%2C%22last_name%22%3A%22%D0%9C%D0%B0%D1%80%D1%87%D1%83%D0%BA%22%2C%22username%22%3A%22scarlettnik%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2F9zQoUimkDP8GJlxHvaSdoTyyBjp-d_3fHGjyYeoPoTI.svg%22%7D&chat_instance=-6489690302062850781&chat_type=sender&auth_date=1742513384&signature=tr7IXxOkPsCygck72EqkJ1MtXDf2zvLF74pCKeyXNp8iNjJ9n3GBE7tQHQMuqAVCp3WyYdx5rQ2WO1fBtCaSBg&hash=c0a2ab6465de8874bbc9428faab5e30a58927f259b6d824e5f017605f7a4bfcd';
 
 export const CLOTH_STYLES = [
-    { id: 1, name: "y2k", url: 'https://postimg.cc/q6wXCq8Z/image.png' },
+    { id: 1, name: "y2k", url: 'https://i.postimg.cc/q6wXCq8Z/image.png' },
     { id: 2, name: "streetwear", url: 'https://i.postimg.cc/B68fGHZ1/image.png' },
     { id: 3, name: "minimalist", url: 'https://i.postimg.cc/ZY3XFTWZ/image.png' },
     { id: 4, name: "romantic", url: 'https://i.postimg.cc/PrQc92bR/image.png' },
@@ -58,3 +58,32 @@ export const PRICE_RANGES = [
 ];
 
 export const BOTNAME = 'look_app_dev_bot'
+
+export const VERTICAL_SWIPE_THRESHOLD_RATIO = 0.2;
+export const HORIZONTAL_SWIPE_THRESHOLD_RATIO = 0.2;
+export const INITIAL_CARDS_COUNT = 3;
+export const SKELETON_COUNT = 3;
+
+export const SWIPE_CONFIG = {
+    horizontal: {
+        threshold: 0.15,
+        speedMultiplier: 0.8,
+        rotationAngle: 25,
+        animationDuration: 800
+    },
+    verticalUp: {
+        threshold: 0.1,
+        speedMultiplier: 0.8,
+        animationDuration: 1000
+    },
+    verticalDown: {
+        threshold: 1000000000000000000,
+        speedMultiplier: 0.2,
+        animationDuration: 5000
+    },
+    physics: {
+        velocityThreshold: 0.9,
+        power: 0.2,
+        deceleration: 0.95
+    }
+};

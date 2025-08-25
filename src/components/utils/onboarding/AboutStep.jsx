@@ -32,7 +32,7 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
                 >
                     <img src='/subicons/whitearrowleft.svg' alt="Назад"/>
                 </button>
-                <p className={titleStyle.stepTitle}>Выберите пол и возрасты</p>
+                <p className={titleStyle.stepTitle}>Выберите пол и возраст</p>
             </div>
 
             <div className={styles.genderContainer}>
@@ -47,7 +47,7 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
                     onClick={() => onUpdate({gender: 'male'})}
                     disabled={true}
                 >
-                    Пврень*
+                    Парень*
                 </button>
                 <p style={{fontSize: '8px', fontWeight: '400', color: 'var(--beige)'}}>
                     *В разработке

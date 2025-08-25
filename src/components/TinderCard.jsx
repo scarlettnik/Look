@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 
-const TinderCard = React.memo(({
+const TinderCard = ({
                         card,
                         onSwipe,
                         updateSwipeFeedback,
@@ -16,7 +16,7 @@ const TinderCard = React.memo(({
                         setCardRef,
                         isOnboardingActive,
                         swipeConfig,
-                        onSaveClick={handleOpenSaveModal}
+                        onSaveClick
                     }) => {
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -27,6 +27,7 @@ const TinderCard = React.memo(({
     const startTime = useRef(0);
     const navigate = useNavigate();
 
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         if (cardRef.current) {
@@ -34,6 +35,13 @@ const TinderCard = React.memo(({
         }
         return () => setCardRef(card.id, null);
     }, [card.id, setCardRef]);
+
+    // Этот useEffect теперь только для начального рендера и zIndex
+    useEffect(() => {
+        if (cardRef.current) {
+            cardRef.current.style.zIndex = zIndex;
+        }
+    }, [zIndex]);
 
     const handleStart = (clientX, clientY) => {
         if (isExpanded) return false;
@@ -61,7 +69,36 @@ const TinderCard = React.memo(({
                 swipeConfig.horizontal.rotationAngle
             );
 
+            // Обновляем состояние для логики
             setPosition({ x: deltaX, y: deltaY, rotate });
+
+            // **ОСНОВНОЕ ИЗМЕНЕНИЕ: Применяем transform здесь для мгновенной анимации**
+            if (cardRef.current) {
+                let scale = 1 - Math.max(0, offset) * 0.03;
+                let translateY = 0;
+                let translateX = 0;
+
+                if (offset > 0 && topCardPosition) {
+                    const progress = Math.min(
+                        1,
+                        Math.max(
+                            Math.abs(topCardPosition.x) / (window.innerWidth * 0.5),
+                            Math.abs(topCardPosition.y) / (window.innerHeight * 0.5)
+                        )
+                    );
+                    const influenceFactor = 1 - (offset - 1) * 0.3;
+                    if (influenceFactor > 0) {
+                        scale += 0.03 * progress * influenceFactor;
+                        translateY += -5 * progress * influenceFactor;
+                        if (topCardPosition.x !== 0) {
+                            const direction = topCardPosition.x > 0 ? 1 : -1;
+                            translateX = direction * 5 * progress * influenceFactor;
+                        }
+                    }
+                }
+
+                cardRef.current.style.transform = `translate3d(${deltaX + translateX}px, ${deltaY + translateY}px, 0) rotate(${rotate}deg) scale(${scale})`;
+            }
 
             if (isTopCard) {
                 updateSwipeFeedback(deltaX, deltaY);
@@ -81,17 +118,18 @@ const TinderCard = React.memo(({
         const velocity = {
             x: (position.x / (deltaTime || 1)) * swipeConfig.physics.power * swipeConfig.horizontal.speedMultiplier,
             y: (position.y / (deltaTime || 1)) * swipeConfig.physics.power *
-                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0) // Умножаем на 0 для свайпа вниз
+                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0)
         };
 
         const direction = getSwipeDirection(velocity, innerWidth, innerHeight);
 
         if (direction) {
-            animateSwipe(direction, velocity);
+            animateSwipe(direction);
         } else {
             resetPosition();
         }
     };
+
     const getSwipeDirection = (velocity, screenWidth, screenHeight) => {
         const isHorizontalFast = Math.abs(velocity.x) > swipeConfig.physics.velocityThreshold;
 
@@ -113,11 +151,11 @@ const TinderCard = React.memo(({
         cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
 
         if (direction === 'left') {
-            cardRef.current.style.transform = 'translateX(-100vw) rotate(-30deg)';
+            cardRef.current.style.transform = 'translate3d(-100vw, 0, 0) rotate(-30deg)';
         } else if (direction === 'right') {
-            cardRef.current.style.transform = 'translateX(100vw) rotate(30deg)';
+            cardRef.current.style.transform = 'translate3d(100vw, 0, 0) rotate(30deg)';
         } else if (direction === 'up') {
-            cardRef.current.style.transform = 'translateY(-100vh)';
+            cardRef.current.style.transform = 'translate3d(0, -100vh, 0)';
         }
 
         setTimeout(() => {
@@ -128,9 +166,8 @@ const TinderCard = React.memo(({
     const resetPosition = () => {
         if (!cardRef.current) return;
 
-        cardRef.current.style.transition = `all ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
-        cardRef.current.style.transform = 'translate(0, 0) rotate(0deg)';
-        cardRef.current.style.opacity = '1';
+        cardRef.current.style.transition = `transform ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+        cardRef.current.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
 
         const onTransitionEnd = () => {
             cardRef.current?.removeEventListener('transitionend', onTransitionEnd);
@@ -140,45 +177,6 @@ const TinderCard = React.memo(({
 
         cardRef.current.addEventListener('transitionend', onTransitionEnd);
     };
-
-    useEffect(() => {
-        if (!cardRef.current) return;
-        let scale = 1 - Math.max(0, offset) * 0.03;
-        let translateY = 0;
-        let translateX = 0;
-
-        if (offset > 0 && topCardPosition) {
-            const progress = Math.min(
-                1,
-                Math.max(
-                    Math.abs(topCardPosition.x) / (window.innerWidth * 0.5),
-                    Math.abs(topCardPosition.y) / (window.innerHeight * 0.5)
-                )
-            );
-
-            const influenceFactor = 1 - (offset - 1) * 0.3;
-
-            if (influenceFactor > 0) {
-                scale += 0.03 * progress * influenceFactor;
-                translateY += -5 * progress * influenceFactor;
-
-                if (topCardPosition.x !== 0) {
-                    const direction = topCardPosition.x > 0 ? 1 : -1;
-                    translateX = direction * 5 * progress * influenceFactor;
-                }
-            }
-        }
-
-        cardRef.current.style.transform = `
-      translate(${position.x + translateX}px, ${position.y + translateY}px)
-      rotate(${position.rotate}deg)
-      scale(${scale})
-    `;
-        cardRef.current.style.zIndex = zIndex;
-    }, [position, zIndex, offset, topCardPosition]);
-
-
-    const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         if (cardRef.current) {
@@ -216,9 +214,9 @@ const TinderCard = React.memo(({
                         }}
                     />
                 )}
-                <img  onLoad={() => setImageLoaded(true)}
-                      onError={() => setImageLoaded(true)}
-                      className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
+                <img onLoad={() => setImageLoaded(true)}
+                     onError={() => setImageLoaded(true)}
+                     className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
             </div>
 
             {isTopCard && (
@@ -272,6 +270,6 @@ const TinderCard = React.memo(({
             </div>
         </div>
     );
-});
+};
 
 export default TinderCard;

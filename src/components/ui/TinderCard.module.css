@@ -9,9 +9,14 @@
     transition:
             transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
             opacity 0.3s ease;
-    will-change: transform, opacity;
+    will-change: transform;
     opacity: 0;
-
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
 }
 
 .cardImage {
@@ -23,6 +28,8 @@
     object-fit: cover;
     background-position: center;
     z-index: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
 .card::after {

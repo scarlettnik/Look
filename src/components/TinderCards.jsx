@@ -112,7 +112,6 @@ const TinderCards = observer(() => {
         }
     }, [store?.authStore.data]);
 
-
     const sendInteraction = async (productId, action) => {
         try {
             const response = await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {
@@ -134,7 +133,6 @@ const TinderCards = observer(() => {
         }
     };
 
-
     const handleSwipe = useCallback((direction, card) => {
         if (direction === 'down') return;
 
@@ -152,17 +150,18 @@ const TinderCards = observer(() => {
                 ? SWIPE_CONFIG.horizontal.rotationAngle
                 : -SWIPE_CONFIG.horizontal.rotationAngle;
 
-            cardElement.style.transition = `all ${duration}ms linear`;
+            cardElement.style.transition = `transform ${duration}ms linear`;
+            cardElement.style.willChange = 'transform';
 
             switch(direction) {
                 case 'left':
-                    cardElement.style.transform = `translate(-${window.innerWidth * 2}px, 0) rotate(${rotation}deg)`;
+                    cardElement.style.transform = `translate3d(-${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
                     break;
                 case 'right':
-                    cardElement.style.transform = `translate(${window.innerWidth * 2}px, 0) rotate(${rotation}deg)`;
+                    cardElement.style.transform = `translate3d(${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
                     break;
                 case 'up':
-                    cardElement.style.transform = `translate(0, -${window.innerHeight * 2}px) rotate(0deg)`;
+                    cardElement.style.transform = `translate3d(0, -${window.innerHeight * 2}px, 0) rotate(0deg)`;
                     break;
             }
         }
@@ -172,8 +171,7 @@ const TinderCards = observer(() => {
         setTimeout(() => {
             store.catalogStore.handleSwipe(direction, card);
         }, duration/2);
-    }, [SWIPE_CONFIG]);
-
+    }, [SWIPE_CONFIG, store.catalogStore]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
         const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
@@ -191,9 +189,7 @@ const TinderCards = observer(() => {
 
         setSwipeProgress({ direction, opacity });
         setTopCardPosition({ x: dx, y: dy });
-
     }, []);
-
 
     const [undoButtonHighlight, setUndoButtonHighlight] = useState(false);
     const [saveHighlight, setsaveHighlight] = useState(false);
@@ -240,8 +236,7 @@ const TinderCards = observer(() => {
         }
     };
 
-
-    const [isAnimating, setIsAnimating] = useState(false); // Добавляем состояние для отслеживания анимации
+    const [isAnimating, setIsAnimating] = useState(false);
 
     const simulateSwipe = useCallback((direction) => {
         if (!store.catalogStore.cards?.length || isAnimating) return;
@@ -275,38 +270,33 @@ const TinderCards = observer(() => {
             transform: cardRef.style.transform,
             transition: cardRef.style.transition,
             opacity: cardRef.style.opacity,
-            zIndex: cardRef.style.zIndex
+            zIndex: cardRef.style.zIndex,
+            willChange: cardRef.style.willChange
         };
 
         cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
-        cardRef.style.transform = `translate(${params.endX}px, ${params.endY}px) rotate(${params.rotation}deg)`;
+        cardRef.style.willChange = 'transform';
+        cardRef.style.transform = `translate3d(${params.endX}px, ${params.endY}px, 0) rotate(${params.rotation}deg)`;
         cardRef.style.zIndex = '10000';
 
         setTimeout(() => {
-
-
             cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
             cardRef.style.transform = originalStyles.transform;
 
             setTimeout(() => {
-                // Окончательная очистка
                 cardRef.style.transition = originalStyles.transition;
                 cardRef.style.zIndex = originalStyles.zIndex;
+                cardRef.style.willChange = originalStyles.willChange;
                 setIsOnboardingActive(false);
                 setIsAnimating(false);
             }, 300);
         }, 800);
     }, [store.catalogStore.cards, isAnimating]);
 
-    console.log(store?.popular?.collections)
-
-
-
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const cardsRef = useRef(store?.catalogStore?.cards || []);
 
     useEffect(() => {
-        // Сбрасываем флаг загрузки при изменении карточек
         if (store?.catalogStore?.cards !== cardsRef.current) {
             setImagesLoaded(false);
             cardsRef.current = store?.catalogStore?.cards;
@@ -315,7 +305,6 @@ const TinderCards = observer(() => {
         if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
             const imageElements = document.querySelectorAll('.tinder-card-image');
 
-            // Если нет изображений - сразу считаем загруженными
             if (imageElements.length === 0) {
                 setImagesLoaded(true);
                 return;
@@ -347,10 +336,9 @@ const TinderCards = observer(() => {
             };
         }
     }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
-    console.log(isSearchActive)
+
     return (
         <>
-
             <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
                 <SearchHeaderMain
                     onSearch={(searchRequest) => {
@@ -408,7 +396,6 @@ const TinderCards = observer(() => {
                             onSaveClick={handleOpenSaveModal}
                             topCardPosition={index === 0 ? null : topCardPosition}
                             style={isSearchActive ? { opacity: 0, pointerEvents: 'none' } : {}}
-
                         />
                     ))}
 
@@ -443,7 +430,6 @@ const TinderCards = observer(() => {
                     highlightSave={saveHighlight}
                     highlightPopular={popularHighlight}
                     onboarding={!store?.authStore?.data?.preferences?.complete_onboarding}
-
                 />
                 <Onboarding
                     showOnboarding={showOnboarding}
@@ -458,7 +444,6 @@ const TinderCards = observer(() => {
                     setsaveHighlight={setsaveHighlight}
                     popularHighlight={popularHighlight}
                     setPopularHighlight={setPopularHighlight}
-
                 />
             </div>
             <SaveToCollectionModal

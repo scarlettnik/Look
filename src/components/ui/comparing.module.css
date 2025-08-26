@@ -15,6 +15,7 @@
     background: var(--ultralight-gray);
     border: none;
     cursor: pointer;
+    color: var(--black);
 }
 .tabs .active {
     border: 1px solid var(--black);

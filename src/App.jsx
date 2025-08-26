@@ -42,6 +42,7 @@ function AppContent() {
         const tgWebApp = window.Telegram.WebApp;
         tgWebApp.expand();
         tgWebApp.enableClosingConfirmation();
+        tgWebApp.disableVerticalSwipe();
     }, [isTWA]);
 
     useEffect(() => {

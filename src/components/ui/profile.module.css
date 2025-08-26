@@ -158,6 +158,7 @@
 .tabs {
     display: flex;
     justify-content: space-between;
+    color: var(--black);
 
 }
 .tabs button {

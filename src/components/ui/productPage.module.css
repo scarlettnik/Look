@@ -6,19 +6,18 @@
     font-family: 'Arial', sans-serif;
     color: #333;
     position: relative;
-    justify-content: center;
     overflow-x: hidden;
 }
 
 .slider {
     position: relative;
-    width: 92%;
+    width: 96vw;
     height: 42vh;
+    margin: 2vw;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin: 4%;
     border-radius: 10px;
 }
 
@@ -69,7 +68,8 @@
 }
 
 .infoCard {
-    padding: 16px;
+    margin: 2vw;
+    width: 94vw;
 }
 
 .header {
@@ -132,8 +132,8 @@
     white-space: nowrap;
     font-size: 12px;
     border-bottom: 1px solid var(--light-gray);
-
-
+    color: var(--black);
+    background: var(--ultralight-gray);
 }
 .sizeOption.active {
     border-color: 1px solid var(--black);

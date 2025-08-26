@@ -30,7 +30,8 @@
     background-color: transparent;
     font-size: 14px;
     margin-right: 10px;
-
+    color: var(--black);
+    font-weight: normal;
 }
 
 .banner::after {

@@ -42,11 +42,7 @@ function AppContent() {
         const tgWebApp = window.Telegram.WebApp;
 
         tgWebApp.ready();
-
-        if (tgWebApp.disableVerticalSwipe) {
-            tgWebApp.disableVerticalSwipe();
-        }
-
+        tgWebApp.disableVerticalSwipes();
         tgWebApp.expand();
         tgWebApp.enableClosingConfirmation();
     }, [isTWA]);

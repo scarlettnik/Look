@@ -180,7 +180,7 @@ const Save = observer(() => {
                     />
                   </div>
                   <h3 className={styles.cardTitle}>
-                    {save.name.toUpperCase() === "__FAVOURITES__" ? 'Все избранное' : save.name}
+                    {save.name.toUpperCase() === "__FAVOURITES__" ? 'Лайки' : save.name}
                   </h3>
                 </Link>
               </div>

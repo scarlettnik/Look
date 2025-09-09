@@ -4,6 +4,7 @@ import CustomCheckbox from "../../CustomCheckbox.jsx";
 import FullScreenButton from "../../FullScrinButton.jsx";
 import CustomSkeleton from "../CustomSkeleton.jsx";
 import {CLOTH_STYLES} from "../../../constants.js";
+import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -68,18 +69,20 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
             </div>
 
             <div className={styles.onboardingActions}>
-                <FullScreenButton
-                    color='var(--beige)'
-                    textColor='var(--black)'
-                    className={`${styles.onboardingButton} ${styles.primary}`}
-                    onClick={onNext}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Загрузка...' : 'Вперед'}
-                </FullScreenButton>
-                <button className={styles.secondaryButton} onClick={onSkip}>
-                    Пропустить
-                </button>
+                <ButtonWrapper>
+                    <FullScreenButton
+                        color='var(--beige)'
+                        textColor='var(--black)'
+                        className={`${styles.onboardingButton} ${styles.primary}`}
+                        onClick={onNext}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Загрузка...' : 'Вперед'}
+                    </FullScreenButton>
+                    <button className={styles.secondaryButton} onClick={onSkip}>
+                        Пропустить
+                    </button>
+                </ButtonWrapper>
             </div>
         </div>
     );

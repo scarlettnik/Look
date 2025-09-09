@@ -58,6 +58,7 @@
     font-weight: 400;
     color: var(--beige);
 }
+
 .ageContainer {
     display: flex;
     flex-direction: column;
@@ -72,6 +73,7 @@
 
 .ageSlider {
     -webkit-appearance: none;
+    appearance: none;
     width: 96%;
     height: 1px;
     border-radius: 0.1875rem;
@@ -89,14 +91,15 @@
     padding-top: 3rem;
     z-index: -1;
 }
-
 .ageSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 7px;
-    height: 7px;
+    appearance: none;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: white;
     cursor: pointer;
-    padding: 5px;
-    outline: 1px solid var(--white);
+    box-shadow: 0 0 0 0.5px white;
+    background-clip: content-box;
+    padding: 4px;
 }

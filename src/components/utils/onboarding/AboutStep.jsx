@@ -9,15 +9,14 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
 
     useEffect(() => {
         if (sliderRef.current) {
-            const sliderWidth = sliderRef.current.offsetWidth;
+            const sliderWidth = sliderRef.current.offsetWidth * 0.96;
             const min = 16;
             const max = 80;
-            const thumbWidth = 20;
+            const thumbSize = 20;
 
             const ratio = (age - min) / (max - min);
-            let position = ratio * (sliderWidth - thumbWidth);
 
-            position = Math.max(thumbWidth/2, Math.min(position, sliderWidth - thumbWidth/2));
+            const position = ratio * (sliderWidth - thumbSize) + (thumbSize / 2);
 
             setValuePosition(position);
         }
@@ -66,7 +65,8 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
                 <div
                     className={styles.ageValue}
                     style={{
-                        left: `${age === 16 ? valuePosition : valuePosition + 10}px`,
+                        marginLeft: '2%',
+                        left: `${valuePosition}px`,
                         transform: 'translateX(-50%)'
                     }}
                 >

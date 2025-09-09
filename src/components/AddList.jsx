@@ -52,7 +52,7 @@ function AddList({
                 <label className={styles.label}>Название</label>
                 <input
                     type="text"
-                    value={closetName === '__FAVOURITES__' ? 'Все избранное' : closetName}
+                    value={closetName === '__FAVOURITES__' ? 'Лайки' : closetName}
                     onChange={(e) => setClosetName(e.target.value)}
                     className={styles.input}
                     placeholder="Введите название подборки"

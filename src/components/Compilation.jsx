@@ -230,7 +230,7 @@ export const Banner = observer(({ save, isSave = false, loading, id, onEnterEdit
                         e.target.src = '/placeholder-banner.jpg';
                     }}
                 />
-                <div className={styles.bannerText}>{save?.name === '__FAVOURITES__' ? 'Все избранное' : save?.name}</div>
+                <div className={styles.bannerText}>{save?.name === '__FAVOURITES__' ? 'Лайки' : save?.name}</div>
 
                 <button onClick={() => setIsShareOpen(true)}>
                     <img className={styles.shareIcon} src='/subicons/share.svg' alt="Поделиться"/>

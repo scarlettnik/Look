@@ -14,9 +14,9 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         resist: {
             maxTranslate: 150,
             maxRotate: 15,
-            swipeDuration: 800,
+            swipeDuration: 2000,
             holdDuration: 400,
-            returnDuration: 800,
+            returnDuration: 1200,
             restDuration: 1000,
             get totalDuration() {
                 return this.swipeDuration + this.holdDuration + this.returnDuration + this.restDuration;
@@ -24,7 +24,7 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
         },
         regular: {
             swipeDistance: 500,
-            duration: 1000,
+            duration: 2000,
             maxRotate: 30
         }
     };
@@ -186,8 +186,6 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                             src={card.image}
                             alt={`Card ${index + 1}`}
                             className={welcomstyle.cardImage}
-                            width="300"
-                            height="400"
                             loading="eager"
                         />
                     </div>
@@ -203,6 +201,11 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
                     Начать <img style={{ paddingLeft: '10px' }} src='/rightarrow.svg' alt="Arrow" />
                 </div>
             </button>
+            <div className={welcomstyle.attempContainer}>
+                <p className={welcomstyle.attemp}>
+                    Фото стилей и подписи к ним на текущем экране являются вымышленными и носят иллюстративный характер
+                </p>
+            </div>
         </div>
     );
 };

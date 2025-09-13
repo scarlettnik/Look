@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
@@ -21,13 +21,12 @@ const TinderCard = ({
     const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+    const [imageLoaded, setImageLoaded] = useState(false); // Новое состояние
 
     const cardRef = useRef(null);
     const animationFrame = useRef(null);
     const startTime = useRef(0);
     const navigate = useNavigate();
-
-    const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         if (cardRef.current) {
@@ -36,7 +35,6 @@ const TinderCard = ({
         return () => setCardRef(card.id, null);
     }, [card.id, setCardRef]);
 
-    // Этот useEffect теперь только для начального рендера и zIndex
     useEffect(() => {
         if (cardRef.current) {
             cardRef.current.style.zIndex = zIndex;
@@ -69,10 +67,8 @@ const TinderCard = ({
                 swipeConfig.horizontal.rotationAngle
             );
 
-            // Обновляем состояние для логики
             setPosition({ x: deltaX, y: deltaY, rotate });
 
-            // **ОСНОВНОЕ ИЗМЕНЕНИЕ: Применяем transform здесь для мгновенной анимации**
             if (cardRef.current) {
                 let scale = 1 - Math.max(0, offset) * 0.03;
                 let translateY = 0;
@@ -145,7 +141,6 @@ const TinderCard = ({
         return null;
     };
 
-
     const animateSwipe = (direction) => {
         if (!cardRef.current) return;
         cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
@@ -190,9 +185,7 @@ const TinderCard = ({
         <div
             ref={cardRef}
             id={card.id}
-            className={`${styles.card} 
-            ${isDragging ? styles.moving : ''} 
-            ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
+            className={`${styles.card} ${isDragging ? styles.moving : ''} ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
             onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleEnd}
@@ -214,9 +207,14 @@ const TinderCard = ({
                         }}
                     />
                 )}
-                <img onLoad={() => setImageLoaded(true)}
-                     onError={() => setImageLoaded(true)}
-                     className={styles.cardImage} src={card.image_urls[0]} alt={card.name} />
+                <img
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                    className={styles.cardImage}
+                    src={card.image_urls[0]}
+                    alt={card.name}
+                    style={{ visibility: imageLoaded ? 'visible' : 'hidden' }}
+                />
             </div>
 
             {isTopCard && (

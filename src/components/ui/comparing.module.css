@@ -65,7 +65,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding-bottom: 60px;
+    /*правка 2*/
+    padding-bottom: 80px;
 }
 
 .collectionCard {

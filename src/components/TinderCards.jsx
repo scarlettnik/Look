@@ -339,7 +339,7 @@ const TinderCards = observer(() => {
 
     return (
         <>
-            <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
+            <div className={styles.container} style={{height: `${containerHeight}px`, overflow: 'hidden'}} ref={containerRef}>
                 <SearchHeaderMain
                     onSearch={(searchRequest) => {
                         store.catalogStore.fetchCardsWithSearch(searchRequest);
@@ -362,13 +362,13 @@ const TinderCards = observer(() => {
                     catalogStore={store.catalogStore}
                 />
 
-                <div className={styles.cardsContainer}>
+                <div className={styles.cardsContainer} >
                     {(store.catalogStore.loading || isSearchActive) && Array(SKELETON_COUNT).fill(0).map((_, i) => (
                         <CustomSkeleton
                             key={`skeleton-${i}`}
                             style={{
                                 width: '92vw',
-                                height: 'calc(100% - 60px - 2vh)',
+                                height: 'calc(100% - 80px - 2vh)',
                                 position: 'absolute',
                                 zIndex: SKELETON_COUNT - i,
                                 borderRadius: '8px'

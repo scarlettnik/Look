@@ -6,7 +6,7 @@ const TabButton = ({active, onClick, label }) => (
         className={active ? styles.active : ""}
         onClick={onClick}
     >
-        {label}
+        <p style={{color: 'var(--black)'}}>{label}</p>
     </button>
 );
 

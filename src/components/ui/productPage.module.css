@@ -164,13 +164,12 @@
 }
 
 .readMoreButton {
-    margin-top: 8px;
     background: none;
     border: none;
     color: var(--light-warm-gray);
     cursor: pointer;
     font-weight: 500;
-    float: right;
+    float: left;
 }
 
 .colorsContainer {

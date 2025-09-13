@@ -1,7 +1,7 @@
 .card {
     display: inline-block;
     width: 92vw;
-    height: calc(100% - 60px - 2vh);
+    height: calc(100% - 80px - 2vh);
     border-radius: 8px;
     overflow: hidden;
     position: absolute;
@@ -17,6 +17,8 @@
     backface-visibility: hidden;
     -webkit-perspective: 1000px;
     perspective: 1000px;
+    touch-action: manipulation;
+    overscroll-behavior: none;
 }
 
 .cardImage {
@@ -92,7 +94,7 @@
 }
 
 .manufacturer {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     color: var(--light-warm-gray);
 }

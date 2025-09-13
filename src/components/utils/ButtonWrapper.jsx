@@ -3,7 +3,7 @@ import React from 'react';
 
 const ButtonWrapper= ({
                                                          children,
-                                                         bottom = '60px',
+                                                         bottom = '80px',
                                                          style = {}
                                                      }) => {
     const wrapperStyle = {

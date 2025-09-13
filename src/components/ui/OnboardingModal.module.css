@@ -39,12 +39,11 @@
     align-items: center;
     width: 100%;
     position: relative;
-    padding: 2vw;
     padding-bottom: 5vh;
 }
 
 .backButton {
-    position: absolute;
+    position: fixed;
     left: 2vw;
     background: none;
     border: none;
@@ -54,6 +53,7 @@
 }
 
 .stepTitle {
+    position: sticky;
     font-size: 16px;
     font-weight: 400;
     color: var(--white);
@@ -133,7 +133,6 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    height: 43vh;
 }
 .tabContent {
     display: flex;

@@ -181,7 +181,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    padding: 6vw 4vw;
+    padding: 1vh;
 }
 .selectedSize {
     border: 1px solid var(--black);

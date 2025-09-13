@@ -8,15 +8,20 @@ import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [loadedImages, setLoadedImages] = useState({});
 
     useEffect(() => {
-        let loaded = 0;
-        CLOTH_STYLES.forEach(({ url }) => {
+        let loadedCount = 0;
+        const totalImages = CLOTH_STYLES.length;
+
+        CLOTH_STYLES.forEach(style => {
             const img = new Image();
-            img.src = url;
+            img.src = style.url;
             img.onload = img.onerror = () => {
-                loaded += 1;
-                if (loaded === CLOTH_STYLES.length) {
+                loadedCount++;
+                setLoadedImages(prev => ({ ...prev, [style.id]: true }));
+
+                if (loadedCount === totalImages) {
                     setIsLoading(false);
                 }
             };
@@ -26,6 +31,52 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const handleStyleToggle = (styleName) => {
         onUpdate('styles', styleName);
     };
+
+    // Обработчик клика по карточке
+    const handleCardClick = (styleName) => {
+        handleStyleToggle(styleName);
+    };
+
+    if (isLoading) {
+        return (
+            <div className={styles.onboardingStep}>
+                <div className={styles.stepHeader}>
+                    <button className={styles.backButton} onClick={onBack}>
+                        <img src='/subicons/whitearrowleft.svg' alt="Назад" />
+                    </button>
+                    <p className={styles.stepTitle}>Выберите стили</p>
+                </div>
+
+                <div className={styles.scrollContainer}>
+                    <div className={styles.styleGrid}>
+                        {Array.from({ length: CLOTH_STYLES.length }).map((_, index) => (
+                            <CustomSkeleton
+                                key={index}
+                                className={styles.styleCard}
+                                style={{ height: '200px' }}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div className={styles.onboardingActions}>
+                    <ButtonWrapper>
+                        <FullScreenButton
+                            color='var(--beige)'
+                            textColor='var(--black)'
+                            className={`${styles.onboardingButton} ${styles.primary}`}
+                            disabled={true}
+                        >
+                            Загрузка...
+                        </FullScreenButton>
+                        <button className={styles.secondaryButton} disabled>
+                            Пропустить
+                        </button>
+                    </ButtonWrapper>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.onboardingStep}>
@@ -38,33 +89,27 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
 
             <div className={styles.scrollContainer}>
                 <div className={styles.styleGrid}>
-                    {isLoading ? (
-                        Array.from({ length: CLOTH_STYLES.length }).map((_, index) => (
-
-                            <CustomSkeleton
-                                key={index}
-                                className={styles.styleCard}
-                                style={{ height: '200px' }}
+                    {CLOTH_STYLES.map(style => (
+                        <div
+                            key={style.id}
+                            className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
+                            onClick={() => handleCardClick(style.name)} // Добавляем обработчик клика
+                        >
+                            <img
+                                src={style.url}
+                                alt={style.name}
+                                className={styles.styleImage}
                             />
-                        ))
-                    ) : (
-                        CLOTH_STYLES.map(style => (
-                            <div
-                                key={style.id}
-                                className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
-                            >
-                                <img src={style.url} alt={style.name} className={styles.styleImage} />
-                                <div className={styles.styleContent}>
-                                    <CustomCheckbox
-                                        className={styles.styleCheckbox}
-                                        checked={selectedStyles.includes(style.name)}
-                                        onChange={() => handleStyleToggle(style.name)}
-                                    />
-                                    <span className={styles.styleName}>{style.name}</span>
-                                </div>
+                            <div className={styles.styleContent}>
+                                <CustomCheckbox
+                                    className={styles.styleCheckbox}
+                                    checked={selectedStyles.includes(style.name)}
+                                    onChange={() => handleStyleToggle(style.name)}
+                                />
+                                <span className={styles.styleName}>{style.name}</span>
                             </div>
-                        ))
-                    )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -75,9 +120,8 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                         textColor='var(--black)'
                         className={`${styles.onboardingButton} ${styles.primary}`}
                         onClick={onNext}
-                        disabled={isLoading}
                     >
-                        {isLoading ? 'Загрузка...' : 'Вперед'}
+                        Вперед
                     </FullScreenButton>
                     <button className={styles.secondaryButton} onClick={onSkip}>
                         Пропустить

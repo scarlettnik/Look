@@ -36,7 +36,7 @@ const Modal = ({ isOpen, onClose, children, height }) => {
     return (
         <div
             className={`${styles.backdrop} ${isClosing ? styles.backdropClosing : ''}`}
-
+            style={{pointerEvents: 'auto'}}
             onClick={onClose}
         >
             <div

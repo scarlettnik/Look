@@ -8,7 +8,7 @@ const ParamsTab = ({ params, updateParam }) => {
     };
 
     return (
-        <div style={{height: '30vh'}} className={styles.paramsForm}>
+        <div style={{height: '27vh'}} className={styles.paramsForm}>
             <div className={styles.paramsInputGroup}>
                 <ParamControl
                     label="Объем груди"

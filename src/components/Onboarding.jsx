@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import styles from './ui/TinderCards.module.css';
 import { observer } from 'mobx-react-lite';
 
@@ -10,11 +10,8 @@ export const Onboarding = observer(({
                                         simulateSwipe,
                                         isAnimating,
                                         handleSaveChanges,
-                                        undoButtonHighlight,
                                         setUndoButtonHighlight,
-                                        saveHighlight,
                                         setsaveHighlight,
-                                        popularHighlight,
                                         setPopularHighlight
                                     }) => {
     const handleNextOnboardingStep = useCallback(() => {
@@ -61,7 +58,7 @@ export const Onboarding = observer(({
         switch(onboardingStep) {
             case 1:
                 return (
-                    <>
+                    <div className={styles.onboardingContent}>
                         <p className={styles.onboardingText}>
                             Привет! За пару кликов расскажем, как тут все устроено :)
                             Открыть карточку с деталями можно кликнув на нее.
@@ -72,11 +69,11 @@ export const Onboarding = observer(({
                                 Далее
                             </button>
                         </div>
-                    </>
+                    </div>
                 );
             case 2:
                 return (
-                    <>
+                    <div className={styles.onboardingContent}>
                         <p className={styles.onboardingText}>
                             При свайпе влево карточка пропадает из ленты и подобные стили показываются реже
                         </p>
@@ -86,27 +83,44 @@ export const Onboarding = observer(({
                                 Далее
                             </button>
                         </div>
-                    </>
+                    </div>
                 );
             case 3:
                 return (
                     <>
-                        <p className={styles.onboardingText}>
-                            При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще
-                        </p>
-                        <div className={styles.onboardingBlock}>
+                        <img style={{position: 'fixed', left: '2vw', bottom: '220px', width: '30%', rotate: '-8deg'}} src='/arrow.svg'></img>
+                        <img
+                            style={{
+                                position: 'fixed',
+                                right: '2vw',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                width: '80px',
+                                height: '80px',
+                                zIndex: 1000
+                            }}
+                            src='/subicons/darklike.svg'
+                            alt="Лайк"
+                        />
+                        <div className={styles.onboardingContent}>
+                            <p className={styles.onboardingText}>
+                                При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще
+                            </p>
+                            <div className={styles.onboardingBlock}>
                             <p>3/6</p>
-                            <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
-                                Далее
-                            </button>
+                                <button className={styles.onboardingButton} onClick={handleNextOnboardingStep}>
+                                    Далее
+                                </button>
+                            </div>
                         </div>
                     </>
                 );
             case 4:
                 return (
-                    <>
+                    <div className={styles.onboardingContent}>
                         <p className={styles.onboardingText}>
-                            При свайпе вверх появляется новая карточка. Предыдущую можно найти, кликнув на иконку «Назад»
+                            При свайпе вверх появляется новая карточка. Предыдущую можно найти, кликнув на иконку
+                            «Назад»
                         </p>
                         <div className={styles.onboardingBlock}>
                             <p>4/6</p>
@@ -114,11 +128,12 @@ export const Onboarding = observer(({
                                 Далее
                             </button>
                         </div>
-                    </>
+                    </div>
                 );
             case 5:
                 return (
-                    <>
+                    <div className={styles.onboardingContent}>
+
                         <p className={styles.onboardingText}>
                             Здесь можно найти все сохраненные карточки и создать свои подборки
                         </p>
@@ -128,13 +143,15 @@ export const Onboarding = observer(({
                                 Далее
                             </button>
                         </div>
-                    </>
+                    </div>
                 );
             case 6:
                 return (
-                    <>
+                    <div className={styles.onboardingContent}>
+
                         <p className={styles.onboardingText}>
-                            А тут найти подборки по стилям и направлениям. При нажатии на фото из подборки откроется карточка товара.
+                            А тут найти подборки по стилям и направлениям. При нажатии на фото из подборки откроется
+                            карточка товара.
                         </p>
                         <div className={styles.onboardingBlock}>
                             <p>6/6</p>
@@ -142,7 +159,7 @@ export const Onboarding = observer(({
                                 Go on
                             </button>
                         </div>
-                    </>
+                    </div>
                 );
             default:
                 return null;
@@ -153,9 +170,7 @@ export const Onboarding = observer(({
 
     return (
         <div className={styles.onboardingOverlay}>
-            <div className={styles.onboardingContent}>
                 {renderOnboardingStep()}
-            </div>
         </div>
     );
 });

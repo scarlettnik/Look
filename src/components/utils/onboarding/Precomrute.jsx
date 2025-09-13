@@ -5,7 +5,16 @@ import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const Precompute = ({onNext}) => {
     const [count, setCount] = useState(1);
-    const images = Array.from({ length: 8 }, () => '/stylereference.png');
+    const images = [
+        '/styles/y2k.png',
+        '/styles/streetwear.png',
+        '/styles/minimalist.png',
+        '/styles/romantic.png',
+        '/styles/bohemian.png',
+        '/styles/preppy.png',
+        '/styles/gothic.png',
+        '/styles/punk.png'
+    ]
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -21,7 +30,8 @@ const Precompute = ({onNext}) => {
             <p style={{
                 color: 'var(--white)',
                 fontSize:'24px',
-                marginTop: '20px'
+                marginTop: '20px',
+                lineHeight: '1.2'
             }}>
                 Собираем гардероб, <br/>секундочку...
             </p>

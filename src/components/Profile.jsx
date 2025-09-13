@@ -46,7 +46,7 @@ const MenuItem = ({ item, index, activeIndex, onClick }) => {
 };
 
 const SupportButtons = ({ onSupportClick }) => (
-    <ButtonWrapper bottom='60px'>
+    <ButtonWrapper bottom='80px'>
         <FullScreenButton
             color="var(--light-gray)"
             textColor="var(--black)"

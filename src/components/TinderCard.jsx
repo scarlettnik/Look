@@ -10,202 +10,162 @@ const TinderCard = ({
                         zIndex,
                         offset,
                         isTopCard,
-                        topCardPosition,
                         swipeProgress,
-                        isExpanded,
+                        swipeConfig,
                         setCardRef,
                         isOnboardingActive,
-                        swipeConfig,
-                        onSaveClick
+                        onSaveClick,
                     }) => {
-    const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
-    const [isDragging, setIsDragging] = useState(false);
-    const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-    const [imageLoaded, setImageLoaded] = useState(false); // Новое состояние
-
     const cardRef = useRef(null);
-    const animationFrame = useRef(null);
-    const startTime = useRef(0);
     const navigate = useNavigate();
 
+    // НОВОЕ: Состояние для управления видимостью карточки
+    const [isReady, setIsReady] = useState(false);
+
+    const isDragging = useRef(false);
+    const startPos = useRef({ x: 0, y: 0 });
+    const position = useRef({ x: 0, y: 0 });
+    const animationFrame = useRef(null);
+
+    const [imageLoaded, setImageLoaded] = useState(false);
+
     useEffect(() => {
-        if (cardRef.current) {
-            setCardRef(card.id, cardRef.current);
-        }
+        if (cardRef.current) setCardRef(card.id, cardRef.current);
         return () => setCardRef(card.id, null);
     }, [card.id, setCardRef]);
 
     useEffect(() => {
-        if (cardRef.current) {
-            cardRef.current.style.zIndex = zIndex;
+        if (!cardRef.current) return;
+
+        // Отключаем JS-анимацию на время "расстановки" карточек
+        cardRef.current.style.transition = 'none';
+
+        if (isTopCard) {
+            // Устанавливаем верхнюю карту в центр
+            cardRef.current.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
+        } else {
+            // Остальные карты смещаем для эффекта стопки
+            cardRef.current.style.transform = `translateY(${offset * 5}px) scale(${1 - offset * 0.03})`;
         }
-    }, [zIndex]);
 
-    const handleStart = (clientX, clientY) => {
-        if (isExpanded) return false;
+        // НОВОЕ: После того как все стили применились, делаем карточку видимой
+        // requestAnimationFrame гарантирует, что это произойдет после того, как браузер обработает стили выше
+        requestAnimationFrame(() => {
+            setIsReady(true);
+        });
 
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
+    }, [zIndex, offset, isTopCard]);
 
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-        return true;
-    };
-
-    const handleMove = (clientX, clientY) => {
-        if (!isDragging) return;
+    const handleMove = useCallback((clientX, clientY) => {
+        if (!isDragging.current || !isTopCard) return;
 
         cancelAnimationFrame(animationFrame.current);
         animationFrame.current = requestAnimationFrame(() => {
-            const deltaX = clientX - startPos.x;
-            const deltaY = clientY - startPos.y;
-
-            const rotate = Math.min(
-                Math.max(deltaX * 0.1, -swipeConfig.horizontal.rotationAngle),
-                swipeConfig.horizontal.rotationAngle
-            );
-
-            setPosition({ x: deltaX, y: deltaY, rotate });
+            const deltaX = clientX - startPos.current.x;
+            const deltaY = clientY - startPos.current.y;
+            position.current = { x: deltaX, y: deltaY };
+            const rotate = deltaX * 0.1;
 
             if (cardRef.current) {
-                let scale = 1 - Math.max(0, offset) * 0.03;
-                let translateY = 0;
-                let translateX = 0;
-
-                if (offset > 0 && topCardPosition) {
-                    const progress = Math.min(
-                        1,
-                        Math.max(
-                            Math.abs(topCardPosition.x) / (window.innerWidth * 0.5),
-                            Math.abs(topCardPosition.y) / (window.innerHeight * 0.5)
-                        )
-                    );
-                    const influenceFactor = 1 - (offset - 1) * 0.3;
-                    if (influenceFactor > 0) {
-                        scale += 0.03 * progress * influenceFactor;
-                        translateY += -5 * progress * influenceFactor;
-                        if (topCardPosition.x !== 0) {
-                            const direction = topCardPosition.x > 0 ? 1 : -1;
-                            translateX = direction * 5 * progress * influenceFactor;
-                        }
-                    }
-                }
-
-                cardRef.current.style.transform = `translate3d(${deltaX + translateX}px, ${deltaY + translateY}px, 0) rotate(${rotate}deg) scale(${scale})`;
+                cardRef.current.style.willChange = 'transform';
+                cardRef.current.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) rotate(${rotate}deg)`;
             }
-
-            if (isTopCard) {
-                updateSwipeFeedback(deltaX, deltaY);
-            }
+            updateSwipeFeedback(deltaX, deltaY);
         });
-    };
+    }, [isTopCard, updateSwipeFeedback]);
 
-    const handleEnd = () => {
-        if (!isDragging) return;
+    const handleEnd = useCallback(() => {
+        if (!isDragging.current || !isTopCard) return;
+        isDragging.current = false;
+        if (cardRef.current) cardRef.current.style.willChange = 'auto';
 
-        setIsDragging(false);
-        cancelAnimationFrame(animationFrame.current);
-
+        const { x, y } = position.current;
         const { innerWidth, innerHeight } = window;
-        const deltaTime = Date.now() - startTime.current;
+        let direction = null;
 
-        const velocity = {
-            x: (position.x / (deltaTime || 1)) * swipeConfig.physics.power * swipeConfig.horizontal.speedMultiplier,
-            y: (position.y / (deltaTime || 1)) * swipeConfig.physics.power *
-                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0)
-        };
-
-        const direction = getSwipeDirection(velocity, innerWidth, innerHeight);
+        if (Math.abs(x) > innerWidth * swipeConfig.horizontal.threshold) {
+            direction = x > 0 ? 'right' : 'left';
+        } else if (y < -innerHeight * swipeConfig.verticalUp.threshold) {
+            direction = 'up';
+        }
 
         if (direction) {
-            animateSwipe(direction);
+            animateAndFinalizeSwipe(direction);
         } else {
             resetPosition();
         }
-    };
+    }, [isTopCard, swipeConfig, onSwipe, card]);
 
-    const getSwipeDirection = (velocity, screenWidth, screenHeight) => {
-        const isHorizontalFast = Math.abs(velocity.x) > swipeConfig.physics.velocityThreshold;
-
-        if (Math.abs(position.x) > screenWidth * swipeConfig.horizontal.threshold || isHorizontalFast) {
-            return velocity.x > 0 ? 'right' : 'left';
+    const handleStart = useCallback((clientX, clientY) => {
+        if (!isTopCard) return;
+        isDragging.current = true;
+        startPos.current = { x: clientX, y: clientY };
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
         }
+    }, [isTopCard]);
 
-        if (position.y < -screenHeight * swipeConfig.verticalUp.threshold ||
-            (velocity.y < -swipeConfig.physics.velocityThreshold)) {
-            return 'up';
-        }
-
-        return null;
-    };
-
-    const animateSwipe = (direction) => {
+    const animateAndFinalizeSwipe = (direction) => {
         if (!cardRef.current) return;
-        cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+        const { innerWidth, innerHeight } = window;
+        let endX = 0, endY = 0, rotation = 0;
+        const duration = 300;
 
-        if (direction === 'left') {
-            cardRef.current.style.transform = 'translate3d(-100vw, 0, 0) rotate(-30deg)';
-        } else if (direction === 'right') {
-            cardRef.current.style.transform = 'translate3d(100vw, 0, 0) rotate(30deg)';
-        } else if (direction === 'up') {
-            cardRef.current.style.transform = 'translate3d(0, -100vh, 0)';
+        switch (direction) {
+            case 'left': endX = -innerWidth; rotation = -20; break;
+            case 'right': endX = innerWidth; rotation = 20; break;
+            case 'up': endY = -innerHeight; break;
+            default: break;
         }
 
-        setTimeout(() => {
-            onSwipe(direction, card);
-        }, 50);
+        cardRef.current.style.transition = `transform ${duration}ms ease-out`;
+        cardRef.current.style.transform = `translate3d(${endX}px, ${endY}px, 0) rotate(${rotation}deg)`;
+
+        setTimeout(() => onSwipe(direction, card), duration);
     };
 
     const resetPosition = () => {
         if (!cardRef.current) return;
-
-        cardRef.current.style.transition = `transform ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+        cardRef.current.style.transition = `transform 300ms cubic-bezier(0.23, 1, 0.32, 1)`;
         cardRef.current.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
-
-        const onTransitionEnd = () => {
-            cardRef.current?.removeEventListener('transitionend', onTransitionEnd);
-            setPosition({ x: 0, y: 0, rotate: 0 });
-            if (isTopCard) updateSwipeFeedback(0, 0);
-        };
-
-        cardRef.current.addEventListener('transitionend', onTransitionEnd);
+        updateSwipeFeedback(0, 0);
     };
 
     useEffect(() => {
-        if (cardRef.current) {
-            Object.entries(card.style || {}).forEach(([key, value]) => {
-                cardRef.current.style[key] = value;
-            });
-        }
-    }, [card.style]);
+        const currentCard = cardRef.current;
+        if (!currentCard) return;
+        const onMouseMove = (e) => handleMove(e.clientX, e.clientY);
+        const onMouseUp = () => handleEnd();
+        const onMouseDown = (e) => handleStart(e.clientX, e.clientY);
+        currentCard.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            currentCard.removeEventListener('mousedown', onMouseDown);
+        };
+    }, [handleStart, handleMove, handleEnd]);
 
     return (
         <div
             ref={cardRef}
             id={card.id}
-            className={`${styles.card} ${isDragging ? styles.moving : ''} ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
+            className={`${styles.card} ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
+            // НОВОЕ: Управляем видимостью и zIndex через инлайн-стили
+            style={{
+                zIndex,
+                opacity: isReady ? 1 : 0, // Карточка невидима, пока не готова
+                transition: 'opacity 0.2s ease-in', // Плавное появление
+            }}
             onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
             onTouchEnd={handleEnd}
-            onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
-            onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
-            onMouseUp={handleEnd}
-            onMouseLeave={handleEnd}
-            style={{ zIndex }}
         >
             <div onClick={() => navigate(`/product/${card.id}`)}>
                 {!imageLoaded && (
-                    <CustomSkeleton
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            zIndex: 2,
-                            borderRadius: '8px'
-                        }}
-                    />
+                    <CustomSkeleton style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 2, borderRadius: '8px' }} />
                 )}
                 <img
                     onLoad={() => setImageLoaded(true)}
@@ -213,34 +173,20 @@ const TinderCard = ({
                     className={styles.cardImage}
                     src={card.image_urls[0]}
                     alt={card.name}
-                    style={{ visibility: imageLoaded ? 'visible' : 'hidden' }}
                 />
             </div>
 
-            {isTopCard && (
+            {isTopCard && swipeProgress && (
                 <>
-                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}/>
-                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}/>
-                    <div
-                        className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}
-                        style={{
-                            opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0,
-                            transform: `scale(${swipeProgress.direction === 'left' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
-                        }}
-                    >
-                        <img src="/subicons/darklike.svg" alt="Save" style={{width: '80px'}}/>
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`} style={{ opacity: swipeProgress.direction === 'right' ? swipeProgress.opacity : 0 }}>
+                        <img src="/subicons/darklike.svg" alt="Like" style={{ width: '80px' }} />
                     </div>
-                    <div
-                        className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
-                        style={{
-                            opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0,
-                            transform: `scale(${swipeProgress.direction === 'right' ? 0.8 + swipeProgress.opacity * 0.4 : 1})`
-                        }}
-                    >
-                        <img src="/subicons/darkdislike.svg" alt="Close" style={{width: '80px'}}/>
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`} style={{ opacity: swipeProgress.direction === 'left' ? swipeProgress.opacity : 0 }}>
+                        <img src="/subicons/darkdislike.svg" alt="Dislike" style={{ width: '80px' }} />
                     </div>
                 </>
             )}
+
             <div className={styles.cardContent}>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>
@@ -248,17 +194,9 @@ const TinderCard = ({
                         <div className={styles.manufacturer}>{card?.brand}</div>
                         <div className={styles.priceRow}>
                             <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
-                            <button
-                                className={styles.saveButton}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onSaveClick(card);
-                                }}
-                            >
+                            <button className={styles.saveButton} onClick={(e) => { e.stopPropagation(); onSaveClick(card); }}>
                                 <img
-                                    src={card.is_contained_in_user_collections
-                                        ? "/subicons/fullwhitebookmark.svg"
-                                        : "/subicons/whitebookmark.svg"}
+                                    src={card.is_contained_in_user_collections ? "/subicons/fullwhitebookmark.svg" : "/subicons/whitebookmark.svg"}
                                     alt={card.is_contained_in_user_collections ? "Сохранено" : "Сохранить"}
                                 />
                             </button>

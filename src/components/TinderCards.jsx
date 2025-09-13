@@ -8,28 +8,31 @@ import { useStore } from "../provider/StoreContext.jsx";
 import {
     AUTH_TOKEN,
     INITIAL_CARDS_COUNT, SKELETON_COUNT,
-    SWIPE_CONFIG,
-    VERTICAL_SWIPE_THRESHOLD_RATIO
+    SWIPE_CONFIG
 } from "../constants.js";
-import {runInAction} from "mobx";
-import {Onboarding} from "./Onboarding.jsx";
+import { runInAction } from "mobx";
+import { Onboarding } from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import SearchHeaderMain from "./SearchHeaderMain.jsx";
 
 const TinderCards = observer(() => {
+    const store = useStore();
+    const navigate = useNavigate();
+
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
     const [expandedCardId, setExpandedCardId] = useState(null);
     const [onboardingStep, setOnboardingStep] = useState(0);
-    const store = useStore();
     const [containerHeight, setContainerHeight] = useState(window.innerHeight);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isSearchActive, setIsSearchActive] = useState(false);
+
     const containerRef = useRef(null);
-    const navigate = useNavigate()
+    const cardRefs = useRef({});
+
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
-    const [topCardPosition, setTopCardPosition] = useState({ x: 0, y: 0 });
-    const [imagesLoaded, setImagesLoaded] = useState(false); // Новое состояние
-    const cardsRef = useRef(store?.catalogStore?.cards || []);
 
     const [filters, setFilters] = useState(() => ({
         size: store?.catalogStore?.getCurrentFilters().sizes || [],
@@ -40,65 +43,6 @@ const TinderCards = observer(() => {
         },
         type: store?.catalogStore?.getCurrentFilters().categories || []
     }));
-    const [isSearchActive, setIsSearchActive] = useState(false);
-
-    useEffect(() => {
-        const handleSearchStateChange = () => {
-            setIsSearchActive(store?.catalogStore?.isSearching || false);
-        };
-        handleSearchStateChange();
-    }, [store?.catalogStore?.isSearching, store?.catalogStore?.currentSearchQuery]);
-
-    const handleSaveSuccess = useCallback((productId, isSaved) => {
-        runInAction(() => {
-            const card = store.catalogStore.cards.find(c => c.id === productId);
-            if (card) {
-                card.is_contained_in_user_collections = isSaved;
-            }
-
-            store.popular.popular.forEach(item => {
-                if (item.products) {
-                    const product = item.products.find(p => p.id === productId);
-                    if (product) {
-                        product.is_contained_in_user_collections = isSaved;
-                    }
-                }
-            });
-        });
-    }, [store]);
-
-    useEffect(() => {
-        if (showOnboarding) {
-            setOnboardingStep(1);
-        }
-    }, [showOnboarding]);
-
-    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-
-    const handleOpenSaveModal = useCallback((product) => {
-        setSelectedProduct(product);
-        setIsSaveModalOpen(true);
-    }, []);
-
-    const handleCloseSaveModal = useCallback(() => {
-        setIsSaveModalOpen(false);
-        setSelectedProduct(null);
-    }, []);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (containerRef.current) {
-                const initialHeight = containerRef.current.getBoundingClientRect().height;
-                setContainerHeight(initialHeight);
-            }
-        };
-
-        handleResize();
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         if (store?.catalogStore?.cards?.length <= INITIAL_CARDS_COUNT &&
@@ -106,7 +50,7 @@ const TinderCards = observer(() => {
             !store.catalogStore.isFetching) {
             store.catalogStore.fetchCards();
         }
-    }, [store?.catalogStore.cards?.length]);
+    }, [store?.catalogStore?.cards?.length, store.catalogStore.hasMore, store.catalogStore.isFetching]);
 
     useEffect(() => {
         if (store?.authStore.data) {
@@ -115,61 +59,32 @@ const TinderCards = observer(() => {
     }, [store?.authStore.data]);
 
     useEffect(() => {
-        if (store?.catalogStore?.cards !== cardsRef.current) {
-            setImagesLoaded(false);
-            cardsRef.current = store?.catalogStore?.cards;
+        if (showOnboarding) {
+            setOnboardingStep(1);
         }
+    }, [showOnboarding]);
 
-        if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
-            const imageElements = document.querySelectorAll('.tinder-card-image');
-
-            if (imageElements.length === 0) {
-                setImagesLoaded(true);
-                return;
+    useEffect(() => {
+        const handleResize = () => {
+            if (containerRef.current) {
+                setContainerHeight(containerRef.current.getBoundingClientRect().height);
             }
-
-            let loadedCount = 0;
-            const handleImageLoad = () => {
-                loadedCount++;
-                if (loadedCount === imageElements.length) {
-                    setImagesLoaded(true);
-                }
-            };
-
-            imageElements.forEach(img => {
-                if (img.complete) {
-                    handleImageLoad();
-                } else {
-                    img.addEventListener('load', handleImageLoad);
-                    img.addEventListener('error', handleImageLoad);
-                }
-            });
-
-            return () => {
-                imageElements.forEach(img => {
-                    img.removeEventListener('load', handleImageLoad);
-                    img.removeEventListener('error', handleImageLoad);
-                });
-            };
-        }
-    }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const sendInteraction = async (productId, action) => {
         try {
-            const response = await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {
+            await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {
                 method: 'PUT',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    interaction_type: action
-                })
+                body: JSON.stringify({ interaction_type: action })
             });
-
-            if (response.ok) {
-                console.log(response)
-            }
         } catch (error) {
             console.error('Error sending interaction:', error);
         }
@@ -179,72 +94,31 @@ const TinderCards = observer(() => {
         if (direction === 'down') return;
 
         const action = direction === 'right' ? 'like' : 'dislike';
-
         sendInteraction(card.id, action);
-
-        const duration = direction === 'up'
-            ? SWIPE_CONFIG.verticalUp.animationDuration
-            : SWIPE_CONFIG.horizontal.animationDuration;
-
-        const cardElement = document.getElementById(card.id);
-        if (cardElement) {
-            const rotation = direction === 'right'
-                ? SWIPE_CONFIG.horizontal.rotationAngle
-                : -SWIPE_CONFIG.horizontal.rotationAngle;
-
-            cardElement.style.transition = `transform ${duration}ms linear`;
-            cardElement.style.willChange = 'transform';
-
-            switch(direction) {
-                case 'left':
-                    cardElement.style.transform = `translate3d(-${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
-                    break;
-                case 'right':
-                    cardElement.style.transform = `translate3d(${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
-                    break;
-                case 'up':
-                    cardElement.style.transform = `translate3d(0, -${window.innerHeight * 2}px, 0) rotate(0deg)`;
-                    break;
-            }
-        }
-
+        store.catalogStore.handleSwipe(direction, card);
         setSwipeProgress({ direction: null, opacity: 0 });
-
-        setTimeout(() => {
-            store.catalogStore.handleSwipe(direction, card);
-        }, duration/2);
-    }, [SWIPE_CONFIG, store.catalogStore]);
+    }, [store.catalogStore]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {
-        const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
-
+        const horizontalThreshold = window.innerWidth * 0.2;
         let direction = null;
         let opacity = 0;
 
-        if (Math.abs(dx) > Math.abs(dy * 1.5)) {
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
             direction = dx > 0 ? 'right' : 'left';
-            opacity = Math.min(1);
-        } else if (dy < -verticalThreshold) {
-            direction = 'up';
-            opacity = Math.min( 1);
+            opacity = Math.min(Math.abs(dx) / horizontalThreshold, 1);
         }
-
         setSwipeProgress({ direction, opacity });
-        setTopCardPosition({ x: dx, y: dy });
     }, []);
 
     const [undoButtonHighlight, setUndoButtonHighlight] = useState(false);
-    const [saveHighlight, setsaveHighlight] = useState(false);
+    const [saveHighlight, setSaveHighlight] = useState(false);
     const [popularHighlight, setPopularHighlight] = useState(false);
-    const [isOnboardingActive, setIsOnboardingActive] = useState(false);
-    const cardRefs = useRef({});
+    const [isAnimating, setIsAnimating] = useState(false);
 
     const setCardRef = useCallback((id, ref) => {
-        if (ref) {
-            cardRefs.current[id] = ref;
-        } else {
-            delete cardRefs.current[id];
-        }
+        if (ref) cardRefs.current[id] = ref;
+        else delete cardRefs.current[id];
     }, []);
 
     const handleSaveChanges = async () => {
@@ -255,11 +129,7 @@ const TinderCards = observer(() => {
                     "Authorization": `tma ${AUTH_TOKEN}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    preferences: {
-                        complete_onboarding: true
-                    }
-                })
+                body: JSON.stringify({ preferences: { complete_onboarding: true } })
             });
 
             if (!response.ok) throw new Error('Update failed');
@@ -278,8 +148,7 @@ const TinderCards = observer(() => {
         }
     };
 
-    const [isAnimating, setIsAnimating] = useState(false);
-
+    // NOTE: This complex simulation logic remains as is, assuming it's correct for onboarding purposes.
     const simulateSwipe = useCallback((direction) => {
         if (!store.catalogStore.cards?.length || isAnimating) return;
 
@@ -287,31 +156,17 @@ const TinderCards = observer(() => {
         const cardRef = cardRefs.current[cardId];
         if (!cardRef) return;
 
-        setIsOnboardingActive(true);
         setIsAnimating(true);
 
         const params = {
-            left: {
-                endX: -window.innerWidth * 0.7,
-                endY: 0,
-                rotation: -15
-            },
-            right: {
-                endX: window.innerWidth * 0.7,
-                endY: 0,
-                rotation: 15
-            },
-            up: {
-                endX: window.innerWidth * 0.5,
-                endY: -window.innerHeight * 0.5,
-                rotation: 5
-            }
+            left: { endX: -window.innerWidth * 0.7, endY: 0, rotation: -15 },
+            right: { endX: window.innerWidth * 0.7, endY: 0, rotation: 15 },
+            up: { endX: window.innerWidth * 0.5, endY: -window.innerHeight * 0.5, rotation: 5 }
         }[direction];
 
         const originalStyles = {
             transform: cardRef.style.transform,
             transition: cardRef.style.transition,
-            opacity: cardRef.style.opacity,
             zIndex: cardRef.style.zIndex,
             willChange: cardRef.style.willChange
         };
@@ -329,40 +184,56 @@ const TinderCards = observer(() => {
                 cardRef.style.transition = originalStyles.transition;
                 cardRef.style.zIndex = originalStyles.zIndex;
                 cardRef.style.willChange = originalStyles.willChange;
-                setIsOnboardingActive(false);
                 setIsAnimating(false);
             }, 300);
         }, 800);
     }, [store.catalogStore.cards, isAnimating]);
 
+    const handleOpenSaveModal = useCallback((product) => {
+        setSelectedProduct(product);
+        setIsSaveModalOpen(true);
+    }, []);
+
+    const handleCloseSaveModal = useCallback(() => {
+        setIsSaveModalOpen(false);
+        setSelectedProduct(null);
+    }, []);
+
+    const handleSaveSuccess = useCallback((productId, isSaved) => {
+        runInAction(() => {
+            const card = store.catalogStore.cards.find(c => c.id === productId);
+            if (card) {
+                card.is_contained_in_user_collections = isSaved;
+            }
+        });
+    }, [store.catalogStore.cards]);
+
+    const isInitialLoading = store.catalogStore.isFetching && store.catalogStore.cards.length === 0;
+
     return (
         <>
-            <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
+            <div className={styles.container} style={{ height: `${containerHeight}px` }} ref={containerRef}>
                 <SearchHeaderMain
                     onSearch={(searchRequest) => {
-                        store.catalogStore.fetchCardsWithSearch(searchRequest);
                         setIsSearchActive(true);
+                        store.catalogStore.fetchCardsWithSearch(searchRequest);
                     }}
                     onClearSearch={() => {
-                        store.catalogStore.resetSearch();
                         setIsSearchActive(false);
+                        store.catalogStore.resetSearch();
                     }}
                     isSearchActive={isSearchActive}
                     onSearchActiveChange={setIsSearchActive}
                 />
                 <FilterBar
-                    onUndo={() => {
-                        store.catalogStore.undoSwipe();
-                    }}
-                    undoHighlight = {undoButtonHighlight}
+                    onUndo={() => store.catalogStore.undoSwipe()}
+                    undoHighlight={undoButtonHighlight}
                     filters={filters}
                     setFilters={setFilters}
                     catalogStore={store.catalogStore}
                 />
-
                 <div className={styles.cardsContainer}>
-                    {/* Показываем скелетоны, если данные загружаются, идёт поиск или изображения ещё не загружены */}
-                    {(store.catalogStore.loading || isSearchActive || !imagesLoaded) && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                    {isInitialLoading && Array(SKELETON_COUNT).fill(0).map((_, i) => (
                         <CustomSkeleton
                             key={`skeleton-${i}`}
                             style={{
@@ -374,39 +245,31 @@ const TinderCards = observer(() => {
                             }}
                         />
                     ))}
-
-                    {/* Отображаем карточки только после полной загрузки */}
-                    {!store.catalogStore.loading && !isSearchActive && imagesLoaded && store?.catalogStore?.cards?.map((card, index) => (
+                    {!isInitialLoading && store.catalogStore.cards?.length > 0 && store.catalogStore.cards.map((card, index) => (
                         <TinderCard
-                            key={card._key}
+                            key={card.id}
                             card={card}
                             onSwipe={handleSwipe}
                             updateSwipeFeedback={updateSwipeFeedback}
-                            zIndex={10000- index}
+                            zIndex={store.catalogStore.cards.length - index}
                             offset={index}
                             swipeConfig={SWIPE_CONFIG}
                             isExpanded={expandedCardId === card.id}
                             onExpand={() => setExpandedCardId(card.id)}
                             onCollapse={() => setExpandedCardId(null)}
-                            isPending={card._pending}
-                            swipeProgress={index === 0 ? swipeProgress : {direction: null, opacity: 0}}
+                            swipeProgress={index === 0 ? swipeProgress : null}
                             isTopCard={index === 0}
                             setCardRef={setCardRef}
                             isOnboardingActive={showOnboarding && index === 0}
                             onSaveClick={handleOpenSaveModal}
-                            topCardPosition={index === 0 ? null : topCardPosition}
-                            style={isSearchActive ? { opacity: 0, pointerEvents: 'none' } : {}}
                         />
                     ))}
-
-                    {!store.catalogStore.loading && store.catalogStore.cards?.length === 0 && (
+                    {!store.catalogStore.isFetching && store.catalogStore.cards?.length === 0 && (
                         <div className={styles.emptyState}>
                             <div className={styles.notCard}>
                                 <p className={styles.notCardText}>Товары из ассортимента брендов закончились</p>
                             </div>
-                            <p className={styles.notCardCatText}>
-                                Но можно посмотреть подборки
-                            </p>
+                            <p className={styles.notCardCatText}>Но можно посмотреть подборки</p>
                             <div className={styles.collectionsBlock}>
                                 {(store?.popular?.collections || []).map((item) => (
                                     <div
@@ -414,11 +277,7 @@ const TinderCards = observer(() => {
                                         className={styles.collectionCard}
                                         onClick={() => navigate(`/trands/collection/${item.id}`)}
                                     >
-                                        <img
-                                            className={styles.collectionImg}
-                                            src={item.cover_image_url}
-                                            alt={item.name}
-                                        />
+                                        <img className={styles.collectionImg} src={item.cover_image_url} alt={item.name} />
                                         <p className={styles.collectionTitle}>{item.name}</p>
                                     </div>
                                 ))}
@@ -431,21 +290,23 @@ const TinderCards = observer(() => {
                     highlightPopular={popularHighlight}
                     onboarding={!store?.authStore?.data?.preferences?.complete_onboarding}
                 />
-                <Onboarding
-                    showOnboarding={showOnboarding}
-                    onboardingStep={onboardingStep}
-                    setOnboardingStep={setOnboardingStep}
-                    simulateSwipe={simulateSwipe}
-                    isAnimating={isAnimating}
-                    handleSaveChanges={handleSaveChanges}
-                    undoButtonHighlight={undoButtonHighlight}
-                    setUndoButtonHighlight={setUndoButtonHighlight}
-                    saveHighlight={saveHighlight}
-                    setsaveHighlight={setsaveHighlight}
-                    popularHighlight={popularHighlight}
-                    setPopularHighlight={setPopularHighlight}
-                />
             </div>
+
+            <Onboarding
+                showOnboarding={showOnboarding}
+                onboardingStep={onboardingStep}
+                setOnboardingStep={setOnboardingStep}
+                simulateSwipe={simulateSwipe}
+                isAnimating={isAnimating}
+                handleSaveChanges={handleSaveChanges}
+                undoButtonHighlight={undoButtonHighlight}
+                setUndoButtonHighlight={setUndoButtonHighlight}
+                saveHighlight={saveHighlight}
+                setsaveHighlight={setSaveHighlight}
+                popularHighlight={popularHighlight}
+                setPopularHighlight={setPopularHighlight}
+            />
+
             <SaveToCollectionModal
                 isOpen={isSaveModalOpen}
                 onClose={handleCloseSaveModal}

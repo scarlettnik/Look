@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
@@ -23,36 +23,17 @@ const TinderCard = React.memo(({
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [imageLoaded, setImageLoaded] = useState(false);
-    const store = useStore();
     const cardRef = useRef(null);
     const animationFrame = useRef(null);
     const startTime = useRef(0);
     const navigate = useNavigate();
+    const store = useStore();
 
     const handleSwipeRef = useRef(onSwipe);
     const updateSwipeFeedbackRef = useRef(updateSwipeFeedback);
 
-    const canInteract = !store.catalogStore.isAddingCards;
-
-    useEffect(() => {
-        if (cardRef.current) {
-            setCardRef(card._key, cardRef.current);
-        }
-        return () => setCardRef(card._key, null);
-    }, [card._key, setCardRef]);
-
-    const handleStart = useCallback((clientX, clientY) => {
-        if (isExpanded || !canInteract) return false;
-
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
-
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-        return true;
-    }, [isExpanded, canInteract]);
+    // ➡️ УБИРАЕМ canInteract, так как он создает проблемы
+    // const canInteract = !store.catalogStore.isAddingCards;
 
     useEffect(() => {
         handleSwipeRef.current = onSwipe;
@@ -72,6 +53,18 @@ const TinderCard = React.memo(({
         }
     }, [zIndex]);
 
+    const handleStart = useCallback((clientX, clientY) => {
+        // ➡️ Проверяем только, является ли карточка верхней
+        if (isExpanded || !isTopCard) return false;
+
+        setStartPos({ x: clientX, y: clientY });
+        setIsDragging(true);
+        startTime.current = Date.now();
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
+        }
+        return true;
+    }, [isExpanded, isTopCard]);
 
     const handleMove = useCallback((clientX, clientY) => {
         if (!isDragging) return;
@@ -172,9 +165,8 @@ const TinderCard = React.memo(({
             cardRef.current.style.transform = 'translate3d(0, -100vh, 0)';
         }
 
-        setTimeout(() => {
-            handleSwipeRef.current(direction, card);
-        }, 50);
+        // ➡️ Вызываем onSwipe без setTimeout
+        handleSwipeRef.current(direction, card);
     }, [card]);
 
     const resetPosition = useCallback(() => {
@@ -194,20 +186,29 @@ const TinderCard = React.memo(({
 
     // Обработчики событий
     const handleTouchStart = useCallback((e) => {
+        if (!isTopCard) return;
         handleStart(e.touches[0].clientX, e.touches[0].clientY);
-    }, [handleStart]);
+    }, [handleStart, isTopCard]);
 
     const handleTouchMove = useCallback((e) => {
+        if (!isTopCard) return;
         handleMove(e.touches[0].clientX, e.touches[0].clientY);
-    }, [handleMove]);
+    }, [handleMove, isTopCard]);
 
     const handleMouseDown = useCallback((e) => {
+        if (!isTopCard) return;
         handleStart(e.clientX, e.clientY);
-    }, [handleStart]);
+    }, [handleStart, isTopCard]);
 
     const handleMouseMove = useCallback((e) => {
+        if (!isTopCard) return;
         handleMove(e.clientX, e.clientY);
-    }, [handleMove]);
+    }, [handleMove, isTopCard]);
+
+    const handleEndEvent = useCallback(() => {
+        if (!isTopCard) return;
+        handleEnd();
+    }, [handleEnd, isTopCard]);
 
     return (
         <div
@@ -216,17 +217,17 @@ const TinderCard = React.memo(({
             className={`${styles.card} 
       ${isDragging ? styles.moving : ''} 
       ${isOnboardingActive ? styles['card-onboarding'] : ''}
-      ${!canInteract ? styles.disabled : ''}`} // Добавляем класс disabled
-            onTouchStart={(e) => canInteract && handleStart(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchMove={(e) => canInteract && isDragging && handleMove(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchEnd={() => canInteract && handleEnd()}
-            onMouseDown={(e) => canInteract && handleStart(e.clientX, e.clientY)}
-            onMouseMove={(e) => canInteract && isDragging && handleMove(e.clientX, e.clientY)}
-            onMouseUp={() => canInteract && handleEnd()}
-            onMouseLeave={() => canInteract && handleEnd()}
+      ${isTopCard ? styles['top-card'] : ''}`}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleEndEvent}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleEndEvent}
+            onMouseLeave={handleEndEvent}
             style={{
                 zIndex,
-                pointerEvents: canInteract ? 'auto' : 'none',
+                pointerEvents: isTopCard ? 'auto' : 'none', // ➡️ ВАЖНО: Только верхняя карточка интерактивна
                 opacity: 1
             }}
         >

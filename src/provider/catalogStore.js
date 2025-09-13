@@ -58,16 +58,13 @@ class CatalogStore {
 
         try {
             this.isFetching = true;
+
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Упростили логику initialLoad
             if (initialLoad) {
                 this.loading = true;
                 this.currentOffset = 0;
-                // Сохраняем существующие карточки при initialLoad
-                if (this.cards.length > 0) {
-                    const existingCards = this.cards.slice();
-                    this.cards = [];
-                    yield new Promise(resolve => setTimeout(resolve, 10));
-                    this.cards = existingCards;
-                }
+                // Полностью очищаем карточки при начальной загрузке
+                this.cards = [];
             }
 
             const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
@@ -95,15 +92,18 @@ class CatalogStore {
             this.hasMore = newCards.length >= this.limit;
             this.currentOffset += newCards.length;
 
-            // Добавляем новые карточки с уникальными ключами
             const cardsWithKeys = newCards.map(card => ({
                 ...card,
                 _key: this.getUniqueKey(),
-                _pending: false // Убираем pending состояние
+                _pending: false
             }));
 
-            // Используем push вместо замены массива
-            this.cards.push(...cardsWithKeys);
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Простая логика добавления карточек
+            if (initialLoad) {
+                this.cards = cardsWithKeys; // Полная замена при начальной загрузке
+            } else {
+                this.cards.push(...cardsWithKeys); // Добавление при подгрузке
+            }
 
         } catch (err) {
             this.error = err.message;
@@ -152,7 +152,6 @@ class CatalogStore {
 
         this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
 
-        // Удаляем карточку по индексу, а не по ID, чтобы избежать проблем с дубликатами
         const cardIndex = this.cards.findIndex(c => c._key === card._key);
         if (cardIndex !== -1) {
             this.cards.splice(cardIndex, 1);
@@ -176,7 +175,7 @@ class CatalogStore {
         // Восстанавливаем карточку с сохранением её первоначального ключа
         const restoredCard = {
             ...card,
-            _key: card._key // Сохраняем оригинальный ключ
+            _key: card._key
         };
 
         // Добавляем карточку в начало массива

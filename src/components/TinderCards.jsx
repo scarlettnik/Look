@@ -23,26 +23,18 @@ const TinderCards = observer(() => {
     const navigate = useNavigate();
 
     // --- Onboarding state ---
-    const [isOnboardingVisible, setIsOnboardingVisible] = useState(true); // показываем по умолчанию
+    // Инициализируем состояние онбординга на основе данных из хранилища.
+    // Это исключает потенциальные проблемы с race condition при инициализации.
+    const [isOnboardingVisible, setIsOnboardingVisible] = useState(() => {
+        const complete = store?.authStore?.data?.preferences?.complete_onboarding;
+        return complete !== true;
+    });
     const [onboardingStep, setOnboardingStep] = useState(1);
 
+    // Упрощенный useEffect для управления видимостью.
     useEffect(() => {
         const complete = store?.authStore?.data?.preferences?.complete_onboarding;
-        if (complete === false) {
-            // явно нужно показать
-            // ставим маленькую задержку, чтобы браузер успел отрисовать контейнер до запуска любых анимаций
-            setTimeout(() => {
-                setIsOnboardingVisible(true);
-                setOnboardingStep(1);
-            }, 0);
-        } else if (complete === true) {
-            setIsOnboardingVisible(false);
-            setOnboardingStep(0);
-        } else {
-            // если undefined — оставляем видимым (пользователь, вероятно, новый)
-            setIsOnboardingVisible(true);
-            setOnboardingStep(1);
-        }
+        setIsOnboardingVisible(complete !== true);
     }, [store?.authStore?.data?.preferences?.complete_onboarding]);
 
     // --- UI state ---
@@ -202,7 +194,7 @@ const TinderCards = observer(() => {
     const [popularHighlight, setPopularHighlight] = useState(false);
 
     const [isAnimating, setIsAnimating] = useState(false);
-    const isAnimatingRef = useRef(false); // чтобы избежать залипания в колбэках
+    const isAnimatingRef = useRef(false);
     const cardRefs = useRef({});
 
     const setCardRef = useCallback((id, ref) => {
@@ -211,7 +203,6 @@ const TinderCards = observer(() => {
     }, []);
 
     const simulateSwipe = useCallback(async (direction) => {
-        // безопасный simulate, который гарантированно сбросит флаг анимации
         if (!store.catalogStore.cards?.length) return;
         const cardId = store.catalogStore.cards[0].id;
         const cardRef = cardRefs.current[cardId];
@@ -235,22 +226,18 @@ const TinderCards = observer(() => {
                 willChange: cardRef.style.willChange || ''
             };
 
-            // запускаем анимацию (первый этап)
             cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
             cardRef.style.willChange = 'transform';
             cardRef.style.transform = `translate3d(${params.endX}px, ${params.endY}px, 0) rotate(${params.rotation}deg)`;
             cardRef.style.zIndex = '10000';
 
-            // ждём основную длительность (даём браузеру время на paint)
             await new Promise(res => setTimeout(res, 820));
 
-            // возвращаемся
             cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
             cardRef.style.transform = originalStyles.transform;
 
             await new Promise(res => setTimeout(res, 320));
 
-            // восстанавливаем
             cardRef.style.transition = originalStyles.transition;
             cardRef.style.zIndex = originalStyles.zIndex;
             cardRef.style.willChange = originalStyles.willChange;
@@ -262,7 +249,7 @@ const TinderCards = observer(() => {
         }
     }, [store.catalogStore.cards]);
 
-    // --- Ensure images loaded (как у тебя было) ---
+    // --- Ensure images loaded ---
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const cardsRef = useRef(store?.catalogStore?.cards || []);
 
@@ -391,25 +378,25 @@ const TinderCards = observer(() => {
                     onboarding={isOnboardingVisible}
                 />
 
-                {/* передаём showOnboarding, isAnimating и simulateSwipe */}
                 <Onboarding
                     showOnboarding={isOnboardingVisible}
                     onboardingStep={onboardingStep}
                     setOnboardingStep={setOnboardingStep}
                     simulateSwipe={simulateSwipe}
                     isAnimating={isAnimating}
-                    handleSaveChanges={() => {
-                        // сохраняем флаг на сервер и в сторе
-                        fetch('https://api.lookvogue.ru/v1/user', {
-                            method: 'PATCH',
-                            headers: {
-                                "Authorization": `tma ${AUTH_TOKEN}`,
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                preferences: { complete_onboarding: true }
-                            })
-                        }).then(() => {
+                    handleSaveChanges={async () => {
+                        try {
+                            await fetch('https://api.lookvogue.ru/v1/user', {
+                                method: 'PATCH',
+                                headers: {
+                                    "Authorization": `tma ${AUTH_TOKEN}`,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    preferences: { complete_onboarding: true }
+                                })
+                            });
+
                             runInAction(() => {
                                 if (store.authStore.data) {
                                     store.authStore.data.preferences = {
@@ -420,9 +407,9 @@ const TinderCards = observer(() => {
                             });
                             setIsOnboardingVisible(false);
                             setOnboardingStep(0);
-                        }).catch((e) => {
+                        } catch (e) {
                             console.error('save onboarding flag error', e);
-                        });
+                        }
                     }}
                     setUndoButtonHighlight={setUndoButtonHighlight}
                     setsaveHighlight={setsaveHighlight}

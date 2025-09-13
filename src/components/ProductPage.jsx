@@ -6,11 +6,12 @@ import FullScreenButton from "./FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
+import {useStore} from "../provider/StoreContext.jsx";
 
 const ProductPage = () => {
+    const store = useStore();
     const {id} = useParams();
     const navigate = useNavigate();
-    const [isShareOpen, setIsShareOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -24,7 +25,6 @@ const ProductPage = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [collectionImage, setCollectionImage] = useState('');
 
     const handleColorChange = async (color) => {
         if (color.product_id === currentColorId || isTransitioning) return;
@@ -233,7 +233,7 @@ const ProductPage = () => {
                                 </button>
                             )}
                         </div>
-
+                        <div style={{width: '98vw', height: '1px', backgroundColor: 'var(--light-warm-gray)', marginTop: '1.5vh'}}></div>
                     </span>
                 )}
 
@@ -257,6 +257,8 @@ const ProductPage = () => {
                                     </button>
                                 ))}
                             </div>
+                            <p className={styles.aboutSize}>Размер подобран на основе ваших параметров </p>
+                            <div style={{width: '96vw', height: '1px', backgroundColor: 'var(--light-warm-gray)', marginTop: '1.5vh'}}></div>
                         </>
                     )
                 )}
@@ -285,11 +287,18 @@ const ProductPage = () => {
                                     </div>
                                 ))}
                             </div>
+                            <div style={{
+                                width: '96vw',
+                                height: '1px',
+                                backgroundColor: 'var(--light-warm-gray)',
+                                marginTop: '1vh'
+                            }}></div>
+
                         </>
                     )
                 )}
 
-                <p className={styles.blockTitle}>Детали</p>
+                <p className={styles.blockTitle}>О товаре</p>
                 <div className={styles.infoSection}>
                     {loading ? (
                         <>

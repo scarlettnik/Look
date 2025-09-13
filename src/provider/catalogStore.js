@@ -22,6 +22,8 @@ class CatalogStore {
         max_price: null
     };
     lastSearchQuery = null;
+    // Добавляем флаг для отслеживания состояния добавления карточек
+    isAddingCards = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -40,7 +42,6 @@ class CatalogStore {
         'Content-Type': 'application/json',
         'Authorization': `tma ${this.authToken}`
     });
-
     setLastSearchQuery = (query) => {
         this.lastSearchQuery = query;
     };
@@ -54,16 +55,15 @@ class CatalogStore {
     };
 
     fetchCards = flow(function* (initialLoad = false) {
-        if (!this.hasMore || this.isFetching) return;
+        if (!this.hasMore || this.isFetching || this.isAddingCards) return;
 
         try {
             this.isFetching = true;
+            this.isAddingCards = true; // Устанавливаем флаг добавления карточек
 
-            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Упростили логику initialLoad
             if (initialLoad) {
                 this.loading = true;
                 this.currentOffset = 0;
-                // Полностью очищаем карточки при начальной загрузке
                 this.cards = [];
             }
 
@@ -98,22 +98,32 @@ class CatalogStore {
                 _pending: false
             }));
 
-            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Простая логика добавления карточек
-            if (initialLoad) {
-                this.cards = cardsWithKeys; // Полная замена при начальной загрузке
-            } else {
-                this.cards.unshift(...cardsWithKeys); // Добавление при подгрузке
-            }
+            // Используем runInAction для batch updates
+            runInAction(() => {
+                if (initialLoad) {
+                    this.cards = cardsWithKeys;
+                } else {
+                    // Добавляем новые карточки с небольшой задержкой для стабильности
+                    this.cards = [...this.cards, ...cardsWithKeys];
+                }
+            });
 
         } catch (err) {
             this.error = err.message;
             console.error("Card loading error:", err);
         } finally {
-            this.isFetching = false;
-            this.loading = false;
+            runInAction(() => {
+                this.isFetching = false;
+                this.loading = false;
+                // Сбрасываем флаг после небольшой задержки
+                setTimeout(() => {
+                    runInAction(() => {
+                        this.isAddingCards = false;
+                    });
+                }, 100);
+            });
         }
     });
-
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
         this.hasMore = true;
@@ -148,23 +158,26 @@ class CatalogStore {
     });
 
     handleSwipe = (direction, card) => {
-        if (direction === 'down') return;
+        if (direction === 'down' || this.isAddingCards) return;
 
         this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
 
         const cardIndex = this.cards.findIndex(c => c._key === card._key);
         if (cardIndex !== -1) {
-            this.cards.splice(cardIndex, 1);
+            runInAction(() => {
+                this.cards.splice(cardIndex, 1);
+            });
         }
 
         if (direction === 'up') {
             this.basket = [...this.basket, card];
         }
 
-        if (this.cards.length < 7 && this.hasMore && !this.isFetching) {
+        if (this.cards.length < 7 && this.hasMore && !this.isFetching && !this.isAddingCards) {
             this.fetchCards();
         }
     };
+
 
     undoSwipe = () => {
         if (this.swipeHistory.length === 0) return;

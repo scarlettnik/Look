@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ui/TinderCard.module.css';
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
+import {useStore} from "../provider/StoreContext.jsx";
 
 const TinderCard = React.memo(({
                                    card,
@@ -22,7 +23,7 @@ const TinderCard = React.memo(({
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [imageLoaded, setImageLoaded] = useState(false);
-
+    const store = useStore();
     const cardRef = useRef(null);
     const animationFrame = useRef(null);
     const startTime = useRef(0);
@@ -30,6 +31,28 @@ const TinderCard = React.memo(({
 
     const handleSwipeRef = useRef(onSwipe);
     const updateSwipeFeedbackRef = useRef(updateSwipeFeedback);
+
+    const canInteract = !store.catalogStore.isAddingCards;
+
+    useEffect(() => {
+        if (cardRef.current) {
+            setCardRef(card._key, cardRef.current);
+        }
+        return () => setCardRef(card._key, null);
+    }, [card._key, setCardRef]);
+
+    const handleStart = useCallback((clientX, clientY) => {
+        if (isExpanded || !canInteract) return false;
+
+        setStartPos({ x: clientX, y: clientY });
+        setIsDragging(true);
+        startTime.current = Date.now();
+
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
+        }
+        return true;
+    }, [isExpanded, canInteract]);
 
     useEffect(() => {
         handleSwipeRef.current = onSwipe;
@@ -49,18 +72,6 @@ const TinderCard = React.memo(({
         }
     }, [zIndex]);
 
-    const handleStart = useCallback((clientX, clientY) => {
-        if (isExpanded) return false;
-
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
-
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-        return true;
-    }, [isExpanded]);
 
     const handleMove = useCallback((clientX, clientY) => {
         if (!isDragging) return;
@@ -204,15 +215,20 @@ const TinderCard = React.memo(({
             id={card.id}
             className={`${styles.card} 
       ${isDragging ? styles.moving : ''} 
-      ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleEnd}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleEnd}
-            onMouseLeave={handleEnd}
-            style={{ zIndex, opacity: 1 }}
+      ${isOnboardingActive ? styles['card-onboarding'] : ''}
+      ${!canInteract ? styles.disabled : ''}`} // Добавляем класс disabled
+            onTouchStart={(e) => canInteract && handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchMove={(e) => canInteract && isDragging && handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchEnd={() => canInteract && handleEnd()}
+            onMouseDown={(e) => canInteract && handleStart(e.clientX, e.clientY)}
+            onMouseMove={(e) => canInteract && isDragging && handleMove(e.clientX, e.clientY)}
+            onMouseUp={() => canInteract && handleEnd()}
+            onMouseLeave={() => canInteract && handleEnd()}
+            style={{
+                zIndex,
+                pointerEvents: canInteract ? 'auto' : 'none',
+                opacity: 1
+            }}
         >
             <div onClick={() => navigate(`/product/${card.id}`)}>
                 {!imageLoaded && (

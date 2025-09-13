@@ -40,10 +40,17 @@ const TinderCards = observer(() => {
     }));
     const [isSearchActive, setIsSearchActive] = useState(false);
 
-    // Мемоизированные значения для оптимизации
     const swipeConfigMemo = useMemo(() => SWIPE_CONFIG, []);
     const nonTopSwipeProgress = useMemo(() => ({ direction: null, opacity: 0 }), []);
     const nonTopPosition = useMemo(() => null, []);
+
+
+    useEffect(() => {
+        if (store.catalogStore.isAddingCards) {
+            setSwipeProgress({ direction: null, opacity: 0 });
+            setTopCardPosition({ x: 0, y: 0 });
+        }
+    }, [store.catalogStore.isAddingCards]);
 
     useEffect(() => {
         const handleSearchStateChange = () => {

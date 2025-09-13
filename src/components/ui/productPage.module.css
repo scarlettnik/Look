@@ -3,7 +3,7 @@
     grid-template-rows: 45% 55%;
     height: 94vh;
     width: 100vw;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: #333;
     position: relative;
     overflow-x: hidden;
@@ -12,7 +12,7 @@
 .slider {
     position: relative;
     width: 96vw;
-    height: 42vh;
+    height: 60vh;
     margin: 2vw;
     display: flex;
     align-items: center;
@@ -68,7 +68,9 @@
 }
 
 .infoCard {
-    margin: 2vw;
+    margin-top: 20vh;
+    margin-right: 2vw;
+    margin-left: 2vw;
     width: 94vw;
 }
 
@@ -77,37 +79,41 @@
     align-items: center;
     justify-content: space-between;
 }
-
-
 .title {
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 500;
     color: var(--dark-gray);
 }
 .brand {
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 400;
     color: var(--light-warm-gray);
 }
 
 .price {
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 500;
     padding: 16px 0;
     color: var(--dark-gray);
 }
 .blockTitle {
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     padding: 8px 0;
     color: var(--dark-gray);
 }
 
 .description {
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 400;
     color: var(--black);
     line-height: 16px;
+    border-bottom: 2px var(--light-warm-gray);
 }
 .bar {
     display: flex;
@@ -123,6 +129,12 @@
 .bar::-webkit-scrollbar {
     display: none;
 }
+.aboutSize {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    margin-top: 5px;
+    color: var(--light-cold-gray);
+}
 
 .sizeOption {
     flex: 0 0 auto;
@@ -137,16 +149,18 @@
 }
 .sizeOption.active {
     border-color: 1px solid var(--black);
+    background-color: var(--white);
 }
 .colorTitle {
     font-size: 12px;
     font-weight: 400;
     padding-left: 5px;
+    color: var(--light-cold-gray);
 
 }
 .colorCircle {
-    width: 30px;
-    height: 30px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     transition: all 0.3s ease;
     margin: 5px;
@@ -175,7 +189,6 @@
 .colorsContainer {
     width: 100%;
     overflow-x: auto;
-    padding: 8px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     display: flex;
@@ -197,14 +210,27 @@
     flex-shrink: 0;
 }
 .colorCircle.selected {
+    position: relative;
+    border: 1px solid white;
+    box-shadow: 0 0 0 0.5px white;
+}
+
+.colorCircle.selected::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
     border: 1px solid var(--black);
-    transform: scale(1.2);
+    border-radius: 50%;
+    padding: 3px;
 }
 .border {
     border-bottom: 1px solid var(--light-gray);
 }
 .infoSection {
-    border-bottom: 1px solid var(--light-gray);
+    padding-bottom: 30px;
 }
 
 .infoRow {
@@ -219,7 +245,7 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--light-cold-gray);
-    flex: 0 0 50%;
+    flex: 0 0 20%;
     text-align: left;
 }
 
@@ -227,6 +253,6 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--black);
-    flex: 0 0 48%;
+    flex: 0 0 70%;
     padding-left: 10px;
 }

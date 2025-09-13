@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import styles from './ui/TinderCards.module.css';
 import Sidebar from './Sidebar';
@@ -22,27 +22,28 @@ const TinderCards = observer(() => {
     const store = useStore();
     const navigate = useNavigate();
 
-// --- Onboarding state ---
-    const [isOnboardingVisible, setIsOnboardingVisible] = useState(true); // по умолчанию показываем
+    // --- Onboarding state ---
+    const [isOnboardingVisible, setIsOnboardingVisible] = useState(true); // показываем по умолчанию
     const [onboardingStep, setOnboardingStep] = useState(1);
 
     useEffect(() => {
         const complete = store?.authStore?.data?.preferences?.complete_onboarding;
-
         if (complete === false) {
-            setIsOnboardingVisible(true);
-            setOnboardingStep(1);
+            // явно нужно показать
+            // ставим маленькую задержку, чтобы браузер успел отрисовать контейнер до запуска любых анимаций
+            setTimeout(() => {
+                setIsOnboardingVisible(true);
+                setOnboardingStep(1);
+            }, 0);
         } else if (complete === true) {
             setIsOnboardingVisible(false);
             setOnboardingStep(0);
+        } else {
+            // если undefined — оставляем видимым (пользователь, вероятно, новый)
+            setIsOnboardingVisible(true);
+            setOnboardingStep(1);
         }
-        // если complete === undefined → оставляем true (будет показываться)
-    }, [store?.authStore?.data?.preferences?.complete_onboarding]);console.log("Onboarding visible:", isOnboardingVisible, store?.authStore?.data?.preferences?.complete_onboarding);
-
-
-    console.log("Onboarding visible:", isOnboardingVisible, store?.authStore?.data?.preferences?.complete_onboarding);
-
-
+    }, [store?.authStore?.data?.preferences?.complete_onboarding]);
 
     // --- UI state ---
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });
@@ -62,7 +63,6 @@ const TinderCards = observer(() => {
     }));
     const [isSearchActive, setIsSearchActive] = useState(false);
 
-    // --- Handle search state ---
     useEffect(() => {
         setIsSearchActive(store?.catalogStore?.isSearching || false);
     }, [store?.catalogStore?.isSearching, store?.catalogStore?.currentSearchQuery]);
@@ -98,7 +98,6 @@ const TinderCards = observer(() => {
         });
     }, [store]);
 
-    // --- Resize handling ---
     useEffect(() => {
         const handleResize = () => {
             if (containerRef.current) {
@@ -111,7 +110,6 @@ const TinderCards = observer(() => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // --- Auto fetch more cards ---
     useEffect(() => {
         if (store?.catalogStore?.cards?.length <= INITIAL_CARDS_COUNT &&
             store.catalogStore.hasMore &&
@@ -120,7 +118,6 @@ const TinderCards = observer(() => {
         }
     }, [store?.catalogStore.cards?.length]);
 
-    // --- Fetch collections ---
     useEffect(() => {
         if (store?.authStore.data) {
             store.popular.fetchCollections();
@@ -199,11 +196,13 @@ const TinderCards = observer(() => {
         setTopCardPosition({ x: dx, y: dy });
     }, []);
 
-    // --- Onboarding swipe simulation ---
+    // --- Onboarding swipe simulation + safe anim flag ---
     const [undoButtonHighlight, setUndoButtonHighlight] = useState(false);
     const [saveHighlight, setsaveHighlight] = useState(false);
     const [popularHighlight, setPopularHighlight] = useState(false);
+
     const [isAnimating, setIsAnimating] = useState(false);
+    const isAnimatingRef = useRef(false); // чтобы избежать залипания в колбэках
     const cardRefs = useRef({});
 
     const setCardRef = useCallback((id, ref) => {
@@ -211,46 +210,59 @@ const TinderCards = observer(() => {
         else delete cardRefs.current[id];
     }, []);
 
-    const simulateSwipe = useCallback((direction) => {
-        if (!store.catalogStore.cards?.length || isAnimating) return;
-
+    const simulateSwipe = useCallback(async (direction) => {
+        // безопасный simulate, который гарантированно сбросит флаг анимации
+        if (!store.catalogStore.cards?.length) return;
         const cardId = store.catalogStore.cards[0].id;
         const cardRef = cardRefs.current[cardId];
         if (!cardRef) return;
 
-        setIsAnimating(true);
+        if (isAnimatingRef.current) return;
+        try {
+            isAnimatingRef.current = true;
+            setIsAnimating(true);
 
-        const params = {
-            left: { endX: -window.innerWidth * 0.7, endY: 0, rotation: -15 },
-            right: { endX: window.innerWidth * 0.7, endY: 0, rotation: 15 },
-            up: { endX: window.innerWidth * 0.5, endY: -window.innerHeight * 0.5, rotation: 5 }
-        }[direction];
+            const params = {
+                left: { endX: -window.innerWidth * 0.7, endY: 0, rotation: -15 },
+                right: { endX: window.innerWidth * 0.7, endY: 0, rotation: 15 },
+                up: { endX: window.innerWidth * 0.5, endY: -window.innerHeight * 0.5, rotation: 5 }
+            }[direction];
 
-        const originalStyles = {
-            transform: cardRef.style.transform,
-            transition: cardRef.style.transition,
-            zIndex: cardRef.style.zIndex,
-            willChange: cardRef.style.willChange
-        };
+            const originalStyles = {
+                transform: cardRef.style.transform || '',
+                transition: cardRef.style.transition || '',
+                zIndex: cardRef.style.zIndex || '',
+                willChange: cardRef.style.willChange || ''
+            };
 
-        cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
-        cardRef.style.willChange = 'transform';
-        cardRef.style.transform = `translate3d(${params.endX}px, ${params.endY}px, 0) rotate(${params.rotation}deg)`;
-        cardRef.style.zIndex = '10000';
+            // запускаем анимацию (первый этап)
+            cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
+            cardRef.style.willChange = 'transform';
+            cardRef.style.transform = `translate3d(${params.endX}px, ${params.endY}px, 0) rotate(${params.rotation}deg)`;
+            cardRef.style.zIndex = '10000';
 
-        setTimeout(() => {
+            // ждём основную длительность (даём браузеру время на paint)
+            await new Promise(res => setTimeout(res, 820));
+
+            // возвращаемся
             cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
             cardRef.style.transform = originalStyles.transform;
-            setTimeout(() => {
-                cardRef.style.transition = originalStyles.transition;
-                cardRef.style.zIndex = originalStyles.zIndex;
-                cardRef.style.willChange = originalStyles.willChange;
-                setIsAnimating(false);
-            }, 300);
-        }, 800);
-    }, [store.catalogStore.cards, isAnimating]);
 
-    // --- Ensure images loaded ---
+            await new Promise(res => setTimeout(res, 320));
+
+            // восстанавливаем
+            cardRef.style.transition = originalStyles.transition;
+            cardRef.style.zIndex = originalStyles.zIndex;
+            cardRef.style.willChange = originalStyles.willChange;
+        } catch (e) {
+            console.error('simulateSwipe error', e);
+        } finally {
+            isAnimatingRef.current = false;
+            setIsAnimating(false);
+        }
+    }, [store.catalogStore.cards]);
+
+    // --- Ensure images loaded (как у тебя было) ---
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const cardsRef = useRef(store?.catalogStore?.cards || []);
 
@@ -379,41 +391,43 @@ const TinderCards = observer(() => {
                     onboarding={isOnboardingVisible}
                 />
 
-                {isOnboardingVisible && (
-                    <Onboarding
-                        onboardingStep={onboardingStep}
-                        setOnboardingStep={setOnboardingStep}
-                        simulateSwipe={simulateSwipe}
-                        isAnimating={isAnimating}
-                        handleSaveChanges={() => {
-                            fetch('https://api.lookvogue.ru/v1/user', {
-                                method: 'PATCH',
-                                headers: {
-                                    "Authorization": `tma ${AUTH_TOKEN}`,
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    preferences: { complete_onboarding: true }
-                                })
-                            }).then(() => {
-                                runInAction(() => {
-                                    if (store.authStore.data) {
-                                        store.authStore.data.preferences = {
-                                            ...store.authStore.data.preferences,
-                                            complete_onboarding: true
-                                        };
-                                    }
-                                });
+                {/* передаём showOnboarding, isAnimating и simulateSwipe */}
+                <Onboarding
+                    showOnboarding={isOnboardingVisible}
+                    onboardingStep={onboardingStep}
+                    setOnboardingStep={setOnboardingStep}
+                    simulateSwipe={simulateSwipe}
+                    isAnimating={isAnimating}
+                    handleSaveChanges={() => {
+                        // сохраняем флаг на сервер и в сторе
+                        fetch('https://api.lookvogue.ru/v1/user', {
+                            method: 'PATCH',
+                            headers: {
+                                "Authorization": `tma ${AUTH_TOKEN}`,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                preferences: { complete_onboarding: true }
+                            })
+                        }).then(() => {
+                            runInAction(() => {
+                                if (store.authStore.data) {
+                                    store.authStore.data.preferences = {
+                                        ...store.authStore.data.preferences,
+                                        complete_onboarding: true
+                                    };
+                                }
                             });
-                        }}
-                        undoButtonHighlight={undoButtonHighlight}
-                        setUndoButtonHighlight={setUndoButtonHighlight}
-                        saveHighlight={saveHighlight}
-                        setsaveHighlight={setsaveHighlight}
-                        popularHighlight={popularHighlight}
-                        setPopularHighlight={setPopularHighlight}
-                    />
-                )}
+                            setIsOnboardingVisible(false);
+                            setOnboardingStep(0);
+                        }).catch((e) => {
+                            console.error('save onboarding flag error', e);
+                        });
+                    }}
+                    setUndoButtonHighlight={setUndoButtonHighlight}
+                    setsaveHighlight={setsaveHighlight}
+                    setPopularHighlight={setPopularHighlight}
+                />
             </div>
 
             <SaveToCollectionModal

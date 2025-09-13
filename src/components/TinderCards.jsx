@@ -45,13 +45,12 @@ const TinderCards = observer(() => {
     const nonTopPosition = useMemo(() => null, []);
 
 
-    // ➡️ ЭТОТ useEffect УБИРАЕМ, он создает проблемы
-    // useEffect(() => {
-    //     if (store.catalogStore.isAddingCards) {
-    //         setSwipeProgress({ direction: null, opacity: 0 });
-    //         setTopCardPosition({ x: 0, y: 0 });
-    //     }
-    // }, [store.catalogStore.isAddingCards]);
+    useEffect(() => {
+        if (store.catalogStore.isAddingCards) {
+            setSwipeProgress({ direction: null, opacity: 0 });
+            setTopCardPosition({ x: 0, y: 0 });
+        }
+    }, [store.catalogStore.isAddingCards]);
 
     useEffect(() => {
         const handleSearchStateChange = () => {
@@ -84,7 +83,7 @@ const TinderCards = observer(() => {
         }
     }, [showOnboarding]);
 
-    const [isSaveModalOpen, setIsSaveModal] = useState(false);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
     const handleOpenSaveModal = useCallback((product) => {
@@ -146,7 +145,6 @@ const TinderCards = observer(() => {
         }
     };
 
-    // ➡️ ИСПРАВЛЕННАЯ handleSwipe
     const handleSwipe = useCallback((direction, card) => {
         if (direction === 'down') return;
 
@@ -181,7 +179,6 @@ const TinderCards = observer(() => {
 
         setSwipeProgress({ direction: null, opacity: 0 });
 
-        // ➡️ ВАЖНО: Вызываем handleSwipe MobX только после завершения анимации
         setTimeout(() => {
             store.catalogStore.handleSwipe(direction, card);
         }, duration);
@@ -393,7 +390,7 @@ const TinderCards = observer(() => {
 
                     {!store.catalogStore.loading && !isSearchActive && store?.catalogStore?.cards?.map((card, index) => (
                         <TinderCard
-                            key={card._key}
+                            key={card._key} // Используем стабильный ключ
                             card={card}
                             onSwipe={handleSwipe}
                             updateSwipeFeedback={updateSwipeFeedback}

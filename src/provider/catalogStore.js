@@ -42,6 +42,18 @@ class CatalogStore {
         'Authorization': `tma ${this.authToken}`
     });
 
+    setLastSearchQuery = (query) => {
+        this.lastSearchQuery = query;
+    };
+
+    getCurrentFilters = () => {
+        return this.lastAppliedFilters || this.currentFilters;
+    };
+
+    clearLastSearchQuery = () => {
+        this.lastSearchQuery = null;
+    };
+
     fetchCards = flow(function* (initialLoad = false) {
         // Убрали проверку isAddingCards, так как она теперь управляется внутри
         if (!this.hasMore || this.isFetching) return;
@@ -102,35 +114,10 @@ class CatalogStore {
             runInAction(() => {
                 this.isFetching = false;
                 this.loading = false;
-                // Сбрасываем флаг сразу после завершения операции
-                this.isAddingCards = false;
+                this.isAddingCards = false; // Сбрасываем флаг сразу после завершения
             });
         }
     });
-
-    handleSwipe = (direction, card) => {
-        if (direction === 'down' || this.isAddingCards) return;
-
-        this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
-
-        const cardIndex = this.cards.findIndex(c => c._key === card._key);
-        if (cardIndex !== -1) {
-            runInAction(() => {
-                this.cards.splice(cardIndex, 1);
-            });
-        }
-
-        if (direction === 'up') {
-            this.basket = [...this.basket, card];
-        }
-
-        // Проверяем, что не идёт процесс добавления карточек, прежде чем запускать fetchCards
-        if (this.cards.length < 7 && this.hasMore && !this.isFetching && !this.isAddingCards) {
-            this.fetchCards();
-        }
-    };
-
-    // Остальной код остается без изменений
     fetchCardsWithSearch = flow(function* (searchRequest) {
         this.currentSearchQuery = searchRequest.query?.trim() || null;
         this.hasMore = true;
@@ -164,6 +151,27 @@ class CatalogStore {
         yield this.fetchCards(true);
     });
 
+    handleSwipe = (direction, card) => {
+        if (direction === 'down' || this.isAddingCards) return;
+
+        this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
+
+        const cardIndex = this.cards.findIndex(c => c._key === card._key);
+        if (cardIndex !== -1) {
+            runInAction(() => {
+                this.cards.splice(cardIndex, 1);
+            });
+        }
+
+        if (direction === 'up') {
+            this.basket = [...this.basket, card];
+        }
+
+        if (this.cards.length < 7 && this.hasMore && !this.isFetching && !this.isAddingCards) {
+            this.fetchCards();
+        }
+    };
+
     undoSwipe = () => {
         if (this.swipeHistory.length === 0) return;
 
@@ -175,6 +183,7 @@ class CatalogStore {
             _key: card._key
         };
 
+        // Добавляем карточку в начало массива
         this.cards.unshift(restoredCard);
         this.swipeHistory = this.swipeHistory.slice(1);
 

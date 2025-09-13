@@ -149,7 +149,6 @@ const TinderCards = observer(() => {
         if (direction === 'down') return;
 
         const action = direction === 'right' ? 'like' : 'dislike';
-
         sendInteraction(card.id, action);
 
         const duration = direction === 'up'
@@ -182,7 +181,8 @@ const TinderCards = observer(() => {
 
         setTimeout(() => {
             store.catalogStore.handleSwipe(direction, card);
-        }, duration/2);
+        }, duration);
+
     }, [SWIPE_CONFIG, store.catalogStore]);
 
     const updateSwipeFeedback = useCallback((dx, dy) => {

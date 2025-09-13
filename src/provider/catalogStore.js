@@ -1,4 +1,4 @@
-import {makeAutoObservable, flow, runInAction} from "mobx";
+import { makeAutoObservable, flow, runInAction } from "mobx";
 import { AUTH_TOKEN } from "../constants.js";
 
 class CatalogStore {
@@ -52,6 +52,7 @@ class CatalogStore {
     clearLastSearchQuery = () => {
         this.lastSearchQuery = null;
     };
+
     fetchCards = flow(function* (initialLoad = false) {
         if (!this.hasMore || this.isFetching) return;
 
@@ -60,7 +61,13 @@ class CatalogStore {
             if (initialLoad) {
                 this.loading = true;
                 this.currentOffset = 0;
-                this.cards = [];
+                // Сохраняем существующие карточки при initialLoad
+                if (this.cards.length > 0) {
+                    const existingCards = this.cards.slice();
+                    this.cards = [];
+                    yield new Promise(resolve => setTimeout(resolve, 10));
+                    this.cards = existingCards;
+                }
             }
 
             const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
@@ -75,7 +82,6 @@ class CatalogStore {
                 min_price: this.currentFilters.min_price,
                 max_price: this.currentFilters.max_price,
             };
-            console.log(requestBody);
 
             const response = yield fetch(url.toString(), {
                 method: 'POST',
@@ -89,25 +95,15 @@ class CatalogStore {
             this.hasMore = newCards.length >= this.limit;
             this.currentOffset += newCards.length;
 
-            const pendingCards = newCards.map(card => ({
+            // Добавляем новые карточки с уникальными ключами
+            const cardsWithKeys = newCards.map(card => ({
                 ...card,
-                _pending: true,
-                _key: this.getUniqueKey()
+                _key: this.getUniqueKey(),
+                _pending: false // Убираем pending состояние
             }));
 
-            this.cards.push(...pendingCards);
-
-            setTimeout(() => {
-                this.cards = this.cards.map(c => ({
-                    ...c,
-                    _pending: false,
-                    style: {
-                        transform: 'translate(0, 0) rotate(0deg)',
-                        opacity: 1,
-                        transition: `all 800ms ease-out`
-                    }
-                }));
-            }, 50);
+            // Используем push вместо замены массива
+            this.cards.push(...cardsWithKeys);
 
         } catch (err) {
             this.error = err.message;
@@ -155,7 +151,12 @@ class CatalogStore {
         if (direction === 'down') return;
 
         this.swipeHistory = [{ direction, card }, ...this.swipeHistory];
-        this.cards = this.cards.filter(c => c.id !== card.id);
+
+        // Удаляем карточку по индексу, а не по ID, чтобы избежать проблем с дубликатами
+        const cardIndex = this.cards.findIndex(c => c._key === card._key);
+        if (cardIndex !== -1) {
+            this.cards.splice(cardIndex, 1);
+        }
 
         if (direction === 'up') {
             this.basket = [...this.basket, card];
@@ -172,35 +173,18 @@ class CatalogStore {
         const lastAction = this.swipeHistory[0];
         const { direction, card } = lastAction;
 
+        // Восстанавливаем карточку с сохранением её первоначального ключа
         const restoredCard = {
             ...card,
-            _pending: true,
-            _key: this.getUniqueKey(),
-            style: {
-                opacity: 0,
-                zIndex: 100001
-            }
+            _key: card._key // Сохраняем оригинальный ключ
         };
 
+        // Добавляем карточку в начало массива
         this.cards.unshift(restoredCard);
-
-        setTimeout(() => {
-            runInAction(() => {
-                const cardToAnimate = this.cards.find(c => c.id === restoredCard.id);
-                if (cardToAnimate) {
-                    cardToAnimate._pending = false;
-                    cardToAnimate.style = {
-                        transform: 'translate(0, 0) rotate(0deg)',
-                        opacity: 1,
-                        transition: `all 200ms ease-out`
-                    };
-                }
-            });
-        }, 50);
-
         this.swipeHistory = this.swipeHistory.slice(1);
+
         if (direction === 'up') {
-            this.basket = this.basket.filter(c => c.id !== card.id);
+            this.basket = this.basket.filter(c => c._key !== card._key);
         }
     };
 }

@@ -102,7 +102,7 @@ class CatalogStore {
             if (initialLoad) {
                 this.cards = cardsWithKeys; // Полная замена при начальной загрузке
             } else {
-                this.cards.push(...cardsWithKeys); // Добавление при подгрузке
+                this.cards.unshift(...cardsWithKeys); // Добавление при подгрузке
             }
 
         } catch (err) {
@@ -172,7 +172,6 @@ class CatalogStore {
         const lastAction = this.swipeHistory[0];
         const { direction, card } = lastAction;
 
-        // Восстанавливаем карточку с сохранением её первоначального ключа
         const restoredCard = {
             ...card,
             _key: card._key

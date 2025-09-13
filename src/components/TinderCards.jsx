@@ -28,6 +28,8 @@ const TinderCards = observer(() => {
     const navigate = useNavigate()
     const showOnboarding = !store?.authStore?.data?.preferences?.complete_onboarding;
     const [topCardPosition, setTopCardPosition] = useState({ x: 0, y: 0 });
+    const [imagesLoaded, setImagesLoaded] = useState(false); // Новое состояние
+    const cardsRef = useRef(store?.catalogStore?.cards || []);
 
     const [filters, setFilters] = useState(() => ({
         size: store?.catalogStore?.getCurrentFilters().sizes || [],
@@ -111,6 +113,46 @@ const TinderCards = observer(() => {
             store.popular.fetchCollections();
         }
     }, [store?.authStore.data]);
+
+    useEffect(() => {
+        if (store?.catalogStore?.cards !== cardsRef.current) {
+            setImagesLoaded(false);
+            cardsRef.current = store?.catalogStore?.cards;
+        }
+
+        if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
+            const imageElements = document.querySelectorAll('.tinder-card-image');
+
+            if (imageElements.length === 0) {
+                setImagesLoaded(true);
+                return;
+            }
+
+            let loadedCount = 0;
+            const handleImageLoad = () => {
+                loadedCount++;
+                if (loadedCount === imageElements.length) {
+                    setImagesLoaded(true);
+                }
+            };
+
+            imageElements.forEach(img => {
+                if (img.complete) {
+                    handleImageLoad();
+                } else {
+                    img.addEventListener('load', handleImageLoad);
+                    img.addEventListener('error', handleImageLoad);
+                }
+            });
+
+            return () => {
+                imageElements.forEach(img => {
+                    img.removeEventListener('load', handleImageLoad);
+                    img.removeEventListener('error', handleImageLoad);
+                });
+            };
+        }
+    }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
 
     const sendInteraction = async (productId, action) => {
         try {
@@ -293,50 +335,6 @@ const TinderCards = observer(() => {
         }, 800);
     }, [store.catalogStore.cards, isAnimating]);
 
-    const [imagesLoaded, setImagesLoaded] = useState(false);
-    const cardsRef = useRef(store?.catalogStore?.cards || []);
-
-    useEffect(() => {
-        if (store?.catalogStore?.cards !== cardsRef.current) {
-            setImagesLoaded(false);
-            cardsRef.current = store?.catalogStore?.cards;
-        }
-
-        if (!store.catalogStore.loading && store?.catalogStore?.cards?.length > 0 && !imagesLoaded) {
-            const imageElements = document.querySelectorAll('.tinder-card-image');
-
-            if (imageElements.length === 0) {
-                setImagesLoaded(true);
-                return;
-            }
-
-            let loadedCount = 0;
-
-            const handleImageLoad = () => {
-                loadedCount++;
-                if (loadedCount === imageElements.length) {
-                    setImagesLoaded(true);
-                }
-            };
-
-            imageElements.forEach(img => {
-                if (img.complete) {
-                    handleImageLoad();
-                } else {
-                    img.addEventListener('load', handleImageLoad);
-                    img.addEventListener('error', handleImageLoad);
-                }
-            });
-
-            return () => {
-                imageElements.forEach(img => {
-                    img.removeEventListener('load', handleImageLoad);
-                    img.removeEventListener('error', handleImageLoad);
-                });
-            };
-        }
-    }, [store.catalogStore.loading, store?.catalogStore?.cards, imagesLoaded]);
-
     return (
         <>
             <div className={styles.container} style={{height: `${containerHeight}px`}} ref={containerRef}>
@@ -363,7 +361,8 @@ const TinderCards = observer(() => {
                 />
 
                 <div className={styles.cardsContainer}>
-                    {(store.catalogStore.loading || isSearchActive) && Array(SKELETON_COUNT).fill(0).map((_, i) => (
+                    {/* Показываем скелетоны, если данные загружаются, идёт поиск или изображения ещё не загружены */}
+                    {(store.catalogStore.loading || isSearchActive || !imagesLoaded) && Array(SKELETON_COUNT).fill(0).map((_, i) => (
                         <CustomSkeleton
                             key={`skeleton-${i}`}
                             style={{
@@ -376,7 +375,8 @@ const TinderCards = observer(() => {
                         />
                     ))}
 
-                    {!store.catalogStore.loading && !isSearchActive && store?.catalogStore?.cards?.map((card, index) => (
+                    {/* Отображаем карточки только после полной загрузки */}
+                    {!store.catalogStore.loading && !isSearchActive && imagesLoaded && store?.catalogStore?.cards?.map((card, index) => (
                         <TinderCard
                             key={card._key}
                             card={card}

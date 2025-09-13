@@ -9,23 +9,23 @@ import ButtonWrapper from "../ButtonWrapper.jsx";
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [loadedImages, setLoadedImages] = useState({});
+    const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-        let loadedCount = 0;
-        const totalImages = CLOTH_STYLES.length;
+        const timer = setTimeout(() => {
+            setShowContent(true);
+            setIsLoading(false);
+        }, 300);
 
         CLOTH_STYLES.forEach(style => {
             const img = new Image();
             img.src = style.url;
             img.onload = img.onerror = () => {
-                loadedCount++;
                 setLoadedImages(prev => ({ ...prev, [style.id]: true }));
-
-                if (loadedCount === totalImages) {
-                    setIsLoading(false);
-                }
             };
         });
+
+        return () => clearTimeout(timer);
     }, []);
 
     const handleStyleToggle = (styleName) => {
@@ -36,7 +36,8 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
         handleStyleToggle(styleName);
     };
 
-    if (isLoading) {
+    // Быстрая версия скелетонов на короткое время
+    if (!showContent) {
         return (
             <div className={styles.onboardingStep}>
                 <div className={styles.stepHeader}>
@@ -45,6 +46,19 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                     </button>
                     <p className={styles.stepTitle}>Выберите стили</p>
                 </div>
+
+                <div className={styles.scrollContainer}>
+                    <div className={styles.styleGrid}>
+                        {Array.from({ length: Math.min(6, CLOTH_STYLES.length) }).map((_, index) => (
+                            <CustomSkeleton
+                                key={index}
+                                className={styles.styleCard}
+                                style={{ height: '200px' }}
+                            />
+                        ))}
+                    </div>
+                </div>
+
                 <div className={styles.onboardingActions}>
                     <ButtonWrapper>
                         <FullScreenButton
@@ -79,12 +93,16 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                         <div
                             key={style.id}
                             className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
-                            onClick={() => handleCardClick(style.name)} // Добавляем обработчик клика
+                            onClick={() => handleCardClick(style.name)}
                         >
                             <img
                                 src={style.url}
                                 alt={style.name}
                                 className={styles.styleImage}
+                                loading="lazy" // Ленивая загрузка
+                                onError={(e) => {
+                                    e.target.src = '/placeholder-style.jpg'; // Запасное изображение
+                                }}
                             />
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
@@ -106,10 +124,15 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                         textColor='var(--black)'
                         className={`${styles.onboardingButton} ${styles.primary}`}
                         onClick={onNext}
+                        disabled={isLoading}
                     >
-                        Вперед
+                        {isLoading ? 'Загрузка...' : 'Вперед'}
                     </FullScreenButton>
-                    <button className={styles.secondaryButton} onClick={onSkip}>
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={onSkip}
+                        disabled={isLoading}
+                    >
                         Пропустить
                     </button>
                 </ButtonWrapper>

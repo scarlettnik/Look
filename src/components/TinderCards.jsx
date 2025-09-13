@@ -22,16 +22,15 @@ const TinderCards = observer(() => {
     const store = useStore();
     const navigate = useNavigate();
 
-    // --- Onboarding state ---
-    // Инициализируем состояние онбординга на основе данных из хранилища.
-    // Это исключает потенциальные проблемы с race condition при инициализации.
+    // Инициализация состояния онбординга.
+    // Устанавливаем `isOnboardingVisible` напрямую на основе данных из хранилища.
+    // Это исключает асинхронные задержки и рейс-кондишны.
     const [isOnboardingVisible, setIsOnboardingVisible] = useState(() => {
-        const complete = store?.authStore?.data?.preferences?.complete_onboarding;
-        return complete !== true;
+        return store?.authStore?.data?.preferences?.complete_onboarding !== true;
     });
     const [onboardingStep, setOnboardingStep] = useState(1);
 
-    // Упрощенный useEffect для управления видимостью.
+    // Этот useEffect теперь просто следит за изменениями в данных и обновляет состояние.
     useEffect(() => {
         const complete = store?.authStore?.data?.preferences?.complete_onboarding;
         setIsOnboardingVisible(complete !== true);
@@ -377,7 +376,10 @@ const TinderCards = observer(() => {
                     highlightPopular={popularHighlight}
                     onboarding={isOnboardingVisible}
                 />
+            </div>
 
+            {/* Важное изменение: Онбординг теперь вне основного контейнера  */}
+            {isOnboardingVisible && (
                 <Onboarding
                     showOnboarding={isOnboardingVisible}
                     onboardingStep={onboardingStep}
@@ -396,7 +398,6 @@ const TinderCards = observer(() => {
                                     preferences: { complete_onboarding: true }
                                 })
                             });
-
                             runInAction(() => {
                                 if (store.authStore.data) {
                                     store.authStore.data.preferences = {
@@ -415,7 +416,7 @@ const TinderCards = observer(() => {
                     setsaveHighlight={setsaveHighlight}
                     setPopularHighlight={setPopularHighlight}
                 />
-            </div>
+            )}
 
             <SaveToCollectionModal
                 isOpen={isSaveModalOpen}

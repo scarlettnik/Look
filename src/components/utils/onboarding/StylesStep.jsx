@@ -32,7 +32,6 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
         onUpdate('styles', styleName);
     };
 
-    // Обработчик клика по карточке
     const handleCardClick = (styleName) => {
         handleStyleToggle(styleName);
     };
@@ -46,19 +45,6 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                     </button>
                     <p className={styles.stepTitle}>Выберите стили</p>
                 </div>
-
-                <div className={styles.scrollContainer}>
-                    <div className={styles.styleGrid}>
-                        {Array.from({ length: CLOTH_STYLES.length }).map((_, index) => (
-                            <CustomSkeleton
-                                key={index}
-                                className={styles.styleCard}
-                                style={{ height: '200px' }}
-                            />
-                        ))}
-                    </div>
-                </div>
-
                 <div className={styles.onboardingActions}>
                     <ButtonWrapper>
                         <FullScreenButton

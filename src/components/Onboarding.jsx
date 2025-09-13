@@ -166,7 +166,7 @@ export const Onboarding = observer(({
         }
     };
 
-    if (!showOnboarding || onboardingStep === 0) return null;
+    if (onboardingStep === 0) return null;
 
     return (
         <div className={styles.onboardingOverlay}>

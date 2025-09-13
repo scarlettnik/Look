@@ -6,6 +6,7 @@
     position: relative;
     z-index: 1;
     height: 7vh;
+    margin-top: 2vh;
 }
 
 .cardsContainer {
@@ -28,7 +29,7 @@
     position: absolute;
     width: 90vw;
     max-width: 600px;
-    height: 64vh;
+    height: 60vh;
     display: flex;
     justify-content: center;
     align-items: center;

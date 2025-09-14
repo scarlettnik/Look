@@ -115,6 +115,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    background: var(--white-gray);
     z-index: 999;
 }
 

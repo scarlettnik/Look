@@ -170,7 +170,7 @@ const ProductPage = () => {
                         <p className={styles.brand}>{product?.brand}</p>
                         <div className={styles.header}>
                             <p className={styles.price}>
-                                {product?.discount_price && product?.discount_price != product?.price ? (
+                                {product?.discount_price && product?.discount_price !== product?.price ? (
                                     <>
                                         <span
                                             style={{textDecoration: 'line-through', color: 'gray', marginRight: '8px'}}>
@@ -183,13 +183,13 @@ const ProductPage = () => {
                                 )}
                             </p>
                             <button
+                                style={{backgroundColor:'transparent'}}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleOpenSaveModal(product);
                                 }}
                             >
                                 <img
-                                    style={{backgroundColor:'transparent'}}
                                     className={styles.saveIcon}
                                     src={product.is_contained_in_user_collections
                                         ? "/menuIcons/active/save.svg"

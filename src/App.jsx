@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { BackButton } from '@twa-dev/sdk/react';
-import { useEffect } from 'react';
+import {useEffect, useRef} from 'react';
 import ProductPage from './components/ProductPage';
 import TinderCards from "./components/TinderCards.jsx";
 import Profile from "./components/Profile.jsx";
@@ -32,6 +32,7 @@ function App() {
 
 function AppContent() {
     const navigate = useNavigate();
+    const hasRedirected = useRef(false);
 
     const isTWA = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
     const startParamFromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
@@ -48,8 +49,13 @@ function AppContent() {
     }, [isTWA]);
 
     useEffect(() => {
+        if (hasRedirected.current) {
+            return;
+        }
+
         if (startParamFromInitData && startParamFromInitData.startsWith('collection_')) {
             const collectionId = startParamFromInitData.split('_')[1];
+            hasRedirected.current = true;
             navigate(`/trands/collection/${collectionId}`, { replace: true });
         }
     }, [startParamFromInitData, navigate]);

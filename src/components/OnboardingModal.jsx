@@ -16,7 +16,6 @@ const OnboardingModal = observer(() => {
     const store = useStore();
     const auth = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
-
     const [preferences, setPreferences] = useState({
         gender: 'female',
         age: store.authStore.data?.preferences?.age || 25,

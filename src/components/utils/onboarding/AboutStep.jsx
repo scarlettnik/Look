@@ -6,6 +6,10 @@ import titleStyle from '../../ui/OnboardingModal.module.css'
 const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
     const sliderRef = useRef(null);
     const [valuePosition, setValuePosition] = useState(0);
+    const handleBack = (e) => {
+        e.stopPropagation(); // Предотвращаем всплытие события
+        onBack();
+    };
 
     useEffect(() => {
         if (sliderRef.current) {
@@ -26,8 +30,9 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
         <div className={styles.container}>
             <div className={titleStyle.stepHeader}>
                 <button
+                    style={{zIndex: 9999}}
                     className={titleStyle.backButton}
-                    onClick={onBack}
+                    onClick={handleBack}
                 >
                     <img src='/subicons/whitearrowleft.svg' alt="Назад"/>
                 </button>

@@ -181,7 +181,12 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
-    padding: 1vh;
+    padding: 1vh 0;
+}
+.textwear {
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
 }
 .selectedSize {
     border: 1px solid var(--black);

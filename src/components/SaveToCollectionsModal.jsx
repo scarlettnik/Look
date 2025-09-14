@@ -8,7 +8,6 @@ import FullScreenButton from "./FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
 import AddList from "./AddList.jsx";
-import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
 const SaveToCollectionModal = observer(({

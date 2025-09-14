@@ -16,6 +16,7 @@ const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => 
         <div className={styles.onboardingStep}>
             <div className={styles.stepHeader}>
                 <button
+                    style={{zIndex: 9999}}
                     className={styles.backButton}
                     onClick={onBack}
                 >

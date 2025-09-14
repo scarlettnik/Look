@@ -24,6 +24,9 @@
     background: white;
     z-index: 10;
 }
+.circleButton {
+    background: transparent;
+}
 
 .modalHeader {
     margin-top: 20px;

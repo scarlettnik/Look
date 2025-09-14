@@ -157,7 +157,7 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
                         )}
 
                         <div className={styles.fitOptionsWrapper}>
-                            <p>Ношу одежду</p>
+                            <p className={styles.textwear}>Ношу одежду</p>
                             <FitOptions
                                 params={preferences}
                                 updateParam={(value) => updateParam('wearing_styles', value)}

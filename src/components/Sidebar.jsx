@@ -59,7 +59,7 @@ const Sidebar = ({highlightSave, highlightPopular, onboarding}) => {
                 <img
                     src={highlightSave ? '/menuIcons/onboarding/save.svg' : getIconPath('save', activePath === '/save')}
                     alt="save"
-                    className={styles.icon}
+                    className={highlightSave ? styles.highlightIcon: styles.icon}
                 />
             </button>
 
@@ -70,7 +70,7 @@ const Sidebar = ({highlightSave, highlightPopular, onboarding}) => {
                 <img
                     src={highlightPopular ? '/menuIcons/onboarding/trands.svg' : getIconPath('trends', activePath === '/trands')}
                     alt="trends"
-                    className={styles.icon}
+                    className={highlightPopular ? styles.highlightIcon: styles.icon}
                 />
             </button>
 

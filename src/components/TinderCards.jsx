@@ -249,7 +249,6 @@ const TinderCards = observer(() => {
     };
 
     const [isAnimating, setIsAnimating] = useState(false);
-
     const simulateSwipe = useCallback((direction) => {
         if (!store.catalogStore.cards?.length || isAnimating) return;
 
@@ -260,50 +259,50 @@ const TinderCards = observer(() => {
         setIsOnboardingActive(true);
         setIsAnimating(true);
 
-        const params = {
+        const swipeParams = {
             left: {
-                endX: -window.innerWidth * 0.7,
-                endY: 0,
-                rotation: -15
+                x: -window.innerWidth * 0.7,
+                y: 0,
+                rotation: -SWIPE_CONFIG.horizontal.rotationAngle
             },
             right: {
-                endX: window.innerWidth * 0.7,
-                endY: 0,
-                rotation: 15
+                x: window.innerWidth * 0.7,
+                y: 0,
+                rotation: SWIPE_CONFIG.horizontal.rotationAngle
             },
             up: {
-                endX: window.innerWidth * 0.5,
-                endY: -window.innerHeight * 0.5,
+                x: window.innerWidth * 0.3,
+                y: -window.innerHeight * 0.4,
                 rotation: 5
+            },
+            down: {
+                x: 0,
+                y: 0,
+                rotation: 0
             }
         }[direction];
 
-        const originalStyles = {
-            transform: cardRef.style.transform,
-            transition: cardRef.style.transition,
-            opacity: cardRef.style.opacity,
-            zIndex: cardRef.style.zIndex,
-            willChange: cardRef.style.willChange
-        };
+        const originalTransform = cardRef.style.transform;
+        const originalTransition = cardRef.style.transition;
+        const originalZIndex = cardRef.style.zIndex;
+        const originalWillChange = cardRef.style.willChange;
 
-        cardRef.style.transition = 'transform 800ms ease-out, opacity 800ms ease-out';
+        cardRef.style.transition = `transform ${SWIPE_CONFIG.horizontal.animationDuration}ms ease-out`;
         cardRef.style.willChange = 'transform';
-        cardRef.style.transform = `translate3d(${params.endX}px, ${params.endY}px, 0) rotate(${params.rotation}deg)`;
+        cardRef.style.transform = `translate3d(${swipeParams.x}px, ${swipeParams.y}px, 0) rotate(${swipeParams.rotation}deg)`;
         cardRef.style.zIndex = '10000';
 
         setTimeout(() => {
-            cardRef.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-            cardRef.style.transform = originalStyles.transform;
+            setIsAnimating(false);
+            setIsOnboardingActive(false);
 
-            setTimeout(() => {
-                cardRef.style.transition = originalStyles.transition;
-                cardRef.style.zIndex = originalStyles.zIndex;
-                cardRef.style.willChange = originalStyles.willChange;
-                setIsOnboardingActive(false);
-                setIsAnimating(false);
-            }, 300);
-        }, 800);
-    }, [store.catalogStore.cards, isAnimating]);
+            cardRef.style.transition = originalTransition;
+            cardRef.style.zIndex = originalZIndex;
+            cardRef.style.willChange = originalWillChange;
+
+        }, SWIPE_CONFIG.horizontal.animationDuration);
+
+    }, [store.catalogStore.cards, isAnimating, SWIPE_CONFIG]);
 
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const cardsRef = useRef(store?.catalogStore?.cards || []);

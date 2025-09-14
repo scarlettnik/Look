@@ -36,7 +36,6 @@ const TinderCard = ({
         return () => setCardRef(card.id, null);
     }, [card.id, setCardRef]);
 
-    // Этот useEffect теперь только для начального рендера и zIndex
     useEffect(() => {
         if (cardRef.current) {
             cardRef.current.style.zIndex = zIndex;

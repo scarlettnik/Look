@@ -8,11 +8,12 @@ const ONBOARDING_STEPS = {
     1: {
         text: 'Привет! За пару кликов расскажем, как тут всё устроено. Открыть карточку с деталями можно кликнув на неё.',
         page: '1/6',
+        swipe: 'left',
     },
     2: {
         text: 'При свайпе влево карточка пропадает из ленты и подобные стили показываются реже.',
         page: '2/6',
-        swipe: 'left',
+        swipe: 'right',
         images: [
             { src: '/arrowleft.svg', alt: 'arrow', style: { position: 'fixed', right: '2vw', bottom: '220px', width: '30%', rotate: '8deg' } },
             { src: '/subicons/darkdislike.svg', alt: 'Дизайк', style: { position: 'fixed', left: '2vw', top: '50%', transform: 'translateY(-50%)', width: '80px', height: '80px', zIndex: 1000001 } }
@@ -21,16 +22,19 @@ const ONBOARDING_STEPS = {
     3: {
         text: 'При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще.',
         page: '3/6',
-        swipe: 'right',
+        swipe: 'up',
         images: [
             { src: '/arrow.svg', alt: 'arrow', style: { position: 'fixed', left: '2vw', bottom: '220px', width: '30%', rotate: '-8deg' } },
             { src: '/subicons/darklike.svg', alt: 'Лайк', style: { position: 'fixed', right: '2vw', top: '50%', transform: 'translateY(-50%)', width: '80px', height: '80px', zIndex: 1000001 } }
         ],
     },
     4: {
+        swipe: 'down',
         text: 'При свайпе вверх появляется новая карточка. Предыдущую можно найти, кликнув на иконку «Назад».',
         page: '4/6',
-        swipe: 'up',
+        images: [
+            { src: '/arrowup.svg', alt: 'arrow', style: { position: 'fixed', left: '2vw', bottom: '220px', width: '20%', rotate: '-8deg' } },
+        ]
     },
     5: {
         text: 'Здесь можно найти все сохранённые карточки и создать свои подборки.',
@@ -108,7 +112,6 @@ export const Onboarding = observer(({
 
     return (
         <div className={styles.onboardingOverlay} role="dialog" aria-modal="true">
-            {/* Добавляем изображения только для шага 3 */}
             {currentStep.images && currentStep.images.map((img, index) => (
                 <img key={index} src={img.src} alt={img.alt} style={img.style} />
             ))}
@@ -119,7 +122,7 @@ export const Onboarding = observer(({
                     <button
                         className={styles.onboardingButton}
                         onClick={handleNextOnboardingStep}
-                        disabled={isProcessing || isAnimating}
+                        // disabled={isProcessing || isAnimating}
                     >
                         {onboardingStep === 6 ? 'Go on' : 'Далее'}
                     </button>

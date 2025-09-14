@@ -68,7 +68,7 @@ export const SWIPE_CONFIG = {
     horizontal: {
         threshold: 0.15,
         speedMultiplier: 0.8,
-        rotationAngle: 25,
+        rotationAngle: 15,
         animationDuration: 800
     },
     verticalUp: {

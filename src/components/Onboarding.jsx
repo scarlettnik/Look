@@ -13,6 +13,10 @@ const ONBOARDING_STEPS = {
         text: 'При свайпе влево карточка пропадает из ленты и подобные стили показываются реже.',
         page: '2/6',
         swipe: 'left',
+        images: [
+            { src: '/arrowleft.svg', alt: 'arrow', style: { position: 'fixed', right: '2vw', bottom: '220px', width: '30%', rotate: '8deg' } },
+            { src: '/subicons/darkdislike.svg', alt: 'Дизайк', style: { position: 'fixed', left: '2vw', top: '50%', transform: 'translateY(-50%)', width: '80px', height: '80px', zIndex: 1000001 } }
+        ]
     },
     3: {
         text: 'При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще.',
@@ -57,12 +61,10 @@ export const Onboarding = observer(({
 
         const currentStepData = ONBOARDING_STEPS[onboardingStep];
 
-        // Симулируем свайп, если он определен для шага
         if (currentStepData?.swipe) {
             await simulateSwipe(currentStepData.swipe);
         }
 
-        // Выделяем кнопки, если это необходимо для шага
         if (onboardingStep === 3) setUndoButtonHighlight(true);
         if (onboardingStep === 4) {
             setUndoButtonHighlight(false);
@@ -75,11 +77,9 @@ export const Onboarding = observer(({
 
         const nextStep = onboardingStep + 1;
 
-        // Устанавливаем следующий шаг
         if (nextStep in ONBOARDING_STEPS) {
             setOnboardingStep(nextStep);
         } else {
-            // Если это последний шаг, завершаем онбординг
             setPopularHighlight(false);
             if (handleSaveChanges) {
                 await handleSaveChanges();

@@ -95,15 +95,17 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                             className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
                             onClick={() => handleCardClick(style.name)}
                         >
-                            <img
-                                src={style.url}
-                                alt={style.name}
-                                className={styles.styleImage}
-                                loading="lazy" // Ленивая загрузка
-                                onError={(e) => {
-                                    e.target.src = '/placeholder-style.jpg'; // Запасное изображение
-                                }}
-                            />
+                            <div style={{height: '250px'}}>
+                                <img
+                                    src={style.url}
+                                    alt={style.name}
+                                    className={styles.styleImage}
+                                    loading="lazy"
+                                    onError={(e) => {
+                                        e.target.src = '/placeholder-style.jpg';
+                                    }}
+                                />
+                            </div>
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
                                     className={styles.styleCheckbox}

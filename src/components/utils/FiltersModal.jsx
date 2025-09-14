@@ -1,7 +1,9 @@
 import React from "react";
 import stylesM from "../ui/filterList.module.css";
+import useIsKeyboardOpen from "../../hooks/useIsKeyboardOpen.js";
 
 export const FiltersModal = ({ title, onClose, onApply, children, applyDisabled = false }) => {
+    const isKeyboardOpen = useIsKeyboardOpen();
     return (
 
             <div className={stylesM.modalContent}>
@@ -12,13 +14,14 @@ export const FiltersModal = ({ title, onClose, onApply, children, applyDisabled 
                     </button>
                 </div>
                 <div className={stylesM.modalBody}>{children}</div>
-                <button
+                {!isKeyboardOpen && <button
                     className={stylesM.applyButton}
                     onClick={onApply}
                     disabled={applyDisabled}
                 >
                     Показать
                 </button>
+                }
             </div>
 
     );

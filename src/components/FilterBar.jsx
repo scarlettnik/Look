@@ -262,7 +262,6 @@ export const FilterBar = observer(({
             const apiFilters = convertToApiFilters(updatedFilters);
             catalogStore.applyFilters(apiFilters);
         } else if (onFilter) {
-            // Используем локальные фильтры через колбэк
             onFilter(updatedFilters);
         }
     };

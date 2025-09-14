@@ -132,7 +132,6 @@ const OnboardingModal = observer(() => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
     };
 
-
     const skipOnboarding = () => {
         handleSaveChanges();
         setIsClosed(true);

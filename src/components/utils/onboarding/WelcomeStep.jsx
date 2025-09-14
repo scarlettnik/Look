@@ -159,7 +159,6 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     const easeInOut = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 
-
     return (
         <div className={styles.onboardingStep}>
             <p className={welcomstyle.onBoardingTitle}>

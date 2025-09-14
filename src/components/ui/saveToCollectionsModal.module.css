@@ -20,13 +20,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 16px 3vw;
+    padding: 16px 2vw;
     background: white;
-    border-top: 1px solid #eee;
     z-index: 10;
 }
 
-/* Остальные стили остаются без изменений */
 .modalHeader {
     margin-top: 20px;
     display: flex;

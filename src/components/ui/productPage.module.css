@@ -56,8 +56,8 @@
 }
 
 .dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background-color: #ccc;
     border-radius: 50%;
     transition: background-color 0.3s ease;
@@ -141,11 +141,10 @@
     padding: 8px 12px;
     border-radius: 6px;
     text-align: center;
-    white-space: nowrap;
     font-size: 12px;
-    border-bottom: 1px solid var(--light-gray);
     color: var(--black);
     background: var(--ultralight-gray);
+    box-shadow: none !important;
 }
 .sizeOption.active {
     border-color: 1px solid var(--black);

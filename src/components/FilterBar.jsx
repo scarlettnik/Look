@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../provider/StoreContext";
-import { filterProducts } from "./utils/incideFilter";
 import { SIZES } from "../constants";
 import styles from "./ui/compilation.module.css";
 import filterStyles from "./ui/filterList.module.css";
@@ -94,14 +93,14 @@ const AllFiltersModal = observer(({
             <div className={filterStyles.section}>
                 <div className={filterStyles.sectionHeader}>
                     <div className={filterStyles.genderLabels}>
-                        <span style={{color: 'var(--dark-warm-gray'}}>Женское</span>
-                        <span style={{color: 'var(--light-warm-gray'}}>Мужское</span>
+                        <span className={filterStyles.sectionTitle} style={{color: 'var(--dark-warm-gray'}}>Женское</span>
+                        <span className={filterStyles.sectionTitle} style={{color: 'var(--light-warm-gray'}}>Мужское</span>
                     </div>
                     <button
                         className={filterStyles.showAllButton}
                         onClick={() => setShowAll(prev => !prev)}
                     >
-                        {showAll ? 'Скрыть' : 'Показать все'}
+                        {showAll ? 'Скрыть' : 'Смотреть все'}
                     </button>
                 </div>
                 <div className={filterStyles.typeOptions}>
@@ -122,6 +121,7 @@ const AllFiltersModal = observer(({
             <div className={filterStyles.section}>
                 <p className={filterStyles.sectionTitle}>Стоимость</p>
                 <div className={filterStyles.priceInputGroup}>
+                    <div className={filterStyles.priceInput}>
                     <input
                         type="number"
                         placeholder="от"
@@ -131,7 +131,9 @@ const AllFiltersModal = observer(({
                             localFilters.price.max
                         )}
                     />
-                    <span style={{marginTop: '10px'}}>-</span>
+                    </div>
+                    <span style={{width: '4vw', height: '1px', backgroundColor: 'var(--black'}}></span>
+                    <div className={filterStyles.priceInput}>
                     <input
                         type="number"
                         placeholder="до"
@@ -141,6 +143,7 @@ const AllFiltersModal = observer(({
                             e.target.value ? parseInt(e.target.value) : null
                         )}
                     />
+                    </div>
                 </div>
                 <div className={filterStyles.gridOptions}>
                     {quickOptions.map((option) => (
@@ -173,7 +176,7 @@ const AllFiltersModal = observer(({
             </div>
 
             <div className={filterStyles.section}>
-                <h3 className={filterStyles.sectionTitle}>Размер</h3>
+                <p className={filterStyles.sectionTitle}>Размер</p>
                 <div className={filterStyles.gridOptions}>
                     {SIZES.map(size => (
                         <button
@@ -191,7 +194,7 @@ const AllFiltersModal = observer(({
 
 
             <div className={filterStyles.section}>
-                <h3 className={filterStyles.sectionTitle}>
+                <p className={filterStyles.sectionTitle}>
                     Цвет
                     {localFilters.color.length > 0 && (
                         <span
@@ -201,7 +204,7 @@ const AllFiltersModal = observer(({
                               {localFilters.color.length > 2 && ` и еще ${localFilters.color.length - 2}`}
                         </span>
                     )}
-                </h3>
+                </p>
 
 
                 <div className={filterStyles.gridOptions}>

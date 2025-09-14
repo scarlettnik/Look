@@ -233,7 +233,7 @@ const ProductPage = () => {
                                 </button>
                             )}
                         </div>
-                        <div style={{width: '98vw', height: '1px', backgroundColor: 'var(--ultralight-gray)', marginTop: '1.5vh'}}></div>
+                        <div style={{width: '98vw', height: '1px', backgroundColor: '#D9D9D9', marginTop: '1.5vh'}}></div>
                     </span>
                 )}
 
@@ -258,7 +258,7 @@ const ProductPage = () => {
                                 ))}
                             </div>
                             <p className={styles.aboutSize}>Размер подобран на основе ваших параметров </p>
-                            <div style={{width: '96vw', height: '1px', backgroundColor: 'var(--ultralight-gray)', marginTop: '1.5vh'}}></div>
+                            <div style={{width: '96vw', height: '1px', backgroundColor: '#D9D9D9', marginTop: '1.5vh'}}></div>
                         </>
                     )
                 )}
@@ -290,7 +290,7 @@ const ProductPage = () => {
                             <div style={{
                                 width: '96vw',
                                 height: '1px',
-                                backgroundColor: 'var(--ultralight-gray)',
+                                backgroundColor: '#D9D9D9',
                                 marginTop: '1vh'
                             }}></div>
 

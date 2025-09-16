@@ -43,7 +43,7 @@ const TinderCard = ({
             }
             timeoutRef.current = setTimeout(() => {
                 setIsInteractive(true);
-            }, 300);
+            }, 100);
         } else {
             setIsInteractive(false);
             if (timeoutRef.current) {

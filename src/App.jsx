@@ -45,7 +45,6 @@ function AppContent() {
         tgWebApp.ready();
         tgWebApp.disableVerticalSwipes();
         tgWebApp.expand();
-        tgWebApp.enableClosingConfirmation();
     }, [isTWA]);
 
     useEffect(() => {

@@ -20,11 +20,9 @@
     z-index: 1;
     position: relative;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y pinch-zoom;
+    touch-action: none;
     overscroll-behavior: none;
-
 }
-
 .onboardingOverlay {
     position: fixed;
     top: 0;

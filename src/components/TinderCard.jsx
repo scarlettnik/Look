@@ -28,6 +28,28 @@ const TinderCard = ({
     const navigate = useNavigate();
 
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [localStyle, setLocalStyle] = useState({
+        transform: 'translate(0,0) rotate(0deg)',
+        opacity: 1,
+    });
+
+    useEffect(() => {
+        if (card._pending) {
+            setLocalStyle({
+                transform: 'translate(0,20px) rotate(0deg)',
+                opacity: 0,
+            });
+
+            requestAnimationFrame(() => {
+                setLocalStyle({
+                    transform: 'translate(0,0) rotate(0deg)',
+                    opacity: 1,
+                    transition: 'all 300ms ease-out',
+                });
+            });
+        }
+    }, [card._key]);
+
 
     useEffect(() => {
         if (cardRef.current) {
@@ -199,7 +221,7 @@ const TinderCard = ({
             onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
             onMouseUp={handleEnd}
             onMouseLeave={handleEnd}
-            style={{ zIndex }}
+            style={{ zIndex, ...localStyle }}
         >
             <div onClick={() => navigate(`/product/${card.id}`)}>
                 {!imageLoaded && (

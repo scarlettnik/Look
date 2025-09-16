@@ -55,7 +55,7 @@ const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => 
                         />
                     )}
 
-                    <div style={{width:'92vw', marginLeft:'2vw'}} className={styles.fitOptionsWrapper}>
+                    <div style={{width:'calc(92vw-1vh)'}} className={styles.fitOptionsWrapper}>
                         <p className={styles.text}>Ношу одежду</p>
                         <FitOptions
                             params={params}

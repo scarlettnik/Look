@@ -82,7 +82,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     return (
         <div className={styles.onboardingStep}>
             <div className={styles.stepHeader}>
-                <button className={styles.backButton} onClick={onBack}>
+                <button style={{zIndex: 9999}} className={styles.backButton} onClick={onBack}>
                     <img src='/subicons/whitearrowleft.svg' alt="Назад" />
                 </button>
                 <p className={styles.stepTitle}>Выберите стили</p>

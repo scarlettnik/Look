@@ -45,7 +45,6 @@
 .backButton {
     position: fixed;
     left: 2vw;
-    background: none;
     border: none;
     cursor: pointer;
     padding: 0;
@@ -135,6 +134,7 @@
     flex-direction: column;
 }
 .tabContent {
+    padding: 0 1vh;
     display: flex;
     flex-direction: column;
 }

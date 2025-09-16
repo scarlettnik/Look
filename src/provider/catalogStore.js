@@ -98,13 +98,9 @@ class CatalogStore {
             this.cards.push(...pendingCards);
 
             setTimeout(() => {
-                this.cards = this.cards.map(c => ({
-                    ...c,
-                    _pending: false,
-                    style: {
-                        transform: 'translate(0, 0) rotate(0deg)',
-                        opacity: 1,
-                    }
+                const pendingCards = newCards.map(card => ({
+                    ...card,
+                    _key: this.getUniqueKey() // только уникальный ключ
                 }));
             }, 50);
 

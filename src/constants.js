@@ -69,12 +69,12 @@ export const SWIPE_CONFIG = {
         threshold: 0.15,
         speedMultiplier: 0.8,
         rotationAngle: 15,
-        animationDuration: 800
+        animationDuration: 1200
     },
     verticalUp: {
         threshold: 0.1,
         speedMultiplier: 0.8,
-        animationDuration: 1000
+        animationDuration: 1500
     },
     verticalDown: {
         threshold: 1000000000000000000,

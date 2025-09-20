@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "../ui/sceleton.module.css";
 
 const CustomSkeleton = ({

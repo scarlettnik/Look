@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ui/customCheckbox.module.css';
+import styles from '../ui/customCheckbox.module.css';
 
 const CustomCheckbox = ({ id, checked, onChange, className = '' }) => {
     return (

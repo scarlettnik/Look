@@ -1,50 +1,7 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import styles from './ui/TinderCards.module.css';
 import { observer } from 'mobx-react-lite';
-
-// Создаем объект с данными для каждого шага онбординга.
-// Это делает код чище и проще для изменений.
-const ONBOARDING_STEPS = {
-    1: {
-        text: 'Привет! За пару кликов расскажем, как тут всё устроено. Открыть карточку с деталями можно кликнув на неё.',
-        page: '1/6',
-        swipe: 'left',
-    },
-    2: {
-        text: 'При свайпе влево карточка пропадает из ленты и подобные стили показываются реже.',
-        page: '2/6',
-        swipe: 'right',
-        images: [
-            { src: '/arrowleft.svg', alt: 'arrow', style: { position: 'fixed', right: '2vw', bottom: '220px', width: '30%', rotate: '8deg' } },
-            { src: '/subicons/darkdislike.svg', alt: 'Дизайк', style: { position: 'fixed', left: '2vw', top: '50%', transform: 'translateY(-50%)', width: '80px', height: '80px', zIndex: 1000001 } }
-        ]
-    },
-    3: {
-        text: 'При свайпе вправо карточка попадает в подборку и подобные стили показываются чаще.',
-        page: '3/6',
-        swipe: 'up',
-        images: [
-            { src: '/arrow.svg', alt: 'arrow', style: { position: 'fixed', left: '2vw', bottom: '220px', width: '30%', rotate: '-8deg' } },
-            { src: '/subicons/darklike.svg', alt: 'Лайк', style: { position: 'fixed', right: '2vw', top: '50%', transform: 'translateY(-50%)', width: '80px', height: '80px', zIndex: 1000001 } }
-        ],
-    },
-    4: {
-        swipe: 'down',
-        text: 'При свайпе вверх появляется новая карточка. Предыдущую можно найти, кликнув на иконку «Назад».',
-        page: '4/6',
-        images: [
-            { src: '/arrowup.svg', alt: 'arrow', style: { position: 'fixed', left: '2vw', bottom: '220px', width: '20%', rotate: '-8deg' } },
-        ]
-    },
-    5: {
-        text: 'Здесь можно найти все сохранённые карточки и создать свои подборки.',
-        page: '5/6',
-    },
-    6: {
-        text: 'А тут — подборки по стилям и направлениям. При нажатии на фото из подборки откроется карточка товара.',
-        page: '6/6',
-    },
-};
+import {ONBOARDING_STEPS} from "../constants.js";
 
 export const Onboarding = observer(({
                                         showOnboarding,

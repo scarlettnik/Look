@@ -3,6 +3,8 @@ import {FullScreenModal} from "../FullScreenModal.jsx";
 import styles from "../../ui/compilation.module.css";
 import {COLORS} from "../../../constants.js";
 
+//не знаю почему его в итоге не окаалось в дизайне, решила добоавить
+
 const ColorFilter = ({ applyFilter, currentValue, onClose }) => {
     const [selected, setSelected] = useState(currentValue || []);
 

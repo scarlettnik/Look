@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import {FullScreenModal} from "../FullScreenModal.jsx";
-import styles from "../../ui/compilation.module.css";
 import filterStyles from "../../ui/filterList.module.css";
-import CustomCheckbox from "../../CustomCheckbox.jsx";
+import CustomCheckbox from "../CustomCheckbox.jsx";
 import store from "../../../store.js";
 
 export const TypeFilter = ({ applyFilter, currentValue, onClose }) => {

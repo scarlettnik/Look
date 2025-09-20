@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../ui/OnboardingModal.module.css';
-import CustomCheckbox from "../../CustomCheckbox.jsx";
-import FullScreenButton from "../../FullScrinButton.jsx";
+import CustomCheckbox from "../CustomCheckbox.jsx";
+import FullScreenButton from "../FullScrinButton.jsx";
 import CustomSkeleton from "../CustomSkeleton.jsx";
 import {CLOTH_STYLES} from "../../../constants.js";
 import ButtonWrapper from "../ButtonWrapper.jsx";

@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {FullScreenModal} from "../FullScreenModal.jsx";
 import styles from "../../ui/compilation.module.css";
-import {BRANDS} from "../../../constants.js";
 import {useStore} from "../../../provider/StoreContext.jsx";
 import {observer} from "mobx-react";
 

@@ -1,4 +1,3 @@
-import React from "react";
 import stylesM from "../ui/filterList.module.css";
 import useIsKeyboardOpen from "../../hooks/useIsKeyboardOpen.js";
 

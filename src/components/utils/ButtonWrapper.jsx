@@ -1,6 +1,3 @@
-import React from 'react';
-
-
 const ButtonWrapper= ({
                                                          children,
                                                          bottom = '80px',

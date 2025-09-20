@@ -16,7 +16,7 @@ import {Onboarding} from "./Onboarding.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 import {useNavigate} from "react-router-dom";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
-import SearchHeaderMain from "./SearchHeaderMain.jsx";
+import SearchHeaderMain from "./utils/SearchHeaderMain.jsx";
 
 const TinderCards = observer(() => {
     const [swipeProgress, setSwipeProgress] = useState({ direction: null, opacity: 0 });

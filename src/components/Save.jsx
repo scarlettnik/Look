@@ -2,13 +2,13 @@ import styles from "./ui/save.module.css";
 import Sidebar from "./Sidebar";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import FullScreenButton from "./FullScrinButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import Modal from "./utils/Modal.jsx";
 import AddList from "./AddList.jsx";
 import {observer} from "mobx-react-lite/src";
 import { useStore } from '../provider/StoreContext.jsx';
-import CustomCheckbox from "./CustomCheckbox.jsx";
+import CustomCheckbox from "./utils/CustomCheckbox.jsx";
 
 const Save = observer(() => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);

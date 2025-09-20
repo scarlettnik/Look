@@ -9,7 +9,7 @@ import {
 import Sidebar from "./Sidebar.jsx";
 import { useAuth } from "../provider/AuthProvider.jsx";
 import React, { useState, useEffect, useRef } from "react";
-import FullScreenButton from "./FullScrinButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
 import styles from "./ui/profile.module.css";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import DeleteProfileButtons from "./DeleteProfileButtons.jsx";

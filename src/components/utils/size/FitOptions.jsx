@@ -1,4 +1,4 @@
-import styles from "./ui/profile.module.css";
+import styles from "../../ui/profile.module.css";
 import React from "react";
 import FitOption from "./FitOption.jsx";
 

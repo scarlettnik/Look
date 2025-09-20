@@ -9,10 +9,10 @@ import Share from "./utils/Share.jsx";
 import AddList from "./AddList.jsx";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import {FilterBar} from "./FilterBar.jsx";
-import FullScreenButton from "./FullScrinButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
-import CustomCheckbox from "./CustomCheckbox.jsx";
+import CustomCheckbox from "./utils/CustomCheckbox.jsx";
 
 const Compilation = observer(() => {
     const { id } = useParams();

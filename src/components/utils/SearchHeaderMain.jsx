@@ -1,24 +1,39 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from '../ui/search.module.css';
 import { AUTH_TOKEN } from "../../constants.js";
 import { useStore } from "../../provider/StoreContext.jsx";
 
-export const SearchHeader = ({ onSearch, onClearSearch }) => {
-    const [isSearchActive, setIsSearchActive] = useState(false);
+const SearchHeaderMain = ({
+                              onSearch,
+                              onClearSearch,
+                              isSearchActive: externalIsSearchActive,
+                              onSearchActiveChange
+                          }) => {
     const store = useStore();
     const [searchQuery, setSearchQuery] = useState(store?.catalogStore?.currentSearchQuery || '');
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [internalIsSearchActive, setInternalIsSearchActive] = useState(false);
 
     const searchRef = useRef(null);
     const inputRef = useRef(null);
-    const prevIsSearchActive = useRef(isSearchActive);
+    const debounceTimer = useRef(null);
 
-    // Мемоизированные обработчики
+    const isSearchActive = externalIsSearchActive !== undefined ? externalIsSearchActive : internalIsSearchActive;
+
+    const setIsSearchActive = useCallback((value) => {
+        if (externalIsSearchActive !== undefined) {
+            onSearchActiveChange?.(value);
+        } else {
+            setInternalIsSearchActive(value);
+        }
+    }, [externalIsSearchActive, onSearchActiveChange]);
+
     const closeSearch = useCallback(() => {
         setIsSearchActive(false);
         inputRef.current?.blur();
-    }, []);
+        setSuggestions([]);
+    }, [setIsSearchActive]);
 
     const fetchSuggestions = useCallback(async (query) => {
         if (!query.trim()) {
@@ -54,21 +69,16 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
     const handleSuggestionClick = useCallback((suggestion) => {
         setSearchQuery(suggestion);
         handleSearch(suggestion);
-        closeSearch();
-    }, [closeSearch]);
+    }, []);
 
     const handleSearch = useCallback((query = searchQuery) => {
         const trimmedQuery = query.trim();
         if (trimmedQuery) {
-            const searchRequest = { query: trimmedQuery };
+            setSearchQuery(trimmedQuery);
             store.catalogStore.setLastSearchQuery(trimmedQuery);
-
-            if (onSearch) {
-                onSearch(searchRequest);
-            }
-
-            closeSearch();
+            onSearch?.({ query: trimmedQuery });
         }
+        closeSearch();
     }, [searchQuery, store.catalogStore, onSearch, closeSearch]);
 
     const handleClearInput = useCallback(() => {
@@ -79,7 +89,6 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         closeSearch();
     }, [store.catalogStore, onClearSearch, closeSearch]);
 
-    // Эффекты
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -87,40 +96,52 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        if (isSearchActive) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [closeSearch]);
+    }, [isSearchActive, closeSearch]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Enter' && isSearchActive) {
+            if (e.key === 'Enter' && isSearchActive && document.activeElement === inputRef.current) {
                 handleSearch();
-                closeSearch();
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isSearchActive, searchQuery, handleSearch, closeSearch]);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isSearchActive, searchQuery, handleSearch]);
 
     useEffect(() => {
-        if (searchQuery && isSearchActive) {
-            const timer = setTimeout(() => {
-                fetchSuggestions(searchQuery);
-            }, 100);
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
 
-            return () => clearTimeout(timer);
+        if (searchQuery && isSearchActive) {
+            debounceTimer.current = setTimeout(() => {
+                fetchSuggestions(searchQuery);
+            }, 300);
         } else {
             setSuggestions([]);
         }
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
     }, [searchQuery, isSearchActive, fetchSuggestions]);
 
     useEffect(() => {
-        // Сохраняем предыдущее состояние для анимации
-        prevIsSearchActive.current = isSearchActive;
-    }, [isSearchActive]);
+        if (store?.catalogStore?.currentSearchQuery !== searchQuery) {
+            setSearchQuery(store?.catalogStore?.currentSearchQuery || '');
+        }
+    }, [store?.catalogStore?.currentSearchQuery]);
+
 
     return (
         <>
@@ -212,3 +233,5 @@ export const SearchHeader = ({ onSearch, onClearSearch }) => {
         </>
     );
 };
+
+export default React.memo(SearchHeaderMain);

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import styles from '../../ui/OnboardingModal.module.css';
 import welcomstyle from '../../ui/welcomStyle.module.css';
 import store from "../../../store.js";
+import {ANIMATION_PARAMS, START_CARDS} from "../../../constants.js";
 
 const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -9,36 +10,11 @@ const WelcomeStep = ({ userName, userSername, onNext }) => {
     const [loadingProgress, setLoadingProgress] = useState(0);
     const cardsRef = useRef([]);
     const animationRef = useRef(null);
-
-    const ANIMATION_PARAMS = {
-        resist: {
-            maxTranslate: 150,
-            maxRotate: 15,
-            swipeDuration: 2000,
-            holdDuration: 400,
-            returnDuration: 1200,
-            restDuration: 1000,
-            get totalDuration() {
-                return this.swipeDuration + this.holdDuration + this.returnDuration + this.restDuration;
-            }
-        },
-        regular: {
-            swipeDistance: 500,
-            duration: 2000,
-            maxRotate: 30
-        }
-    };
-
-    const cards = [
-        { id: 1, image: '/starterscroller.png', direction: 'right' },
-        { id: 2, image: '/starterscroller2.png', direction: 'left' },
-        { id: 3, image: '/starterscroller3.png', direction: 'resist' }
-    ];
+    const cards = START_CARDS;
 
     const preloadImages = async () => {
         const totalImages = cards.length;
         let loadedCount = 0;
-
         const loadPromises = cards.map(card => {
             return new Promise((resolve) => {
                 const img = new Image();

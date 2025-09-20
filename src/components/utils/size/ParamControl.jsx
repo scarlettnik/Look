@@ -1,4 +1,4 @@
-import styles from "./ui/profile.module.css";
+import styles from "../../ui/profile.module.css";
 import React from "react";
 
 const ParamControl = ({ label, value, onChange, min = 0, max = 200 }) => {

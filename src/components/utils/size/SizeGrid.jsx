@@ -1,21 +1,10 @@
-import styles from "./ui/profile.module.css";
+import styles from "../../ui/profile.module.css";
 import React from "react";
+import {sizeRanges} from "../../../constants.js";
 
 const SizeGrid = ({ params, updateParam, color = 'var(--white)' }) => {
     const handleChange = (value) => {
         updateParam("clothing_size", value);
-    };
-
-    const sizeRanges = {
-        "XXS": "38-40",
-        "XS": "40-42",
-        "S": "42-44",
-        "M": "44-46",
-        "L": "46-48",
-        "XL": "48-50",
-        "XXL": "50-52",
-        "3XL": "52-54",
-        "4XL": "54-56"
     };
 
     return (

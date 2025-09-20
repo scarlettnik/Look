@@ -1,5 +1,4 @@
-import styles from "./ui/profile.module.css";
-import React from "react";
+import styles from "../../ui/profile.module.css";
 
 const FitOption = ({ id, value, label, currentValue, onChange }) => (
     <>

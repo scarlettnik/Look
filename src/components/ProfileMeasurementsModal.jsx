@@ -3,11 +3,11 @@ import { observer } from "mobx-react";
 import { useAuth } from "../provider/AuthProvider.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
-import FullScreenButton from "./FullScrinButton.jsx";
-import FitOptions from "./FitOptions.jsx";
-import ParamsTab from "./ParamsTab.jsx";
-import SizeGrid from "./SizeGrid.jsx";
-import TabButton from "./TabButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
+import FitOptions from "./utils/size/FitOptions.jsx";
+import ParamsTab from "./utils/size/ParamsTab.jsx";
+import SizeGrid from "./utils/size/SizeGrid.jsx";
+import TabButton from "./utils/size/TabButton.jsx";
 import UserInfo from "./UserInfo.jsx";
 import styles from './ui/profile.module.css';
 import {AUTH_TOKEN} from "../constants.js";
@@ -86,8 +86,6 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
             });
 
             if (!response.ok) throw new Error('Update failed');
-
-            const updated = await response.json();
 
             runInAction(() => {
                 if (store.authStore.data) {

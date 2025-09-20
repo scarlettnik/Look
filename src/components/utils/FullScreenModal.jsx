@@ -1,4 +1,3 @@
-import React from "react";
 import stylesM from "../ui/fullScreenModal.module.css";
 
 export const FullScreenModal = ({ title, onClose, onApply, children, applyDisabled = false }) => {

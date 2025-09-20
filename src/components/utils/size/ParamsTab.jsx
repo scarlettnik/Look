@@ -1,6 +1,5 @@
-import styles from "./ui/profile.module.css";
+import styles from "../../ui/profile.module.css";
 import ParamControl from "./ParamControl.jsx";
-import React from "react";
 
 const ParamsTab = ({ params, updateParam }) => {
     const handleChange = (field, value) => {

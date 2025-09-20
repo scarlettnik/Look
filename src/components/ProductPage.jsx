@@ -2,14 +2,12 @@ import React, {useState, useRef, useEffect, useCallback} from 'react';
 import Sidebar from './Sidebar';
 import {useNavigate, useParams} from 'react-router-dom';
 import styles from './ui/productPage.module.css';
-import FullScreenButton from "./FullScrinButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
 import {AUTH_TOKEN} from "../constants.js";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
-import {useStore} from "../provider/StoreContext.jsx";
 
 const ProductPage = () => {
-    const store = useStore();
     const {id} = useParams();
     const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);

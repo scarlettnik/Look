@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import styles from "./ui/profile.module.css";
-import FullScreenButton from "./FullScrinButton.jsx";
+import FullScreenButton from "./utils/FullScrinButton.jsx";
 import { useStore } from "../provider/StoreContext";
 import {AUTH_TOKEN} from "../constants.js";
 

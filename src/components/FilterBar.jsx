@@ -10,7 +10,7 @@ import {useNavigate} from "react-router-dom";
 import {BrandFilter} from "./utils/filters/BrandFilter.jsx";
 import {SizeFilter} from "./utils/filters/SizeFilter.jsx";
 import {FiltersModal} from "./utils/FiltersModal.jsx";
-import CustomCheckbox from "./CustomCheckbox.jsx";
+import CustomCheckbox from "./utils/CustomCheckbox.jsx";
 
 
 const AllFiltersModal = observer(({

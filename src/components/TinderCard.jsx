@@ -33,6 +33,31 @@ const TinderCard = ({
         opacity: 1,
     });
 
+    const [isInteractive, setIsInteractive] = useState(false);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+        if (isTopCard) {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(() => {
+                setIsInteractive(true);
+            }, 200);
+        } else {
+            setIsInteractive(false);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        }
+        // Cleanup function
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [isTopCard]);
+
     useEffect(() => {
         if (card._pending) {
             setLocalStyle({
@@ -50,7 +75,6 @@ const TinderCard = ({
         }
     }, [card._key]);
 
-
     useEffect(() => {
         if (cardRef.current) {
             setCardRef(card.id, cardRef.current);
@@ -65,7 +89,10 @@ const TinderCard = ({
     }, [zIndex]);
 
     const handleStart = (clientX, clientY) => {
-        if (isExpanded) return false;
+        // ⭐️ MODIFIED: Only allow dragging if the card is interactive
+        if (!isInteractive || isExpanded) {
+            return false;
+        }
 
         setStartPos({ x: clientX, y: clientY });
         setIsDragging(true);
@@ -214,13 +241,14 @@ const TinderCard = ({
             className={`${styles.card} 
             ${isDragging ? styles.moving : ''} 
             ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
-            onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchEnd={handleEnd}
-            onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
-            onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
-            onMouseUp={handleEnd}
-            onMouseLeave={handleEnd}
+            // ⭐️ MODIFIED: Handlers now check `isInteractive`
+            onTouchStart={(e) => isInteractive && handleStart(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchMove={(e) => isInteractive && handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchEnd={() => isInteractive && handleEnd()}
+            onMouseDown={(e) => isInteractive && handleStart(e.clientX, e.clientY)}
+            onMouseMove={(e) => isInteractive && handleMove(e.clientX, e.clientY)}
+            onMouseUp={() => isInteractive && handleEnd()}
+            onMouseLeave={() => isInteractive && handleEnd()}
             style={{ zIndex, ...localStyle }}
         >
             <div onClick={() => navigate(`/product/${card.id}`)}>

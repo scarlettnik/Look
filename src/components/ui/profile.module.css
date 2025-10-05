@@ -114,7 +114,6 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
     background: var(--white-gray);
     z-index: 999;
 }
@@ -149,6 +148,7 @@
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+
 }
 .tabContent {
     display: flex;
@@ -331,3 +331,49 @@
     z-index: 9999;
 }
 
+/* profile.module.css */
+
+/* -------------------------------------------
+   Стили для скрытого инпута (каретки)
+   ------------------------------------------- */
+
+.valueInput {
+    /* Сброс внешнего вида, чтобы инпут выглядел как обычный текст */
+    width: 40px; /* Установите ширину по желанию */
+    text-align: center;
+    border: none; /* Убираем рамку */
+    outline: none; /* Убираем стандартную рамку фокуса */
+    background: transparent; /* Убираем фон */
+    padding: 0; /* Убираем внутренние отступы */
+    margin: 0; /* Убираем внешние отступы */
+
+    /* Наследование шрифта и размера текста */
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit; /* Используем цвет родительского текста */
+
+    /* Эффект: Делаем курсор (каретку) видимым */
+    /* caret-color: red; /* Вы можете изменить цвет курсора, например, на красный */
+    caret-color: currentColor; /* Используем текущий цвет текста */
+
+    /* Важно: Убираем стрелочки/спиннеры для input type="number" */
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.valueInput::-webkit-inner-spin-button,
+.valueInput::-webkit-outer-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari */
+    margin: 0;
+}
+
+/* -------------------------------------------
+   Дополнительный стиль для кликабельной области
+   ------------------------------------------- */
+
+/* Это стиль для <span>, который становится активным при клике */
+.valueContainer span {
+    /* Чтобы было понятно, что на элемент можно нажать */
+    cursor: pointer;
+    /* Добавьте любой эффект, например, легкое подчеркивание при наведении */
+    /* text-decoration: underline dashed rgba(0, 0, 0, 0.3); */
+}

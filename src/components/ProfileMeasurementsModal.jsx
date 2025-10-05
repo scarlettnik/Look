@@ -12,6 +12,7 @@ import UserInfo from "./UserInfo.jsx";
 import styles from './ui/profile.module.css';
 import {AUTH_TOKEN} from "../constants.js";
 import {runInAction} from "mobx";
+import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
 const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     const store = useStore();
@@ -31,12 +32,18 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     const [activeTab, setActiveTab] = useState("size");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const isKeyboardOpen = useIsKeyboardOpen();
 
     useEffect(() => {
         console.log("Current clothing_size:", preferences.clothing_size);
     }, [preferences.clothing_size]);
 
+    const [height, setHeight] = useState(null);
+    useEffect(() => {
+        setHeight(window.innerHeight);
+    }, []);
+
+    console.log(height)
     const updateParam = (field, value) => {
         if (['breast', 'waist', 'hip'].includes(field)) {
             setPreferences(prev => ({
@@ -64,7 +71,7 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
             }));
         }
     };
-    console.log(preferences)
+    console.log(window.innerHeight)
     const handleSaveChanges = async () => {
         setIsLoading(true);
         setError(null);
@@ -113,7 +120,9 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div className={styles.modalOverlay}>
+        <div
+            style={{height: height}}
+            className={styles.modalOverlay}>
             <div className={styles.modalContent}>
                 <UserInfo
                     photoUrl={data?.photo_url}
@@ -166,22 +175,24 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
 
                 {error && <p className={styles.errorMessage}>{error}</p>}
 
-                <ButtonWrapper>
-                    <FullScreenButton
-                        color='var(--light-gray)'
-                        textColor='var(--black)'
-                        onClick={handleSaveChanges}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Сохранение...' : 'Изменить значения'}
-                    </FullScreenButton>
-                    <FullScreenButton
-                        onClick={onClose}
-                        disabled={isLoading}
-                    >
-                        Отменить
-                    </FullScreenButton>
-                </ButtonWrapper>
+                {!isKeyboardOpen &&
+                    <ButtonWrapper>
+                        <FullScreenButton
+                            color='var(--light-gray)'
+                            textColor='var(--black)'
+                            onClick={handleSaveChanges}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Сохранение...' : 'Изменить значения'}
+                        </FullScreenButton>
+                        <FullScreenButton
+                            onClick={onClose}
+                            disabled={isLoading}
+                        >
+                            Отменить
+                        </FullScreenButton>
+                    </ButtonWrapper>
+                }
             </div>
 
         </div>

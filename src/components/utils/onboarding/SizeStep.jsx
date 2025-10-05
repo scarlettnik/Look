@@ -7,6 +7,11 @@ import FitOptions from "../size/FitOptions.jsx";
 
 const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => {
     const [activeTab, setActiveTab] = useState("size");
+    const [height, setHeight] = useState(0);
+
+    useEffect(() => {
+        setHeight(window.innerHeight*0.4);
+    }, [])
 
     const handleNext = () => {
         onNext();
@@ -38,7 +43,7 @@ const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => 
                     Параметры
                 </button>
             </div>
-            <div className={styles.paramsBlock}>
+            <div className={styles.paramsBlock} style={{height: height}}>
                 <div className={styles.tabContent}>
                     {activeTab === "size" && (
                         <SizeGrid

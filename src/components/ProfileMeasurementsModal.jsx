@@ -38,12 +38,6 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
         console.log("Current clothing_size:", preferences.clothing_size);
     }, [preferences.clothing_size]);
 
-    const [height, setHeight] = useState(null);
-    useEffect(() => {
-        setHeight(window.innerHeight);
-    }, []);
-
-    console.log(height)
     const updateParam = (field, value) => {
         if (['breast', 'waist', 'hip'].includes(field)) {
             setPreferences(prev => ({
@@ -120,9 +114,7 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div
-            style={{height: height}}
-            className={styles.modalOverlay}>
+        <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
                 <UserInfo
                     photoUrl={data?.photo_url}

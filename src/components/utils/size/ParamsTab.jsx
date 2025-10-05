@@ -1,13 +1,19 @@
 import styles from "../../ui/profile.module.css";
 import ParamControl from "./ParamControl.jsx";
+import {useEffect, useState} from "react";
 
 const ParamsTab = ({ params, updateParam }) => {
     const handleChange = (field, value) => {
         updateParam(field, value);
     };
 
+    const [height, setHeight] = useState(0);
+
+    useEffect(() => {
+        setHeight(window.innerHeight*0.27);
+    }, [])
     return (
-        <div style={{height: '27vh'}} className={styles.paramsForm}>
+        <div style={{height: height}} className={styles.paramsForm}>
             <div className={styles.paramsInputGroup}>
                 <ParamControl
                     label="Объем груди"

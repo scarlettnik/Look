@@ -149,6 +149,7 @@
     display: flex;
     flex-direction: column;
 
+
 }
 .tabContent {
     display: flex;
@@ -209,9 +210,7 @@
     font-weight: 400;
     color: var(--light-warm-gray);
 }
-.paramsInputGroup {
-    margin: 5vw;
-}
+
 .paramControl {
     text-align: center;
     padding: 1vh;
@@ -331,49 +330,27 @@
     z-index: 9999;
 }
 
-/* profile.module.css */
-
-/* -------------------------------------------
-   Стили для скрытого инпута (каретки)
-   ------------------------------------------- */
-
 .valueInput {
-    /* Сброс внешнего вида, чтобы инпут выглядел как обычный текст */
-    width: 40px; /* Установите ширину по желанию */
+    width: 60px;
     text-align: center;
-    border: none; /* Убираем рамку */
-    outline: none; /* Убираем стандартную рамку фокуса */
-    background: transparent; /* Убираем фон */
-    padding: 0; /* Убираем внутренние отступы */
-    margin: 0; /* Убираем внешние отступы */
-
-    /* Наследование шрифта и размера текста */
-    font-size: inherit;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 30px;
     font-family: inherit;
-    color: inherit; /* Используем цвет родительского текста */
-
-    /* Эффект: Делаем курсор (каретку) видимым */
-    /* caret-color: red; /* Вы можете изменить цвет курсора, например, на красный */
-    caret-color: currentColor; /* Используем текущий цвет текста */
-
-    /* Важно: Убираем стрелочки/спиннеры для input type="number" */
-    -moz-appearance: textfield; /* Firefox */
+    color: inherit;
+    caret-color: currentColor;
+    -moz-appearance: textfield;
 }
 
 .valueInput::-webkit-inner-spin-button,
 .valueInput::-webkit-outer-spin-button {
-    -webkit-appearance: none; /* Chrome, Safari */
+    -webkit-appearance: none;
     margin: 0;
 }
 
-/* -------------------------------------------
-   Дополнительный стиль для кликабельной области
-   ------------------------------------------- */
-
-/* Это стиль для <span>, который становится активным при клике */
 .valueContainer span {
-    /* Чтобы было понятно, что на элемент можно нажать */
     cursor: pointer;
-    /* Добавьте любой эффект, например, легкое подчеркивание при наведении */
-    /* text-decoration: underline dashed rgba(0, 0, 0, 0.3); */
 }

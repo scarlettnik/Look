@@ -223,7 +223,7 @@
 }
 
 .valueContainer {
-    width: 120px;
+    width: 100px;
     display: inline-flex;
     flex-direction: column;
     align-items: center;

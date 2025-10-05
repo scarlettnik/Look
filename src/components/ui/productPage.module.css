@@ -80,38 +80,33 @@
     justify-content: space-between;
 }
 .title {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 16px;
-    font-weight: 500;
     color: var(--dark-gray);
 }
 .brand {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 12px;
-    font-weight: 400;
     color: var(--light-warm-gray);
 }
 
 .price {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 14px;
-    font-weight: 500;
-    padding: 16px 0;
+    padding: 12px 0;
     color: var(--dark-gray);
 }
 .blockTitle {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 14px;
-    font-weight: 600;
     padding: 8px 0;
-    color: var(--dark-gray);
+    color: black;
 }
 
 .description {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse Intl', sans-serif;
     font-size: 12px;
-    font-weight: 400;
-    color: var(--black);
+    color: var(--dark-warm-gray);
     line-height: 16px;
     border-bottom: 2px var(--light-warm-gray);
 }
@@ -130,13 +125,14 @@
     display: none;
 }
 .aboutSize {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Suisse', sans-serif;
     font-size: 12px;
     margin-top: 5px;
     color: var(--light-cold-gray);
 }
 
 .sizeOption {
+    font-family: 'Suisse', sans-serif;
     flex: 0 0 auto;
     padding: 8px 12px;
     border-radius: 6px;
@@ -151,8 +147,8 @@
     background-color: var(--white);
 }
 .colorTitle {
+    font-family: 'Suisse', sans-serif;
     font-size: 12px;
-    font-weight: 400;
     padding-left: 5px;
     color: var(--light-cold-gray);
 
@@ -241,16 +237,16 @@
 
 
 .infoLabel {
+    font-family: 'Suisse', sans-serif;
     font-size: 12px;
-    font-weight: 500;
     color: var(--light-cold-gray);
     flex: 0 0 20%;
     text-align: left;
 }
 
 .infoValue {
+    font-family: 'Suisse', sans-serif;
     font-size: 12px;
-    font-weight: 500;
     color: var(--black);
     flex: 0 0 70%;
     padding-left: 10px;

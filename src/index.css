@@ -1,5 +1,6 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Suisse', sans-serif;
+
   line-height: 1.5;
   font-weight: 400;
 
@@ -22,6 +23,15 @@
   --dark-blue: #3A4651;
 
 }
+
+@font-face {
+  font-family: 'Suisse';
+  src: url('/fonts/suisse-intl-regular.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -38,6 +48,7 @@ body {
   color: #1a1a1a;
 
 }
+
 
 a {
   font-weight: 500;

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../../ui/OnboardingModal.module.css';
 import FullScreenButton from "../FullScrinButton.jsx";
 import SizeGrid from "../size/SizeGrid.jsx";
 import ParamsTab from "../size/ParamsTab.jsx";
 import FitOptions from "../size/FitOptions.jsx";
+import useIsKeyboardOpen from "../../../hooks/useIsKeyboardOpen.js";
 
 const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => {
     const [activeTab, setActiveTab] = useState("size");
@@ -12,6 +13,8 @@ const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => 
     useEffect(() => {
         setHeight(window.innerHeight*0.4);
     }, [])
+
+    const isKeyboardOpen = useIsKeyboardOpen();
 
     const handleNext = () => {
         onNext();
@@ -78,12 +81,14 @@ const SizeStep = ({ params, updateParam, onUpdate, onNext, onSkip, onBack }) => 
                 >
                     Далее
                 </FullScreenButton>
-                <button
-                    className={styles.secondaryButton}
-                    onClick={onSkip}
-                >
-                    Пропустить
-                </button>
+                {!isKeyboardOpen &&
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={onSkip}
+                    >
+                        Пропустить
+                    </button>
+                }
             </div>
         </div>
     );

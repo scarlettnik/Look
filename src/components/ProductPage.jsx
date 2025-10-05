@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import {useState, useRef, useEffect, useCallback} from 'react';
 import Sidebar from './Sidebar';
 import {useNavigate, useParams} from 'react-router-dom';
 import styles from './ui/productPage.module.css';
@@ -23,6 +23,8 @@ const ProductPage = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+
 
     const handleColorChange = async (color) => {
         if (color.product_id === currentColorId || isTransitioning) return;
@@ -104,8 +106,6 @@ const ProductPage = () => {
     };
 
     if (error) return <div className={styles.error}>Ошибка загрузки товара: {error}</div>;
-
-    const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpanded = () => setIsExpanded(prev => !prev);
 

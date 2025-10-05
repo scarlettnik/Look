@@ -339,6 +339,7 @@
     padding: 0;
     margin: 0;
     font-size: 30px;
+    font-weight: 600;
     font-family: inherit;
     color: inherit;
     caret-color: currentColor;

@@ -8,25 +8,13 @@ import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const [loadedImages, setLoadedImages] = useState({});
     const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setShowContent(true);
-            setIsLoading(false);
-        }, 500);
 
-        CLOTH_STYLES.forEach(style => {
-            const img = new Image();
-            img.src = style.url;
-            img.onload = img.onerror = () => {
-                setLoadedImages(prev => ({ ...prev, [style.id]: true }));
-            };
-        });
-
-        return () => clearTimeout(timer);
-    }, []);
+        setShowContent(true);
+        setIsLoading(false);
+        }, []);
 
     const handleStyleToggle = (styleName) => {
         onUpdate('styles', styleName);
@@ -79,6 +67,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
         );
     }
 
+    // --- Контент отображается немедленно ---
     return (
         <div className={styles.onboardingStep}>
             <div className={styles.stepHeader}>
@@ -101,6 +90,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                                     src={style.url}
                                     alt={style.name}
                                     className={styles.styleImage}
+
                                     loading="lazy"
                                     onError={(e) => {
                                         e.target.src = '/placeholder-style.jpg';
@@ -127,14 +117,14 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                         textColor='var(--black)'
                         className={`${styles.onboardingButton} ${styles.primary}`}
                         onClick={onNext}
-                        disabled={isLoading}
+                        disabled={false}
                     >
-                        {isLoading ? 'Загрузка...' : 'Вперед'}
+                        Вперед
                     </FullScreenButton>
                     <button
                         className={styles.secondaryButton}
                         onClick={onSkip}
-                        disabled={isLoading}
+                        disabled={false}
                     >
                         Пропустить
                     </button>

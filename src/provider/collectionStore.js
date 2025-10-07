@@ -1,6 +1,6 @@
 // CollectionStore.js
 import {makeAutoObservable, runInAction} from 'mobx';
-import { AUTH_TOKEN } from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class CollectionStore {
     currentCollection = null;
@@ -17,7 +17,7 @@ class CollectionStore {
         this.error = null;
 
         try {
-            const response = await fetch(`https://api.lookvogue.ru/v1/collection/${collectionId}`, {
+            const response = await fetch(`${HOST_URL}/v1/collection/${collectionId}`, {
                 method: 'GET',
                 headers: {
                     "ngrok-skip-browser-warning": true,
@@ -42,7 +42,7 @@ class CollectionStore {
         this.error = null;
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/collection', {
+            const response = await fetch(`${HOST_URL}/v1/collection`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -78,7 +78,7 @@ class CollectionStore {
         this.error = null;
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/collections', {
+            const response = await fetch(`${HOST_URL}/v1/collections`, {
                 method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json",
@@ -107,7 +107,7 @@ class CollectionStore {
 
     async removeProductsFromCollection(collectionId, productIds) {
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/collection/products', {
+            const response = await fetch(`${HOST_URL}/v1/collection/products`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

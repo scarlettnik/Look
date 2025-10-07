@@ -1,6 +1,6 @@
 // HelpStore.js
 import { makeAutoObservable, runInAction } from 'mobx';
-import { AUTH_TOKEN } from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class HelpStore {
     metaData = null;
@@ -18,7 +18,7 @@ class HelpStore {
         this.error = null;
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/catalog/search/meta', {
+            const response = await fetch(`${HOST_URL}/v1/catalog/search/meta`, {
                 method: 'GET',
                 headers: {
                     "ngrok-skip-browser-warning": true,

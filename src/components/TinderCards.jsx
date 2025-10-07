@@ -6,7 +6,7 @@ import TinderCard from "./TinderCard.jsx";
 import { FilterBar } from "./FilterBar.jsx";
 import { useStore } from "../provider/StoreContext.jsx";
 import {
-    AUTH_TOKEN,
+    AUTH_TOKEN, HOST_URL,
     INITIAL_CARDS_COUNT, SKELETON_COUNT,
     SWIPE_CONFIG,
     VERTICAL_SWIPE_THRESHOLD_RATIO
@@ -126,7 +126,7 @@ const TinderCards = observer(() => {
 
     const sendInteraction = async (productId, action) => {
         try {
-            const response = await fetch(`https://api.lookvogue.ru/v1/interaction/product/${productId}`, {
+            const response = await fetch(`${HOST_URL}/v1/interaction/product/${productId}`, {
                 method: 'PUT',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,
@@ -219,7 +219,7 @@ const TinderCards = observer(() => {
 
     const handleSaveChanges = async () => {
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/user', {
+            const response = await fetch(`${HOST_URL}/v1/user`, {
                 method: 'PATCH',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,
@@ -282,7 +282,6 @@ const TinderCards = observer(() => {
             }
         }[direction];
 
-        const originalTransform = cardRef.style.transform;
         const originalTransition = cardRef.style.transition;
         const originalZIndex = cardRef.style.zIndex;
         const originalWillChange = cardRef.style.willChange;

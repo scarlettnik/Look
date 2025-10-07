@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class PopularStore {
     trends = [];
@@ -21,7 +21,7 @@ class PopularStore {
 
         this.loadingTrends = true;
         try {
-            const res = await fetch("https://api.lookvogue.ru/v1/feature/trends/global", {
+            const res = await fetch(`${HOST_URL}/v1/feature/trends/global`, {
                 headers: {
                     "ngrok-skip-browser-warning": true,
                     "Content-Type": "application/json",
@@ -47,7 +47,7 @@ class PopularStore {
 
         this.loadingTrandsCollections = true;
         try {
-            const res = await fetch("https://api.lookvogue.ru/v1/feature/trends/personal", {
+            const res = await fetch(`${HOST_URL}/v1/feature/trends/personal`, {
                 headers: {
                     "ngrok-skip-browser-warning": true,
                     "Content-Type": "application/json",
@@ -72,7 +72,7 @@ class PopularStore {
 
         this.loadingBrands = true;
         try {
-            const res = await fetch("https://api.lookvogue.ru/v1/feature/brands/global", {
+            const res = await fetch(`${HOST_URL}/v1/feature/brands/global`, {
                 headers: {
                     "ngrok-skip-browser-warning": true,
                     "Content-Type": "application/json",
@@ -96,7 +96,7 @@ class PopularStore {
         if (this.personalBrands.length > 0) return;
         this.loadingBrandsCollections = true;
         try {
-            const res = await fetch("https://api.lookvogue.ru/v1/feature/brands/personal", {
+            const res = await fetch(`${HOST_URL}/v1/feature/brands/personal`, {
                 headers: {
                     "ngrok-skip-browser-warning": true,
                     "Content-Type": "application/json",

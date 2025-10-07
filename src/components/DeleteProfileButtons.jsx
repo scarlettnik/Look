@@ -3,22 +3,20 @@ import { useNavigate } from "react-router-dom";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import styles from "./ui/profile.module.css";
 import FullScreenButton from "./utils/FullScrinButton.jsx";
-import { useStore } from "../provider/StoreContext";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 const DeleteProfileButtons = ({ onCancel }) => {
     const [confirmStep, setConfirmStep] = useState(0);
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { authStore } = useStore();
 
     const handleDeleteAccount = async () => {
         setIsDeleting(true);
         setError(null);
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/user', {
+            const response = await fetch(`${HOST_URL}/v1/user`, {
                 method: 'DELETE',
                 headers: {
                     "ngrok-skip-browser-warning": true,

@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class AuthStore {
     data = null;
@@ -20,7 +20,7 @@ class AuthStore {
         const authToken = AUTH_TOKEN;
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/auth/init-data', {
+            const response = await fetch(`${HOST_URL}/v1/auth/init-data`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

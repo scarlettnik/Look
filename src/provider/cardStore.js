@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class CartStore {
     cart = [];
@@ -26,7 +26,7 @@ class CartStore {
         this.cartError = null;
 
         try {
-            const response = await fetch(`https://api.lookvogue.ru/v1/catalog/search`, {
+            const response = await fetch(`${HOST_URL}/v1/catalog/search`, {
                 method: 'POST',
                 body: JSON.stringify({}),
                 headers: this.getAuthHeaders(),

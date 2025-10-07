@@ -44,7 +44,6 @@ function AddList({
                 <label className={styles.label}>Название</label>
                 <input
                     type="text"
-                    // Папка с лайками приходит как __FAVOURITES__
                     value={closetName === '__FAVOURITES__' ? 'Лайки' : closetName}
                     onChange={(e) => setClosetName(e.target.value)}
                     className={styles.input}

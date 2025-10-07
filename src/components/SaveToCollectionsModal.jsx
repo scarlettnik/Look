@@ -5,7 +5,7 @@ import styles from './ui/saveToCollectionsModal.module.css';
 import CustomCheckbox from "./utils/CustomCheckbox.jsx";
 import Modal from "./utils/Modal.jsx";
 import FullScreenButton from "./utils/FullScrinButton.jsx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 import {runInAction} from "mobx";
 import AddList from "./AddList.jsx";
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
@@ -59,7 +59,7 @@ const SaveToCollectionModal = observer(({
                 setSelectedCollections([]);
             }
 
-            const response = await fetch(`https://api.lookvogue.ru/v1/product/${productId}/collections`, {
+            const response = await fetch(`${HOST_URL}/v1/product/${productId}/collections`, {
                 headers: {
                     'Authorization': `tma ${AUTH_TOKEN}`
                 }
@@ -123,7 +123,7 @@ const SaveToCollectionModal = observer(({
         const isSaved = requestData.length > 0;
 
         try {
-            const response = await fetch(`https://api.lookvogue.ru/v1/product/${productId}/collections`, {
+            const response = await fetch(`${HOST_URL}/v1/product/${productId}/collections`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -185,7 +185,7 @@
 }
 .textwear {
     text-align: left;
-    font-weight: bold;
+    font-weight: 500;
     font-size: 14px;
 }
 .selectedSize {
@@ -213,9 +213,22 @@
 
 .paramControl {
     text-align: center;
-    padding: 1vh;
+    padding: 5px;
 }
 
+.decrementButton,
+.incrementButton {
+    font-family: 'Suisse', sans-serif;
+    justify-content: center;
+    align-items: center;
+
+    width: 21px;
+    height: 21px;
+    padding: 0;
+    line-height: 1;
+    font-size: 15px;
+    font-weight: bold;
+}
 .inputGroup {
     display: flex;
     align-items: center;
@@ -253,6 +266,10 @@
     cursor: pointer;
     color: var(--white);
     background-color: var(--black);
+}
+
+.paramsInputGroup {
+    margin-top: 5vw;
 }
 .fitOptionsWrapper {
     position: relative;
@@ -333,11 +350,12 @@
 
 .valueInput {
     width: 60px;
+    height: 30px;
+    align-items: center;
     text-align: center;
     border: none;
     outline: none;
     background: transparent;
-    padding: 0;
     margin: 0;
     font-size: 30px;
     font-weight: 600;

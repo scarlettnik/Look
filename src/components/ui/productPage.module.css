@@ -225,14 +225,14 @@
     border-bottom: 1px solid var(--light-gray);
 }
 .infoSection {
-    padding-bottom: 30px;
+    padding-bottom: 40px;
 }
 
 .infoRow {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 5px;
 }
 
 

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import styles from './ui/TinderCards.module.css';
 import { observer } from 'mobx-react-lite';
 import {ONBOARDING_STEPS} from "../constants.js";
@@ -15,6 +15,11 @@ export const Onboarding = observer(({
                                         setPopularHighlight
                                     }) => {
     const [isProcessing, setIsProcessing] = useState(false);
+    const [height, setHeight] = useState(0);
+
+    useEffect(() => {
+        setHeight(window.innerHeight);
+    }, [])
 
     const handleNextOnboardingStep = useCallback(async () => {
         if (isProcessing || isAnimating) return;
@@ -68,7 +73,7 @@ export const Onboarding = observer(({
     if (!currentStep) return null;
 
     return (
-        <div className={styles.onboardingOverlay} role="dialog" aria-modal="true">
+        <div className={styles.onboardingOverlay} style={{height: height}} role="dialog" aria-modal="true">
             {currentStep.images && currentStep.images.map((img, index) => (
                 <img key={index} src={img.src} alt={img.alt} style={img.style} />
             ))}

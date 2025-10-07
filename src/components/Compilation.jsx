@@ -10,7 +10,7 @@ import AddList from "./AddList.jsx";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import {FilterBar} from "./FilterBar.jsx";
 import FullScreenButton from "./utils/FullScrinButton.jsx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import CustomCheckbox from "./utils/CustomCheckbox.jsx";
 
@@ -167,7 +167,7 @@ export const Banner = observer(({ save, isSave = false, loading, id, onEnterEdit
     const handleUpdateCollection = async (name, coverUrl) => {
         if (editingCollection) {
             try {
-                const response = await fetch(`https://api.lookvogue.ru/v1/collection/${editingCollection.id}`, {
+                const response = await fetch(`${HOST_URL}/v1/collection/${editingCollection.id}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',

@@ -10,7 +10,7 @@ import SizeGrid from "./utils/size/SizeGrid.jsx";
 import TabButton from "./utils/size/TabButton.jsx";
 import UserInfo from "./UserInfo.jsx";
 import styles from './ui/profile.module.css';
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 import {runInAction} from "mobx";
 import useIsKeyboardOpen from "../hooks/useIsKeyboardOpen.js";
 
@@ -71,7 +71,7 @@ const ProfileMeasurementsModal = observer(({ isOpen, onClose, onSuccess }) => {
         setError(null);
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/user', {
+            const response = await fetch(`${HOST_URL}/v1/user`, {
                 method: 'PATCH',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,

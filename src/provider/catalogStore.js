@@ -1,5 +1,5 @@
 import {makeAutoObservable, flow, runInAction} from "mobx";
-import { AUTH_TOKEN } from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 
 class CatalogStore {
     cards = [];
@@ -63,7 +63,7 @@ class CatalogStore {
                 this.cards = [];
             }
 
-            const url = new URL('https://api.lookvogue.ru/v1/catalog/search');
+            const url = new URL(`${HOST_URL}/v1/catalog/search`);
             url.searchParams.append('offset', this.currentOffset);
             url.searchParams.append('limit', this.limit);
             const requestBody = {

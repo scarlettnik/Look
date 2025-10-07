@@ -4,11 +4,11 @@ import AboutStep from "./utils/onboarding/AboutStep.jsx";
 import WelcomeStep from "./utils/onboarding/WelcomeStep.jsx";
 import {useStore} from "../provider/StoreContext.jsx";
 import {useAuth} from "../provider/AuthProvider.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styles from './ui/OnboardingModal.module.css'
 import {observer} from "mobx-react";
 import {useNavigate} from "react-router-dom";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 import {runInAction} from "mobx";
 import Precomute from "./utils/onboarding/Precomrute.jsx";
 
@@ -31,12 +31,18 @@ const OnboardingModal = observer(() => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const [height, setHeight] = useState(0);
+
+    useEffect(() => {
+        setHeight(window.innerHeight)
+    }, [])
+
     const handleSaveChanges = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/user', {
+            const response = await fetch(`${HOST_URL}/v1/user`, {
                 method: 'PATCH',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,
@@ -145,7 +151,7 @@ const OnboardingModal = observer(() => {
     };
 
     return (
-        <div className={styles.onboardingModal}>
+        <div className={styles.onboardingModal} style={{height: height}}>
             <div className={styles.onboardingBackGround}/>
             <img className={styles.logo} src='/logo.svg' alt='/logo.png'/>
             <div className={styles.onboardingContent}>

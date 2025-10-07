@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from '../ui/search.module.css';
-import { AUTH_TOKEN } from "../../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../../constants.js";
 import { useStore } from "../../provider/StoreContext.jsx";
 
 const SearchHeaderMain = ({
@@ -43,7 +43,7 @@ const SearchHeaderMain = ({
 
         setIsLoading(true);
         try {
-            const response = await fetch('https://api.lookvogue.ru/v1/catalog/search/suggestions', {
+            const response = await fetch(`${HOST_URL}/v1/catalog/search/suggestions`, {
                 method: 'POST',
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,

@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import {useNavigate, useParams} from 'react-router-dom';
 import styles from './ui/productPage.module.css';
 import FullScreenButton from "./utils/FullScrinButton.jsx";
-import {AUTH_TOKEN} from "../constants.js";
+import {AUTH_TOKEN, HOST_URL} from "../constants.js";
 import CustomSkeleton from "./utils/CustomSkeleton.jsx";
 import SaveToCollectionModal from "./SaveToCollectionsModal.jsx";
 
@@ -43,7 +43,7 @@ const ProductPage = () => {
     const fetchProduct = async (productId) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://api.lookvogue.ru/v1/catalog/product/${productId}`, {
+            const response = await fetch(`${HOST_URL}/v1/catalog/product/${productId}`, {
                 headers: {
                     "Authorization": `tma ${AUTH_TOKEN}`,
                     "Content-Type": "application/json"

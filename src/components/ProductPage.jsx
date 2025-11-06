@@ -32,7 +32,7 @@ const ProductPage = () => {
         try {
             setIsTransitioning(true);
             await loadProduct(color.product_id);
-            setCurrentColorId(color.product_id); // Обновляем ID текущего цвета
+            setCurrentColorId(color.product_id);
         } catch (err) {
             console.error('Error changing color:', err);
         } finally {

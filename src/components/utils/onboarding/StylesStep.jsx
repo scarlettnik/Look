@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from '../../ui/OnboardingModal.module.css';
 import CustomCheckbox from "../CustomCheckbox.jsx";
 import FullScreenButton from "../FullScrinButton.jsx";
@@ -8,13 +8,25 @@ import ButtonWrapper from "../ButtonWrapper.jsx";
 
 const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [loadedImages, setLoadedImages] = useState({});
     const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowContent(true);
+            setIsLoading(false);
+        }, 300);
 
-        setShowContent(true);
-        setIsLoading(false);
-        }, []);
+        CLOTH_STYLES.forEach(style => {
+            const img = new Image();
+            img.src = style.url;
+            img.onload = img.onerror = () => {
+                setLoadedImages(prev => ({ ...prev, [style.id]: true }));
+            };
+        });
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleStyleToggle = (styleName) => {
         onUpdate('styles', styleName);
@@ -67,7 +79,6 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
         );
     }
 
-    // --- Контент отображается немедленно ---
     return (
         <div className={styles.onboardingStep}>
             <div className={styles.stepHeader}>
@@ -82,7 +93,8 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                     {CLOTH_STYLES.map(style => (
                         <div
                             key={style.id}
-                            className={`${styles.styleCard} ${selectedStyles.includes(style.name) ? styles.selected : ''}`}
+                            /* eslint-disable-next-line react/prop-types */
+                            className={`${styles.styleCard} ${(!selectedStyles.includes(style.name) ? '' : styles.selected)}`}
                             onClick={() => handleCardClick(style.name)}
                         >
                             <div style={{height: '250px'}}>
@@ -90,7 +102,6 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                                     src={style.url}
                                     alt={style.name}
                                     className={styles.styleImage}
-
                                     loading="lazy"
                                     onError={(e) => {
                                         e.target.src = '/placeholder-style.jpg';
@@ -100,6 +111,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
                                     className={styles.styleCheckbox}
+                                    /* eslint-disable-next-line react/prop-types */
                                     checked={selectedStyles.includes(style.name)}
                                     onChange={() => handleStyleToggle(style.name)}
                                 />
@@ -117,14 +129,14 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }) => {
                         textColor='var(--black)'
                         className={`${styles.onboardingButton} ${styles.primary}`}
                         onClick={onNext}
-                        disabled={false}
+                        disabled={isLoading}
                     >
-                        Вперед
+                        {isLoading ? 'Загрузка...' : 'Вперед'}
                     </FullScreenButton>
                     <button
                         className={styles.secondaryButton}
                         onClick={onSkip}
-                        disabled={false}
+                        disabled={isLoading}
                     >
                         Пропустить
                     </button>

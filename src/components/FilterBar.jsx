@@ -69,9 +69,6 @@ const AllFiltersModal = observer(({
     };
 
     const [showAll, setShowAll] = useState(false);
-
-    console.log('aaaa', store.help.metaData)
-
     const types = store?.help?.metaData?.categories;
     const displayedTypes = showAll ? types : types.slice(0, 4);
 

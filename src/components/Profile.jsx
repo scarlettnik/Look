@@ -15,6 +15,7 @@ import ButtonWrapper from "./utils/ButtonWrapper.jsx";
 import DeleteProfileButtons from "./DeleteProfileButtons.jsx";
 import ProfileMeasurementsModal from "./ProfileMeasurementsModal.jsx";
 import UserInfo from "./UserInfo.jsx";
+import {SUPPORT_URL} from "../constants.js";
 
 const menuItems = [
     { label: "Мои параметры", icon: UserIcon },
@@ -24,8 +25,6 @@ const menuItems = [
     { label: "Удаление аккаунта", icon: Trash2Icon, delete: true },
     { label: "Поддержка", icon: HelpCircleIcon, support: true },
 ];
-
-
 
 const MenuItem = ({ item, index, activeIndex, onClick }) => {
     const Icon = item.icon;
@@ -112,7 +111,7 @@ export default function ProfilePage() {
     };
 
     const handleSupportButtonClick = () => {
-        window.open("https://t.me/scarlettnik", "_blank");
+        window.open(SUPPORT_URL, "_blank");
     };
 
     const handleDeleteBackScape = () => {

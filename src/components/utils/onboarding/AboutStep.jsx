@@ -7,7 +7,7 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }) => {
     const sliderRef = useRef(null);
     const [valuePosition, setValuePosition] = useState(0);
     const handleBack = (e) => {
-        e.stopPropagation(); // Предотвращаем всплытие события
+        e.stopPropagation();
         onBack();
     };
 

@@ -119,10 +119,8 @@ const TinderCard = ({
                 swipeConfig.horizontal.rotationAngle
             );
 
-            // Обновляем состояние для логики
             setPosition({ x: deltaX, y: deltaY, rotate });
 
-            // **ОСНОВНОЕ ИЗМЕНЕНИЕ: Применяем transform здесь для мгновенной анимации**
             if (cardRef.current) {
                 let scale = 1 - Math.max(0, offset) * 0.03;
                 let translateY = 0;

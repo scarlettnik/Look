@@ -62,7 +62,6 @@ const OnboardingModal = observer(() => {
 
             if (!response.ok) throw new Error('Update failed');
 
-
             runInAction(() => {
                 if (store.authStore.data) {
                     store.authStore.data.preferences = {

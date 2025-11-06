@@ -11,6 +11,8 @@ export const AUTH_TOKEN = window.Telegram.WebApp.initData;
 
 export const HOST_URL = 'https://api.lookvogue.ru'
 
+export const SUPPORT_URL = 't.me/looksupportbot'
+
 export const CLOTH_STYLES = [
     { id: 1, name: "y2k", url: '/styles/y2k.png' },
     { id: 3, name: "minimalist", url: "/styles/minimalist.png" },

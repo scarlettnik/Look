@@ -1,0 +1,104 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-fullscreen-modal);
+    animation: fadeIn 0.28s ease-out forwards;
+}
+
+.modalOverlayClosing {
+    animation: fadeOut 0.28s ease-out forwards;
+}
+
+.modalContent {
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    animation: scaleIn 0.28s ease-out forwards;
+}
+
+.modalContentClosing {
+    animation: scaleOut 0.28s ease-out forwards;
+}
+
+.modalHeader {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.modalBody {
+    padding: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.applyButton {
+    background: black;
+    color: white;
+    padding: 12px;
+    font-size: 14px;
+    display: block;
+    width: calc(100% - 24px);
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    margin: 20px auto var(--app-action-bottom-space);
+}
+.label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+}

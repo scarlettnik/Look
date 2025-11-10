@@ -1,0 +1,43 @@
+.sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--app-bottom-nav-offset);
+    min-height: var(--app-bottom-nav-height);
+    padding-bottom: var(--app-safe-bottom);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: var(--z-sidebar);
+    transition: transform 0.3s ease;
+    background-color: var(--white-gray);
+    pointer-events: all;
+}
+.onboarding {
+    background-color: rgba(0, 0, 0, 0);
+}
+.sidebarbutton {
+    background-color: transparent;
+    width: 40px;
+    /*правка 2*/
+    padding-bottom: 20px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+.highlight {
+    background: #3A4651;
+    z-index: 1;
+    height: 40px;
+    margin-bottom: 20px;
+ }
+.highlightIcon {
+    margin-top: 20px;
+}

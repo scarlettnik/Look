@@ -21,6 +21,14 @@
   --white-gray: #F9F9F9;
   --beige: #EEE7DF;
   --dark-blue: #3A4651;
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --app-bottom-nav-height: 80px;
+  --app-bottom-nav-offset: calc(var(--app-bottom-nav-height) + var(--app-safe-bottom));
+  --app-action-bottom-space: calc(20px + var(--app-safe-bottom));
+  --z-sidebar: 1000;
+  --z-floating-action: 1100;
+  --z-bottom-sheet: 3000;
+  --z-fullscreen-modal: 3200;
 
 }
 

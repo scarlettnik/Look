@@ -6,11 +6,18 @@
     align-items: flex-end;
     justify-content: center;
     background: rgba(0, 0, 0, 0.4);
-    animation: fadeIn 0.28s ease-out forwards;
+    opacity: 0;
+    pointer-events: none;
+    isolation: isolate;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: opacity 0.28s ease-out;
 }
 
-.sheetBackdropClosing {
-    animation: fadeOut 0.28s ease-out forwards;
+.sheetBackdropVisible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .sheetPanel {
@@ -24,7 +31,14 @@
     background: var(--white);
     border-radius: 24px 24px 0 0;
     box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
-    animation: slideUp 0.28s ease-out forwards;
+    opacity: 1;
+    isolation: isolate;
+    contain: layout paint style;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 100%, 0);
+    transition: transform 0.28s ease-out;
 }
 
 .sheetPanelDefault {
@@ -41,8 +55,8 @@
     border-radius: 0;
 }
 
-.sheetPanelClosing {
-    animation: slideDown 0.28s ease-out forwards;
+.sheetPanelVisible {
+    transform: translate3d(0, 0, 0);
 }
 
 .sheetCloseButton {
@@ -59,44 +73,4 @@
     border-radius: 50%;
     background: transparent;
     cursor: pointer;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-    }
-
-    to {
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideDown {
-    from {
-        transform: translateY(0);
-    }
-
-    to {
-        transform: translateY(100%);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
 }

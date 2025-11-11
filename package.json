@@ -7,32 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "check": "npm run lint && npm run typecheck && npm run build",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^5.7.4",
-    "@capacitor/cli": "^5.7.4",
-    "@capacitor/core": "^5.7.4",
-    "@react-spring/web": "^9.5.5",
-    "@reduxjs/toolkit": "^2.6.1",
     "@twa-dev/sdk": "^8.0.2",
-    "hammerjs": "^2.0.8",
     "lucide-react": "^0.482.0",
     "mobx": "^6.13.7",
-    "mobx-react": "^9.2.0",
     "mobx-react-lite": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-helmet": "^6.1.0",
-    "react-loading-skeleton": "^3.5.0",
-    "react-redux": "^9.2.0",
     "react-router-dom": "^7.3.0",
-    "react-share": "^5.2.2",
-    "react-swipeable": "^7.0.2",
-    "react-tinder-card": "^1.6.4",
-    "swiper": "^6.8.4"
+    "react-share": "^5.2.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -40,11 +27,11 @@
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
+    "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "typescript": "^6.0.2",
-    "vite": "^6.2.1"
+    "vite": "7.1.11"
   }
 }

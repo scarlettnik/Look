@@ -58,8 +58,10 @@ const BottomSheet = ({
     children,
 }: BottomSheetProps) => {
     const [isMounted, setIsMounted] = useState(isOpen);
-    const [isClosing, setIsClosing] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const isBodyScrollLockedRef = useRef(false);
+    const backdropRef = useRef<HTMLDivElement | null>(null);
+    const panelRef = useRef<HTMLDivElement | null>(null);
 
     const sizeClassName = useMemo(() => {
         switch (size) {
@@ -75,7 +77,6 @@ const BottomSheet = ({
     useEffect(() => {
         if (isOpen) {
             setIsMounted(true);
-            setIsClosing(false);
             return undefined;
         }
 
@@ -83,16 +84,49 @@ const BottomSheet = ({
             return undefined;
         }
 
-        setIsClosing(true);
+        setIsVisible(false);
 
         const closeTimer = window.setTimeout(() => {
             setIsMounted(false);
-            setIsClosing(false);
             onAfterClose?.();
         }, SHEET_ANIMATION_DURATION_MS);
 
         return () => window.clearTimeout(closeTimer);
     }, [isMounted, isOpen, onAfterClose]);
+
+    useEffect(() => {
+        if (!isMounted || !isOpen) {
+            return undefined;
+        }
+
+        let repaintTimer = 0;
+        let animationFrameId = 0;
+
+        const forcePaint = () => {
+            const backdropElement = backdropRef.current;
+            const panelElement = panelRef.current;
+
+            if (!backdropElement || !panelElement) {
+                return;
+            }
+
+            void backdropElement.getBoundingClientRect();
+            void panelElement.getBoundingClientRect();
+            void panelElement.offsetHeight;
+        };
+
+        animationFrameId = window.requestAnimationFrame(() => {
+            setIsVisible(true);
+            forcePaint();
+
+            repaintTimer = window.setTimeout(forcePaint, 80);
+        });
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+            window.clearTimeout(repaintTimer);
+        };
+    }, [isMounted, isOpen]);
 
     useEffect(() => {
         if (isOpen && !isBodyScrollLockedRef.current) {
@@ -119,24 +153,26 @@ const BottomSheet = ({
 
     const sheetMarkup = (
         <div
+            ref={backdropRef}
             className={[
                 styles.sheetBackdrop,
-                isClosing ? styles.sheetBackdropClosing : '',
+                isVisible ? styles.sheetBackdropVisible : '',
                 backdropClassName,
             ].filter(Boolean).join(' ')}
             onClick={closeOnBackdrop ? onClose : undefined}
         >
             <div
+                ref={panelRef}
                 className={[
                     styles.sheetPanel,
                     sizeClassName,
-                    isClosing ? styles.sheetPanelClosing : '',
+                    isVisible ? styles.sheetPanelVisible : '',
                     panelClassName,
                 ].filter(Boolean).join(' ')}
                 onClick={(event) => event.stopPropagation()}
             >
                 {showCloseButton && (
-                    <button className={styles.sheetCloseButton} onClick={onClose} aria-label="Закрыть">
+                    <button type="button" className={styles.sheetCloseButton} onClick={onClose} aria-label="Закрыть">
                         <img src={UI_ICON_ASSETS.close} alt="Закрыть" />
                     </button>
                 )}

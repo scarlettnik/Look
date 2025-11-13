@@ -51,6 +51,7 @@ const TinderCards = observer(() => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [isSearchActive, setIsSearchActive] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<ProductCard | null>(null);
     const [filters, setFilters] = useState<LocalCatalogFilters>(() => ({
         ...createEmptyLocalCatalogFilters(),
@@ -70,6 +71,7 @@ const TinderCards = observer(() => {
     const cardRefs = useRef<Record<string, HTMLElement>>({});
     const cardsRef = useRef<ProductCard[]>(catalogStore.cards || []);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const stableViewportHeightRef = useRef(0);
     const expandedCardId = null;
     const viewportMetrics = useVisualViewportMetrics();
 
@@ -144,13 +146,27 @@ const TinderCards = observer(() => {
         return undefined;
     }, [catalogStore.isLoading, catalogStore.cards, imagesLoaded]);
 
-    useEffect(() => {
-        if (!containerRef.current) {
+    const syncCardsViewportHeight = useCallback(() => {
+        const containerElement = containerRef.current;
+        if (!containerElement) {
             return;
         }
 
-        containerRef.current.style.setProperty('--cards-viewport-height', `${viewportMetrics.height}px`);
+        const nextHeight = stableViewportHeightRef.current || viewportMetrics.height || window.innerHeight;
+        containerElement.style.setProperty('--cards-viewport-height', `${nextHeight}px`);
     }, [viewportMetrics.height]);
+
+    useEffect(() => {
+        if (viewportMetrics.height <= 0) {
+            return;
+        }
+
+        if (!isSearchActive || stableViewportHeightRef.current === 0) {
+            stableViewportHeightRef.current = viewportMetrics.height;
+        }
+
+        syncCardsViewportHeight();
+    }, [isSearchActive, syncCardsViewportHeight, viewportMetrics.height]);
 
     const refreshCardsRendering = useCallback(() => {
         const containerElement = containerRef.current;
@@ -158,7 +174,7 @@ const TinderCards = observer(() => {
 
         if (containerElement) {
             void containerElement.getBoundingClientRect();
-            containerElement.style.setProperty('--cards-viewport-height', `${viewportMetrics.height}px`);
+            syncCardsViewportHeight();
         }
 
         cardElements.forEach((cardElement) => {
@@ -176,7 +192,7 @@ const TinderCards = observer(() => {
 
             void cardElement.offsetHeight;
         });
-    }, [viewportMetrics.height]);
+    }, [syncCardsViewportHeight]);
 
     useEffect(() => {
         let animationFrameId = 0;
@@ -388,6 +404,8 @@ const TinderCards = observer(() => {
             <div ref={containerRef} className={styles.container}>
                 <div className={styles.topControls}>
                     <SearchHeaderMain
+                        isSearchActive={isSearchActive}
+                        onSearchActiveChange={setIsSearchActive}
                         onSearch={(searchRequest) => {
                             void catalogStore.fetchCardsWithSearch(searchRequest);
                         }}

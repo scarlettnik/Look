@@ -30,6 +30,7 @@ const TinderCard = ({
     const animationFrame = useRef<any>(null);
     const startTime = useRef(0);
     const navigate = useNavigate();
+    const imageRef = useRef<HTMLImageElement | null>(null);
 
     const [imageLoaded, setImageLoaded] = useState(false);
     const [localStyle, setLocalStyle] = useState<{
@@ -94,6 +95,10 @@ const TinderCard = ({
             cardRef.current.style.zIndex = zIndex;
         }
     }, [zIndex]);
+
+    useEffect(() => {
+        setImageLoaded(Boolean(imageRef.current?.complete));
+    }, [card.image_urls?.[0]]);
 
     useEffect(() => {
         if (!cardRef.current) {
@@ -304,8 +309,11 @@ const TinderCard = ({
                 )}
                 <img onLoad={() => setImageLoaded(true)}
                      onError={() => setImageLoaded(true)}
+                     ref={imageRef}
+                     data-card-layer
                      className={`${styles.cardImage} tinder-card-image`} src={card.image_urls[0]} alt={card.name} />
             </div>
+            <div className={styles.cardOverlay} data-card-layer />
 
             {isTopCard && (
                 <>
@@ -325,7 +333,7 @@ const TinderCard = ({
                     </div>
                 </>
             )}
-            <div className={styles.cardContent}>
+            <div className={styles.cardContent} data-card-layer>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>
                         <div className={styles.productName}>{card?.name}</div>
@@ -333,7 +341,9 @@ const TinderCard = ({
                         <div className={styles.priceRow}>
                             <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
                             <button
+                                type="button"
                                 className={styles.saveButton}
+                                data-card-layer
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onSaveClick(card);

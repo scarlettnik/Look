@@ -1,6 +1,9 @@
 .sheetBackdrop {
     position: fixed;
-    inset: 0;
+    top: var(--sheet-offset-top, 0px);
+    left: 0;
+    right: 0;
+    height: var(--sheet-viewport-height, 100dvh);
     z-index: var(--z-bottom-sheet);
     display: flex;
     align-items: flex-end;
@@ -12,7 +15,10 @@
     transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    transition: opacity 0.28s ease-out;
+    transition:
+        opacity 0.28s ease-out,
+        top 0.18s ease-out,
+        height 0.18s ease-out;
 }
 
 .sheetBackdropVisible {
@@ -24,7 +30,7 @@
     position: relative;
     width: min(100vw, 42rem);
     max-width: 100vw;
-    max-height: 100dvh;
+    max-height: var(--sheet-viewport-height, 100dvh);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -38,7 +44,10 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translate3d(0, 100%, 0);
-    transition: transform 0.28s ease-out;
+    transition:
+        transform 0.28s ease-out,
+        height 0.18s ease-out,
+        max-height 0.18s ease-out;
 }
 
 .sheetPanelDefault {
@@ -46,12 +55,12 @@
 }
 
 .sheetPanelTall {
-    height: min(90dvh, 52rem);
+    height: min(calc(var(--sheet-viewport-height, 100dvh) * 0.9), 52rem);
 }
 
 .sheetPanelFullscreen {
     width: 100vw;
-    height: 100dvh;
+    height: var(--sheet-viewport-height, 100dvh);
     border-radius: 0;
 }
 

@@ -7,6 +7,7 @@ import {
     SWIPE_CONFIG,
     VERTICAL_SWIPE_THRESHOLD_RATIO,
 } from '../../../constants';
+import useVisualViewportMetrics from '../../../hooks/useVisualViewportMetrics';
 import { apiSendJson } from '../../../lib/apiClient';
 import type { ProductCard } from '../../../types/domain';
 
@@ -68,7 +69,9 @@ const TinderCards = observer(() => {
     const nonTopSwipeProgress = useMemo<SwipeFeedback>(() => DEFAULT_SWIPE_FEEDBACK, []);
     const cardRefs = useRef<Record<string, HTMLElement>>({});
     const cardsRef = useRef<ProductCard[]>(catalogStore.cards || []);
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const expandedCardId = null;
+    const viewportMetrics = useVisualViewportMetrics();
 
     useEffect(() => {
         if (catalogStore.isAddingCards) {
@@ -140,6 +143,85 @@ const TinderCards = observer(() => {
 
         return undefined;
     }, [catalogStore.isLoading, catalogStore.cards, imagesLoaded]);
+
+    useEffect(() => {
+        if (!containerRef.current) {
+            return;
+        }
+
+        containerRef.current.style.setProperty('--cards-viewport-height', `${viewportMetrics.height}px`);
+    }, [viewportMetrics.height]);
+
+    const refreshCardsRendering = useCallback(() => {
+        const containerElement = containerRef.current;
+        const cardElements = Object.values(cardRefs.current);
+
+        if (containerElement) {
+            void containerElement.getBoundingClientRect();
+            containerElement.style.setProperty('--cards-viewport-height', `${viewportMetrics.height}px`);
+        }
+
+        cardElements.forEach((cardElement) => {
+            const currentTransform = cardElement.style.transform || 'translate3d(0, 0, 0)';
+            const currentOpacity = cardElement.style.opacity || '1';
+
+            cardElement.style.willChange = 'transform, opacity';
+            cardElement.style.transform = currentTransform;
+            cardElement.style.setProperty('-webkit-transform', currentTransform);
+            cardElement.style.opacity = currentOpacity;
+
+            cardElement.querySelectorAll<HTMLElement>('[data-card-layer]').forEach((layer) => {
+                void layer.getBoundingClientRect();
+            });
+
+            void cardElement.offsetHeight;
+        });
+    }, [viewportMetrics.height]);
+
+    useEffect(() => {
+        let animationFrameId = 0;
+        let restoreTimer = 0;
+
+        const scheduleRefresh = () => {
+            animationFrameId = window.requestAnimationFrame(() => {
+                refreshCardsRendering();
+                restoreTimer = window.setTimeout(refreshCardsRendering, 140);
+            });
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                scheduleRefresh();
+            }
+        };
+
+        window.addEventListener('pageshow', scheduleRefresh);
+        window.addEventListener('focus', scheduleRefresh);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+            window.clearTimeout(restoreTimer);
+            window.removeEventListener('pageshow', scheduleRefresh);
+            window.removeEventListener('focus', scheduleRefresh);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [refreshCardsRendering]);
+
+    useEffect(() => {
+        if (catalogStore.isLoading) {
+            return undefined;
+        }
+
+        let animationFrameId = 0;
+        animationFrameId = window.requestAnimationFrame(() => {
+            refreshCardsRendering();
+        });
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+        };
+    }, [catalogStore.isLoading, catalogStore.cards, refreshCardsRendering]);
 
     const handleSaveSuccess = useCallback((productId: ProductCard['id'], isSaved: boolean) => {
         catalogStore.updateProductCollectionStatus(productId, isSaved);
@@ -303,7 +385,7 @@ const TinderCards = observer(() => {
 
     return (
         <>
-            <div className={styles.container}>
+            <div ref={containerRef} className={styles.container}>
                 <div className={styles.topControls}>
                     <SearchHeaderMain
                         onSearch={(searchRequest) => {

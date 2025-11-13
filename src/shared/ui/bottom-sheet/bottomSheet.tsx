@@ -1,7 +1,8 @@
-import { type PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, type PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './bottomSheet.module.css';
 import { UI_ICON_ASSETS } from '../../../lib/assets';
+import useVisualViewportMetrics from '../../../hooks/useVisualViewportMetrics';
 
 const SHEET_ANIMATION_DURATION_MS = 280;
 
@@ -62,6 +63,7 @@ const BottomSheet = ({
     const isBodyScrollLockedRef = useRef(false);
     const backdropRef = useRef<HTMLDivElement | null>(null);
     const panelRef = useRef<HTMLDivElement | null>(null);
+    const viewportMetrics = useVisualViewportMetrics(isMounted);
 
     const sizeClassName = useMemo(() => {
         switch (size) {
@@ -129,6 +131,42 @@ const BottomSheet = ({
     }, [isMounted, isOpen]);
 
     useEffect(() => {
+        if (!isMounted) {
+            return undefined;
+        }
+
+        const panelElement = panelRef.current;
+        if (!panelElement) {
+            return undefined;
+        }
+
+        let focusTimer = 0;
+
+        const handleFocusIn = (event: FocusEvent) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLTextAreaElement)) {
+                return;
+            }
+
+            window.clearTimeout(focusTimer);
+            focusTimer = window.setTimeout(() => {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 140);
+        };
+
+        panelElement.addEventListener('focusin', handleFocusIn);
+
+        return () => {
+            window.clearTimeout(focusTimer);
+            panelElement.removeEventListener('focusin', handleFocusIn);
+        };
+    }, [isMounted]);
+
+    useEffect(() => {
         if (isOpen && !isBodyScrollLockedRef.current) {
             lockBodyScroll();
             isBodyScrollLockedRef.current = true;
@@ -151,9 +189,16 @@ const BottomSheet = ({
         return null;
     }
 
+    const sheetViewportStyle = {
+        '--sheet-viewport-height': `${Math.max(viewportMetrics.height, 1)}px`,
+        '--sheet-offset-top': `${viewportMetrics.offsetTop}px`,
+        '--sheet-keyboard-offset': `${viewportMetrics.keyboardOffset}px`,
+    } as CSSProperties;
+
     const sheetMarkup = (
         <div
             ref={backdropRef}
+            style={sheetViewportStyle}
             className={[
                 styles.sheetBackdrop,
                 isVisible ? styles.sheetBackdropVisible : '',

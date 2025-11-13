@@ -12,13 +12,15 @@
             transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
             opacity 0.3s ease;
     will-change: transform;
-    opacity: 0;
+    opacity: 1;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-perspective: 1000px;
     perspective: 1000px;
+    isolation: isolate;
+    contain: layout paint style;
     touch-action: manipulation;
     overscroll-behavior: none;
 }
@@ -34,10 +36,11 @@
     z-index: 1;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
-.card::after {
-    content: '';
+.cardOverlay {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -46,6 +49,9 @@
     background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
     pointer-events: none;
     z-index: 2;
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .card.moving {
@@ -69,6 +75,9 @@
     z-index: 3;
     padding: 16px;
     box-sizing: border-box;
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .cardBottom {
@@ -117,6 +126,9 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transform: translate3d(0, 0, 0);
 }
 
 .swipeFeedback {

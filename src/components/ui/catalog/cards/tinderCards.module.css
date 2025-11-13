@@ -1,7 +1,8 @@
 .container {
+    --cards-viewport-height: 100dvh;
     --cards-stack-gap: clamp(8px, 1.25vh, 14px);
     --cards-bottom-gap: clamp(14px, 2.5vh, 24px);
-    height: calc(100dvh - var(--app-bottom-nav-offset));
+    height: max(0px, calc(var(--cards-viewport-height) - var(--app-bottom-nav-offset)));
     width: 96vw;
     margin-left: 2vw;
     margin-right: 2vw;
@@ -9,6 +10,7 @@
     flex-direction: column;
     position: relative;
     z-index: 1;
+    isolation: isolate;
     overflow: hidden !important;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
@@ -37,6 +39,7 @@
     overscroll-behavior: none;
     padding-top: var(--cards-stack-gap);
     box-sizing: border-box;
+    isolation: isolate;
 }
 
 .cardsStage {
@@ -46,6 +49,7 @@
     height: 100%;
     min-height: 0;
     margin: 0 auto;
+    isolation: isolate;
 }
 .onboardingOverlay {
     position: fixed;

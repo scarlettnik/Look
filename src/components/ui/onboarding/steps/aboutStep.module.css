@@ -1,3 +1,25 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.centeredContent {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    padding-bottom: 100px;
+}
+
 .title {
     font-size: 16px;
     font-weight: 600;
@@ -9,23 +31,29 @@
 .genderContainer {
     display: flex;
     flex-direction: column;
-    padding: 20vw;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 0 48px;
+    box-sizing: border-box;
 }
 
 .genderOption {
-    padding: 12px 24px;
-    width: 80%;
-    margin: auto;
-    margin-top: 1rem;
-    border-radius: 6px;
-    font-size: 12px;
+    width: min(40vw, 220px);
+    max-width: 40%;
+    padding: 14px 20px;
+    margin: 0;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-size: 14px;
     font-weight: 400;
     background-color: #f5f5f5;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.genderOption.selected {
+.selected {
     color: var(--black);
     border: 1px solid var(--black);
 }
@@ -37,18 +65,23 @@
 }
 
 .helperText {
-    font-size: 8px;
+    margin: 0;
+    font-size: 10px;
     font-weight: 400;
     color: var(--beige);
+    text-align: center;
 }
 
 .actions {
-    margin: auto;
+    width: 100%;
+    flex-shrink: 0;
+    padding-top: 12px;
 }
 
 .primaryButton {
-    padding-bottom: 20vh;
+    width: 100%;
 }
+
 .primaryButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -56,13 +89,16 @@
 
 .secondaryButton {
     background-color: transparent;
-    position: absolute;
-    bottom: calc(8vw + 12px);
-    left: 0;
-    right: 0;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     font-size: 14px;
     font-weight: 400;
     color: var(--beige);
+    padding: 4px 0 0;
+    margin: 0;
 }
 
 .ageContainer {
@@ -74,31 +110,35 @@
     --age-indicator-left: 0px;
     position: relative;
     width: 100%;
-    padding: 0.5rem 0;
-    margin-bottom: 15vh;
+    padding: 8px 0 32px;
+    margin-bottom: 32px;
 }
 
 .ageSlider {
     -webkit-appearance: none;
     appearance: none;
+    display: block;
     width: 96%;
     height: 1px;
+    margin: 0 auto;
     border-radius: 0.1875rem;
     outline: none;
+    background: rgba(255, 255, 255, 0.45);
 }
 
 .ageValue {
     position: absolute;
-    top: 0;
+    top: 24px;
     left: calc(2% + var(--age-indicator-left));
     transform: translateX(-50%);
     font-size: 12px;
     font-weight: 400;
     color: var(--white);
     text-align: center;
-    padding-top: 3rem;
-    z-index: -1;
+    z-index: 1;
+    pointer-events: none;
 }
+
 .ageSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from '../../ui/onboarding/steps/precompute.module.css';
+import onboardingStyles from '../../ui/onboarding/onboardingModal.module.css';
 import FullScreenButton from "../../shared/fullScreenButton";
 import ButtonWrapper from "../../shared/buttonWrapper";
 import { CLOTH_STYLES } from "../../../constants";
@@ -40,7 +41,7 @@ const Precompute = ({onNext}: any) => {
             <div className={styles.centerText}>{count}%</div>
 
         </div>
-            <ButtonWrapper>
+            <ButtonWrapper className={onboardingStyles.bottomActionsDock}>
                 <FullScreenButton
                     variant='beige'
                     onClick={onNext}

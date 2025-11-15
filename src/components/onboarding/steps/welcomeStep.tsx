@@ -132,7 +132,7 @@ const WelcomeStep = ({ userName, userSername, onNext }: any) => {
     };
 
     return (
-        <div className={styles.onboardingStep}>
+        <div className={`${styles.onboardingStep} ${welcomeStyle.onboardingStep}`}>
             <p className={welcomeStyle.onBoardingTitle}>
                 Добро пожаловать{userName && ','} <br/>
                 {userName ? `${userName} ${userSername}!` : 'ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ'}

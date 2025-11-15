@@ -34,6 +34,10 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }: any) =
         handleStyleToggle(styleName);
     };
 
+    const handleCheckboxClick = (event) => {
+        event.stopPropagation();
+    };
+
     if (!showContent) {
         return (
             <div className={styles.onboardingStep}>
@@ -58,7 +62,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }: any) =
                 </div>
 
                 <div className={styles.onboardingActions}>
-                    <ButtonWrapper>
+                    <ButtonWrapper className={styles.bottomActionsDock}>
                         <FullScreenButton
                             variant='beige'
                             className={`${styles.onboardingButton} ${styles.primary}`}
@@ -89,7 +93,7 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }: any) =
                     {CLOTH_STYLES.map(style => (
                         <div
                             key={style.id}
-                            className={`${styles.styleCard} ${(!selectedStyles.includes(style.name) ? '' : styles.selected)}`}
+                            className={styles.styleCard}
                             onClick={() => handleCardClick(style.name)}
                         >
                             <div className={styles.styleImageWrapper}>
@@ -105,8 +109,10 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }: any) =
                             </div>
                             <div className={styles.styleContent}>
                                 <CustomCheckbox
+                                    id={`style-checkbox-${style.id}`}
                                     className={styles.styleCheckbox}
                                     checked={selectedStyles.includes(style.name)}
+                                    onClick={handleCheckboxClick}
                                     onChange={() => handleStyleToggle(style.name)}
                                 />
                                 <span className={styles.styleName}>{style.name}</span>
@@ -117,14 +123,14 @@ const StylesStep = ({ selectedStyles, onUpdate, onNext, onSkip, onBack }: any) =
             </div>
 
             <div className={styles.onboardingActions}>
-                <ButtonWrapper>
-                    <FullScreenButton
-                        variant='beige'
-                        className={`${styles.onboardingButton} ${styles.primary}`}
+                    <ButtonWrapper className={styles.bottomActionsDock}>
+                        <FullScreenButton
+                            variant='beige'
+                            className={`${styles.onboardingButton} ${styles.primary}`}
                         onClick={onNext}
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Загрузка...' : 'Вперед'}
+                        {isLoading ? 'Загрузка...' : 'Далее'}
                     </FullScreenButton>
                     <button
                         className={styles.secondaryButton}

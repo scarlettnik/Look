@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from '../../ui/onboarding/onboardingModal.module.css';
 import FullScreenButton from "../../shared/fullScreenButton";
+import ButtonWrapper from "../../shared/buttonWrapper";
 import SizeGrid from "../../profile/sizeControls/sizeGrid";
 import ParamsTab from "../../profile/sizeControls/paramsTab";
 import FitOptions from "../../profile/sizeControls/fitOptions";
@@ -41,24 +42,29 @@ const SizeStep = ({ params, updateParam, onNext, onSkip, onBack }: any) => {
                     Параметры
                 </button>
             </div>
-            <div className={styles.paramsBlock}>
-                <div className={styles.tabContent}>
+            <div className={`${styles.paramsBlock} ${styles.sizeStepParamsBlock}`}>
+                <div className={`${styles.tabContent} ${styles.sizeStepTabContent}`}>
                     {activeTab === "size" && (
-                        <SizeGrid
-                            tone='muted'
-                            params={params}
-                            updateParam={updateParam}
-                        />
+                        <div className={styles.sizeStepPrimaryPanel}>
+                            <SizeGrid
+                                tone='muted'
+                                params={params}
+                                updateParam={updateParam}
+                            />
+                        </div>
                     )}
 
                     {activeTab === "params" && (
-                        <ParamsTab
-                            params={params}
-                            updateParam={updateParam}
-                        />
+                        <div className={styles.sizeStepPrimaryPanel}>
+                            <ParamsTab
+                                compact={true}
+                                params={params}
+                                updateParam={updateParam}
+                            />
+                        </div>
                     )}
 
-                    <div className={`${styles.fitOptionsWrapper} ${styles.fitOptionsWrapperWide}`}>
+                    <div className={`${styles.fitOptionsWrapper} ${styles.fitOptionsWrapperWide} ${styles.sizeStepFitOptionsWrapper}`}>
                         <p className={styles.text}>Ношу одежду</p>
                         <FitOptions
                             params={params}
@@ -68,22 +74,24 @@ const SizeStep = ({ params, updateParam, onNext, onSkip, onBack }: any) => {
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <FullScreenButton
-                    variant='beige'
-                    onClick={handleNext}
-                >
-                    Далее
-                </FullScreenButton>
-                {!isKeyboardOpen &&
-                    <button
-                        className={styles.secondaryButton}
-                        onClick={onSkip}
+            <ButtonWrapper className={styles.bottomActionsDock}>
+                <div className={styles.actions}>
+                    <FullScreenButton
+                        variant='beige'
+                        onClick={handleNext}
                     >
-                        Пропустить
-                    </button>
-                }
-            </div>
+                        Далее
+                    </FullScreenButton>
+                    {!isKeyboardOpen &&
+                        <button
+                            className={styles.secondaryButton}
+                            onClick={onSkip}
+                        >
+                            Пропустить
+                        </button>
+                    }
+                </div>
+            </ButtonWrapper>
         </div>
     );
 };

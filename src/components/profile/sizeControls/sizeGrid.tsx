@@ -7,9 +7,10 @@ const SizeGrid = ({ params, updateParam, tone = 'default' }: any) => {
     };
 
     const toneClassName = tone === 'muted' ? styles.sizeBoxMuted : '';
+    const gridClassName = tone === 'muted' ? styles.sizesGridCompact : '';
 
     return (
-        <div className={styles.sizesGrid}>
+        <div className={`${styles.sizesGrid} ${gridClassName}`.trim()}>
             {Object.keys(sizeRanges).map(size => (
                 <div
                     key={size}

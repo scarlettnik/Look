@@ -2,16 +2,18 @@
     color: var(--white);
     font-weight: 400;
     font-size: 20px;
-    margin-bottom: 2vh;
+    width: 100%;
+    margin: 0 auto 2vh;
     position: relative;
     z-index: 1;
-    height: 6vh;
+    min-height: 6vh;
+    text-align: center;
 }
 
 .cardsContainer {
     position: relative;
-    width: 100%;
-    height: 62vh;
+    width: min(84vw, 22rem);
+    height: min(62vh, 28rem);
     min-height: 200px;
     max-height: 800px;
     margin: 0 auto;
@@ -26,9 +28,9 @@
 
 .card {
     position: absolute;
-    width: 84vw;
-    max-width: 600px;
-    height: 62vh;
+    width: 100%;
+    max-width: none;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,24 +73,33 @@
 
 .onboardingStep {
     position: relative;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .starterButton {
     position: fixed;
-    bottom: 15vw;
-    left: 10vw;
-    width: 80vw;
+    left: 50%;
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(min(100vw, 42rem) - 48px);
+    min-height: 48px;
     padding: 12px 24px;
     border-radius: 30px;
+    border: none;
     background-color: var(--beige);
     font-size: 16px;
     font-weight: 400;
-    justify-content: center;
     color: #2E2E2E;
+    box-sizing: border-box;
     z-index: 30;
 }
 
@@ -96,17 +107,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
 }
 
 .starterButtonIcon {
-    padding-left: 10px;
+    display: block;
+    width: 16px;
+    height: 16px;
+}
+
+.attempContainer {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    width: calc(min(100vw, 42rem) - 48px);
+    z-index: 30;
 }
 
 .attemp {
     font-size: 10px;
     font-weight: 400;
     color: var(--light-warm-gray);
-    position: fixed;
-    bottom: 5vw;
-    margin: 0 3vw;
+    margin: 0;
+    line-height: 1.35;
 }

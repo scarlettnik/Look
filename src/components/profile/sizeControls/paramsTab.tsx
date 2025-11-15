@@ -1,14 +1,14 @@
 import styles from "../../ui/profile/profile.module.css";
 import ParamControl from "./paramControl";
 
-const ParamsTab = ({ params, updateParam }: any) => {
+const ParamsTab = ({ params, updateParam, compact = false }: any) => {
     const handleChange = (field, value) => {
         updateParam(field, value);
     };
 
     return (
-        <div className={`${styles.paramsForm} ${styles.paramsFormCompact}`}>
-            <div className={styles.paramsInputGroup}>
+        <div className={`${styles.paramsForm} ${compact ? styles.paramsFormCompact : ''}`.trim()}>
+            <div className={`${styles.paramsInputGroup} ${compact ? styles.paramsInputGroupCompact : ''}`.trim()}>
                 <ParamControl
                     label="Объем груди"
                     value={params.size_parameters?.breast || 90}

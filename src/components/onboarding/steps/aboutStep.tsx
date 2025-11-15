@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react';
 import styles from '../../ui/onboarding/steps/aboutStep.module.css';
 import FullScreenButton from "../../shared/fullScreenButton";
+import ButtonWrapper from "../../shared/buttonWrapper";
 import titleStyle from '../../ui/onboarding/onboardingModal.module.css'
 import { UI_ICON_ASSETS } from '../../../lib/assets';
 
@@ -38,57 +39,60 @@ const AboutStep = ({ age, onUpdate, onNext, onSkip, onBack }: any) => {
                 <p className={titleStyle.stepTitle}>Выберите пол и возраст</p>
             </div>
 
-            <div className={styles.genderContainer}>
-                <button
-                    className={`${styles.genderOption} ${styles.selected}`}
-                    onClick={() => onUpdate('gender', 'female')}
-                >
-                    Девушка
-                </button>
-                <button
-                    className={`${styles.genderOption}`}
-                    onClick={() => onUpdate('gender', 'male')}
-                    disabled={true}
-                >
-                    Парень*
-                </button>
-                <p className={styles.helperText}>
-                    *В разработке
-                </p>
-            </div>
+            <div className={styles.centeredContent}>
+                <div className={styles.genderContainer}>
+                    <button
+                        className={`${styles.genderOption} ${styles.selected}`}
+                        onClick={() => onUpdate('gender', 'female')}
+                    >
+                        Девушка
+                    </button>
+                    <button
+                        className={`${styles.genderOption}`}
+                        onClick={() => onUpdate('gender', 'male')}
+                        disabled={true}
+                    >
+                        Парень*
+                    </button>
+                    <p className={styles.helperText}>
+                        *В разработке
+                    </p>
+                </div>
 
-            <div className={styles.sliderWrapper} ref={sliderRef}>
-                <input
-                    type="range"
-                    min="16"
-                    max="80"
-                    value={age}
-                    onChange={(e) => onUpdate('age', Number(e.target.value))}
-                    className={styles.ageSlider}
-                />
-                <div
-                    className={styles.ageValue}
-                >
-                    {age}
+                <div className={styles.sliderWrapper} ref={sliderRef}>
+                    <input
+                        type="range"
+                        min="16"
+                        max="80"
+                        value={age}
+                        onChange={(e) => onUpdate('age', Number(e.target.value))}
+                        className={styles.ageSlider}
+                    />
+                    <div
+                        className={styles.ageValue}
+                    >
+                        {age}
+                    </div>
                 </div>
             </div>
 
-
-            <div className={styles.actions}>
-                <FullScreenButton
-                    variant='beige'
-                    className={styles.primaryButton}
-                    onClick={onNext}
-                >
-                    Далее
-                </FullScreenButton>
-                <button
-                    className={styles.secondaryButton}
-                    onClick={onSkip}
-                >
-                    Войти без регистрации
-                </button>
-            </div>
+            <ButtonWrapper className={titleStyle.bottomActionsDock}>
+                <div className={styles.actions}>
+                    <FullScreenButton
+                        variant='beige'
+                        className={styles.primaryButton}
+                        onClick={onNext}
+                    >
+                        Далее
+                    </FullScreenButton>
+                        <button
+                            className={styles.secondaryButton}
+                            onClick={onSkip}
+                        >
+                            Пропустить
+                        </button>
+                </div>
+            </ButtonWrapper>
         </div>
     );
 };

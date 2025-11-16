@@ -7,7 +7,13 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  ignorePatterns: [
+    'coverage',
+    'dist',
+    'playwright-report',
+    'test-results',
+    '.eslintrc.cjs',
+  ],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
@@ -19,6 +25,10 @@ module.exports = {
     ],
   },
   overrides: [
+    {
+      files: ['jest.config.cjs'],
+      env: { node: true },
+    },
     {
       files: ['**/*.ts', '**/*.tsx'],
       parser: '@typescript-eslint/parser',
@@ -38,6 +48,18 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'off',
         'react/prop-types': 'off',
       },
+    },
+    {
+      files: [
+        'src/**/*.test.ts',
+        'src/**/*.test.tsx',
+        'src/test/**/*.ts',
+      ],
+      env: { jest: true },
+    },
+    {
+      files: ['playwright.config.ts', 'tests/**/*.ts'],
+      env: { node: true },
     },
   ],
 }

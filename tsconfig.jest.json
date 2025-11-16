@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "types": ["vite/client", "jest", "@testing-library/jest-dom"]
+  },
+  "include": ["src", "jest.config.cjs"]
+}

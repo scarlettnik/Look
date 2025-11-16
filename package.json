@@ -6,8 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "check": "npm run lint && npm run typecheck && npm run build",
+    "check": "npm run lint && npm run typecheck && npm run test:unit:ci && npm run build",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives",
+    "prepare": "husky",
+    "precommit": "npm run lint && npm run typecheck && npm run test:unit:ci",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:unit": "jest",
+    "test:unit:ci": "jest --runInBand --coverage",
+    "test:unit:watch": "jest --watch",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "preview": "vite preview"
   },
@@ -22,6 +30,11 @@
     "react-share": "^5.2.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
@@ -31,6 +44,11 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "husky": "^9.1.7",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "ts-jest": "^29.4.11",
     "typescript": "^6.0.2",
     "vite": "^6.2.1"
   }

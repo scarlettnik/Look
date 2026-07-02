@@ -1,26 +1,59 @@
-import {useCallback, useState} from 'react';
-import styles from '../../ui/catalog/cards/tinderCards.module.css';
+import {
+    useCallback,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react';
 import { observer } from 'mobx-react-lite';
-import {ONBOARDING_STEPS} from "../../../constants";
+import { ONBOARDING_STEPS } from '../../../constants';
+import type { SwipeGestureDirection } from '../../../lib/swipeMotion';
+
+import styles from '../../ui/catalog/cards/tinderCards.module.css';
+
+type OnboardingProps = {
+    showOnboarding: boolean;
+    onboardingStep: number;
+    setOnboardingStep: Dispatch<SetStateAction<number>>;
+    simulateSwipe: (direction: SwipeGestureDirection) => void | Promise<void>;
+    isAnimating: boolean;
+    handleSaveChanges?: () => void | Promise<void>;
+    setUndoButtonHighlight: Dispatch<SetStateAction<boolean>>;
+    setSaveHighlight: Dispatch<SetStateAction<boolean>>;
+    setPopularHighlight: Dispatch<SetStateAction<boolean>>;
+};
+
+type OnboardingStepKey = keyof typeof ONBOARDING_STEPS;
+type OnboardingStepConfig = {
+    text: string;
+    page: string;
+    swipe?: SwipeGestureDirection;
+    images?: Array<{
+        src: string;
+        alt: string;
+        className: string;
+    }>;
+};
 
 export const Onboarding = observer(({
-                                        showOnboarding,
-                                        onboardingStep,
-                                        setOnboardingStep,
-                                        simulateSwipe,
-                                        isAnimating,
-                                        handleSaveChanges,
-                                        setUndoButtonHighlight,
-                                        setSaveHighlight,
-                                        setPopularHighlight
-                                    }: any) => {
+    showOnboarding,
+    onboardingStep,
+    setOnboardingStep,
+    simulateSwipe,
+    isAnimating,
+    handleSaveChanges,
+    setUndoButtonHighlight,
+    setSaveHighlight,
+    setPopularHighlight,
+}: OnboardingProps) => {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleNextOnboardingStep = useCallback(async () => {
         if (isProcessing || isAnimating) return;
         setIsProcessing(true);
 
-        const currentStepData = ONBOARDING_STEPS[onboardingStep];
+        const currentStepData = ONBOARDING_STEPS[
+            onboardingStep as OnboardingStepKey
+        ] as OnboardingStepConfig | undefined;
 
         if (currentStepData?.swipe) {
             await simulateSwipe(currentStepData.swipe);
@@ -63,7 +96,9 @@ export const Onboarding = observer(({
 
     if (!showOnboarding || onboardingStep === 0) return null;
 
-    const currentStep = ONBOARDING_STEPS[onboardingStep];
+    const currentStep = ONBOARDING_STEPS[
+        onboardingStep as OnboardingStepKey
+    ] as OnboardingStepConfig | undefined;
 
     if (!currentStep) return null;
 

@@ -1,4 +1,19 @@
+import type {
+    ButtonHTMLAttributes,
+    PropsWithChildren,
+} from 'react';
+
 import styles from '../ui/shared/fullScreenButton.module.css';
+
+type FullScreenButtonVariant = 'primary' | 'light' | 'beige' | 'white';
+
+type FullScreenButtonProps = PropsWithChildren<{
+    variant?: FullScreenButtonVariant;
+    className?: string;
+} & Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    'children' | 'className'
+>>;
 
 const FullScreenButton = ({
     children,
@@ -7,7 +22,7 @@ const FullScreenButton = ({
     onClick,
     disabled,
     type = 'button',
-}: any) => {
+}: FullScreenButtonProps) => {
     const variantClassName = styles[variant] ?? styles.primary;
 
     return (

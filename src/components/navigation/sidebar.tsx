@@ -1,10 +1,24 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation, matchPath } from "react-router-dom";
-import styles from '../ui/navigation/sidebar.module.css';
-import useIsKeyboardOpen from "../../hooks/useIsKeyboardOpen";
-import { NAVIGATION_ICON_ASSETS, getNavigationIconPath } from "../../lib/assets";
+import { useEffect, useState } from 'react';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom';
 
-const SIDEBAR_CONFIG = [
+import useIsKeyboardOpen from '../../hooks/useIsKeyboardOpen';
+import { NAVIGATION_ICON_ASSETS, getNavigationIconPath } from '../../lib/assets';
+
+import styles from '../ui/navigation/sidebar.module.css';
+
+type SidebarProps = {
+    highlightSave?: boolean;
+    highlightPopular?: boolean;
+    onboarding?: boolean;
+};
+
+type SidebarConfigItem = {
+    path: string;
+    exact?: boolean;
+    matchPattern?: string;
+};
+
+const SIDEBAR_CONFIG: SidebarConfigItem[] = [
     { path: '/', exact: true },
     { path: '/save', matchPattern: '/save/*' },
     { path: '/trands', matchPattern: '/trands/*' },
@@ -12,7 +26,11 @@ const SIDEBAR_CONFIG = [
     { path: '/profile', exact: true }
 ];
 
-const Sidebar = ({highlightSave, highlightPopular, onboarding}: any) => {
+const Sidebar = ({
+    highlightSave = false,
+    highlightPopular = false,
+    onboarding = false,
+}: SidebarProps) => {
     const isKeyboardOpen = useIsKeyboardOpen();
     const navigate = useNavigate();
     const location = useLocation();
@@ -62,7 +80,7 @@ const Sidebar = ({highlightSave, highlightPopular, onboarding}: any) => {
 
             <button
                 disabled={onboarding}
-                className={`${styles.sidebarbutton} ${activePath === '/compare' ? styles.active : ''} ${highlightPopular ? styles.highlight : ''}`}
+                className={`${styles.sidebarbutton} ${activePath === '/trands' ? styles.active : ''} ${highlightPopular ? styles.highlight : ''}`}
                 onClick={() => navigate('/trands')}>
                 <img
                     src={highlightPopular ? NAVIGATION_ICON_ASSETS.highlight.trends : getNavigationIconPath('trends', activePath === '/trands')}

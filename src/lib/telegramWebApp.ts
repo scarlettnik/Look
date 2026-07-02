@@ -66,6 +66,41 @@ export const getTelegramStartParam = () =>
 export const isTelegramEnvironment = () =>
   Boolean(getTelegramInitDataUnsafe()?.user);
 
+const compareTelegramVersions = (currentVersion = '0', minimumVersion: string) => {
+  const currentParts = currentVersion.split('.').map((part) => Number(part) || 0);
+  const minimumParts = minimumVersion.split('.').map((part) => Number(part) || 0);
+  const length = Math.max(currentParts.length, minimumParts.length);
+
+  for (let index = 0; index < length; index += 1) {
+    const currentPart = currentParts[index] ?? 0;
+    const minimumPart = minimumParts[index] ?? 0;
+
+    if (currentPart > minimumPart) {
+      return 1;
+    }
+
+    if (currentPart < minimumPart) {
+      return -1;
+    }
+  }
+
+  return 0;
+};
+
+export const isTelegramBackButtonSupported = () => {
+  const webApp = getTelegramWebApp();
+
+  if (!webApp) {
+    return false;
+  }
+
+  if (webApp.isVersionAtLeast) {
+    return webApp.isVersionAtLeast('6.1');
+  }
+
+  return compareTelegramVersions(webApp.version, '6.1') >= 0;
+};
+
 export const ensureTelegramWebApp = () => {
   const currentWindow = getWindowObject();
 
@@ -84,6 +119,7 @@ export const ensureTelegramWebApp = () => {
     currentWebApp?.initDataUnsafe || parseTelegramInitData(initData);
 
   const browserTestWebApp: TelegramWebApp = {
+    version: currentWebApp?.version || '6.0',
     initData,
     initDataUnsafe,
     ready: currentWebApp?.ready || (() => undefined),
@@ -95,6 +131,10 @@ export const ensureTelegramWebApp = () => {
       ((url: string) => {
         currentWindow.open(url, '_blank', 'noopener,noreferrer');
       }),
+    isVersionAtLeast:
+      currentWebApp?.isVersionAtLeast ||
+      ((version: string) =>
+        compareTelegramVersions(currentWebApp?.version || '6.0', version) >= 0),
   };
 
   currentWindow.Telegram = {

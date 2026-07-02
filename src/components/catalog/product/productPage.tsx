@@ -1,80 +1,55 @@
-import {useState, useRef, useEffect, useCallback} from 'react';
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type TouchEvent,
+} from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import { NAVIGATION_ICON_ASSETS, UI_ICON_ASSETS } from '../../../lib/assets';
+import type { ProductCard, ProductColorVariant } from '../../../types/domain';
+
+import SaveToCollectionModal from '../../collections/saveToCollectionsModal';
 import Sidebar from '../../navigation/sidebar';
-import {useNavigate, useParams} from 'react-router-dom';
+import CustomSkeleton from '../../shared/customSkeleton';
+import FullScreenButton from '../../shared/fullScreenButton';
 import styles from '../../ui/catalog/product/productPage.module.css';
-import FullScreenButton from "../../shared/fullScreenButton";
-import CustomSkeleton from "../../shared/customSkeleton";
-import SaveToCollectionModal from "../../collections/saveToCollectionsModal";
-import { NAVIGATION_ICON_ASSETS, UI_ICON_ASSETS } from "../../../lib/assets";
-import { apiGetJson } from "../../../lib/apiClient";
-import type { ProductCard, ProductColorVariant } from "../../../types/domain";
+
+import { useProductDetails } from './useProductDetails';
+
+type ProductSize = NonNullable<ProductCard['sizes']>[number];
 
 const ProductPage = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
+    const {
+        product,
+        loading,
+        error,
+        currentColorId,
+        handleColorChange,
+        setProductSavedState,
+    } = useProductDetails(id);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
-    const touchStartX = useRef(0);
-    const [product, setProduct] = useState<ProductCard | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [selectedSize, setSelectedSize] = useState<string | string[] | null>(null);
-    const [currentColorId, setCurrentColorId] = useState(id);
-    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const sliderTrackRef = useRef<any>(null);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
+    const touchStartX = useRef(0);
+    const sliderTrackRef = useRef<HTMLDivElement | null>(null);
 
-    const handleColorChange = async (color) => {
-        if (color.product_id === currentColorId || isTransitioning) return;
-
-        try {
-            setIsTransitioning(true);
-            await loadProduct(color.product_id);
-            setCurrentColorId(color.product_id);
-        } catch (err) {
-            console.error('Error changing color:', err);
-        } finally {
-            setIsTransitioning(false);
-        }
-    };
-
-    const fetchProduct = useCallback(async (productId: string | number) => {
-        try {
-            setLoading(true);
-            return await apiGetJson<ProductCard>(`/v1/catalog/product/${productId}`);
-        } catch (err) {
-            console.error('Error fetching product:', err);
-            throw err;
-        }
-    }, []);
-    const handleOpenSaveModal = useCallback(() => {
-        setIsSaveModalOpen(true);
-    }, []);
-    const handleCloseSaveModal = useCallback(() => {
-        setIsSaveModalOpen(false);
-    }, []);
-
-    const loadProduct = useCallback(async (productId: string | number) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await fetchProduct(productId);
-            setProduct(data);
-            setCurrentIndex(0);
-            setSelectedSize(null);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load product');
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchProduct]);
+    const imageUrls = product?.image_urls ?? [];
+    const descriptionLines = product?.description?.split('\n') ?? [];
 
     useEffect(() => {
-        if (id) loadProduct(id);
-    }, [id, loadProduct]);
+        setCurrentIndex(0);
+        setSelectedSize(null);
+        setIsDescriptionExpanded(false);
+    }, [product?.id]);
 
     useEffect(() => {
         if (!sliderTrackRef.current) {
@@ -82,34 +57,54 @@ const ProductPage = () => {
         }
 
         sliderTrackRef.current.style.transform = `translateX(calc(${-currentIndex * 100}% + ${dragX}px))`;
-        sliderTrackRef.current.style.transition = isDragging ? 'none' : 'transform 0.3s ease';
+        sliderTrackRef.current.style.transition = isDragging
+            ? 'none'
+            : 'transform 0.3s ease';
     }, [currentIndex, dragX, isDragging]);
 
-    const handleTouchStart = (e) => {
-        touchStartX.current = e.touches[0].clientX;
+    const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+        touchStartX.current = event.touches[0]?.clientX ?? 0;
         setIsDragging(true);
     };
 
-    const handleTouchMove = (e) => {
-        const moveX = e.touches[0].clientX - touchStartX.current;
+    const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+        const moveX = (event.touches[0]?.clientX ?? 0) - touchStartX.current;
         setDragX(moveX);
     };
 
     const handleTouchEnd = () => {
         if (dragX > 80 && currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
-        } else if (dragX < -80 && currentIndex < (product?.image_urls?.length ?? 0) - 1) {
+        } else if (dragX < -80 && currentIndex < imageUrls.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
+
         setDragX(0);
         setIsDragging(false);
     };
 
-    if (error) return <div className={styles.error}>Ошибка загрузки товара: {error}</div>;
+    const openSellerPage = useCallback(() => {
+        const productUrl = product?.original_url;
 
-    const toggleExpanded = () => setIsExpanded(prev => !prev);
+        if (!productUrl) {
+            return;
+        }
 
-    const lines = product?.description?.split('\n') || [];
+        if (window.Telegram?.WebApp?.openLink) {
+            window.Telegram.WebApp.openLink(productUrl);
+            return;
+        }
+
+        window.open(productUrl, '_blank', 'noopener,noreferrer');
+    }, [product?.original_url]);
+
+    const handleColorSelect = useCallback((color: ProductColorVariant) => {
+        void handleColorChange(color);
+    }, [handleColorChange]);
+
+    if (error) {
+        return <div className={styles.error}>Ошибка загрузки товара: {error}</div>;
+    }
 
     return (
         <div className={styles.container}>
@@ -119,8 +114,12 @@ const ProductPage = () => {
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
             >
-                <button className={styles.backButton} onClick={() => navigate(-1)}>
-                    <img className={styles.backIcon} src={UI_ICON_ASSETS.arrowLeft} alt="Назад"/>
+                <button
+                    type="button"
+                    className={styles.backButton}
+                    onClick={() => navigate(-1)}
+                >
+                    <img className={styles.backIcon} src={UI_ICON_ASSETS.arrowLeft} alt="Назад" />
                 </button>
 
                 {loading ? (
@@ -131,14 +130,19 @@ const ProductPage = () => {
                             ref={sliderTrackRef}
                             className={styles.sliderInner}
                         >
-                            {product?.image_urls?.map((src, index) => (
-                                <img key={index} src={src} alt={`Slide ${index}`} className={styles.image}/>
+                            {imageUrls.map((src, index) => (
+                                <img
+                                    key={`${src}-${index}`}
+                                    src={src}
+                                    alt={`${product?.name ?? 'Product'} ${index + 1}`}
+                                    className={styles.image}
+                                />
                             ))}
                         </div>
                         <div className={styles.progressDots}>
-                            {product?.image_urls?.map((_, index) => (
+                            {imageUrls.map((src, index) => (
                                 <span
-                                    key={index}
+                                    key={`${src}-${index}`}
                                     className={`${styles.dot} ${index === currentIndex ? styles.active : ''}`}
                                 />
                             ))}
@@ -151,11 +155,11 @@ const ProductPage = () => {
                 {loading ? (
                     <>
                         <CustomSkeleton className={styles.textLinePrimarySkeleton} />
-                        <CustomSkeleton className={styles.textLineSecondarySkeleton}/>
-                        <CustomSkeleton className={styles.priceLineSkeleton}/>
+                        <CustomSkeleton className={styles.textLineSecondarySkeleton} />
+                        <CustomSkeleton className={styles.priceLineSkeleton} />
                         <FullScreenButton>
                             <p className={styles.sellerButtonContent}>
-                                На сайт продавца <img src={UI_ICON_ASSETS.shoppingBag} alt="Корзина"/>
+                                На сайт продавца <img src={UI_ICON_ASSETS.shoppingBag} alt="Корзина" />
                             </p>
                         </FullScreenButton>
                     </>
@@ -165,45 +169,39 @@ const ProductPage = () => {
                         <p className={styles.brand}>{product?.brand}</p>
                         <div className={styles.header}>
                             <p className={styles.price}>
-                                {product?.discount_price && product?.discount_price !== product?.price ? (
+                                {product?.discount_price && product.discount_price !== product.price ? (
                                     <>
                                         <span className={styles.oldPrice}>
                                             {product.price} ₽
                                         </span>
-                                        {product?.discount_price} ₽
+                                        {product.discount_price} ₽
                                     </>
                                 ) : (
-                                    `${product?.price} ₽`
+                                    product?.price != null ? `${product.price} ₽` : ''
                                 )}
                             </p>
                             <button
+                                type="button"
                                 className={styles.iconButton}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleOpenSaveModal();
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    setIsSaveModalOpen(true);
                                 }}
                             >
                                 <img
                                     className={styles.saveIcon}
-                                    src={product.is_contained_in_user_collections
+                                    src={product?.is_contained_in_user_collections
                                         ? NAVIGATION_ICON_ASSETS.active.save
                                         : NAVIGATION_ICON_ASSETS.inactive.save}
-                                    alt={product.is_contained_in_user_collections ? "Сохранено" : "Сохранить"}
+                                    alt={product?.is_contained_in_user_collections ? 'Сохранено' : 'Сохранить'}
                                 />
                             </button>
                         </div>
-                        <FullScreenButton onClick={() => {
-                            if (window.Telegram?.WebApp?.openLink) {
-                                window.Telegram.WebApp.openLink(product?.original_url);
-                            } else {
-                                window.open(product?.original_url, '_blank');
-                            }
-                        }}>
+                        <FullScreenButton onClick={openSellerPage}>
                             <div className={styles.sellerButtonContent}>
                                 На сайт продавца <img src={UI_ICON_ASSETS.shoppingBag} alt="Корзина" />
                             </div>
                         </FullScreenButton>
-
                     </>
                 )}
 
@@ -211,37 +209,39 @@ const ProductPage = () => {
                 {loading ? (
                     <CustomSkeleton className={styles.sectionSkeleton} />
                 ) : (
-                    <span className={styles.description}>
-                        <div>
-                            <div
-                                className={`${styles.description} ${!isExpanded ? styles.clamped : ''}`}
-                            >
-                                {lines.map((line, index) => (
-                                    <p key={index}>{line}</p>
-                                ))}
-                            </div>
-
-                            {lines.length > 4 && (
-                                <button onClick={toggleExpanded} className={styles.readMoreButton}>
-                                    {isExpanded ? 'Скрыть' : 'Подробнее'}
-                                </button>
-                            )}
+                    <div className={styles.description}>
+                        <div
+                            className={`${styles.description} ${!isDescriptionExpanded ? styles.clamped : ''}`}
+                        >
+                            {descriptionLines.map((line, index) => (
+                                <p key={`${line}-${index}`}>{line}</p>
+                            ))}
                         </div>
-                        <div className={styles.descriptionDivider}></div>
-                    </span>
+
+                        {descriptionLines.length > 4 && (
+                            <button
+                                type="button"
+                                onClick={() => setIsDescriptionExpanded((current) => !current)}
+                                className={styles.readMoreButton}
+                            >
+                                {isDescriptionExpanded ? 'Скрыть' : 'Подробнее'}
+                            </button>
+                        )}
+                        <div className={styles.descriptionDivider} />
+                    </div>
                 )}
 
                 {loading ? (
-                    <CustomSkeleton className={styles.sectionSkeleton}/>
+                    <CustomSkeleton className={styles.sectionSkeleton} />
                 ) : (
                     product?.sizes && (
                         <>
                             <p className={styles.blockTitle}>Размеры</p>
                             <div className={styles.bar}>
-
-                                {product?.sizes?.map((size, index) => (
+                                {product.sizes.map((size, index) => (
                                     <button
-                                        key={index}
+                                        key={`${String(size)}-${index}`}
+                                        type="button"
                                         className={`${styles.sizeOption} ${
                                             selectedSize === size ? styles.active : ''
                                         }`}
@@ -251,33 +251,37 @@ const ProductPage = () => {
                                     </button>
                                 ))}
                             </div>
-                            <p className={styles.aboutSize}>Размер подобран на основе ваших параметров </p>
-                            <div className={styles.contentDivider}></div>
+                            <p className={styles.aboutSize}>Размер подобран на основе ваших параметров</p>
+                            <div className={styles.contentDivider} />
                         </>
                     )
                 )}
+
                 {loading ? (
                     <CustomSkeleton className={styles.sectionSkeleton} />
                 ) : (
-                    product?.color_group?.length > 0 && (
+                    product?.color_group && product.color_group.length > 0 && (
                         <>
                             <div className={styles.colorHeader}>
                                 <p className={styles.blockTitle}>Цвет</p>
-                                <p className={styles.colorTitle}>{product?.color_name}</p>
+                                <p className={styles.colorTitle}>{product.color_name}</p>
                             </div>
                             <div className={styles.colorsContainer}>
-                                {product.color_group.map((color: ProductColorVariant, index) => (
+                                {product.color_group.map((color, index) => (
                                     <ColorSwatch
-                                        key={index}
+                                        key={`${String(color.product_id)}-${index}`}
                                         className={styles.colorCircleWrapper}
                                         colorCode={color.color_code}
-                                        isSelected={color.product_id === currentColorId}
-                                        onClick={() => handleColorChange(color)}
+                                        isSelected={
+                                            color.product_id != null
+                                            && currentColorId != null
+                                            && String(color.product_id) === String(currentColorId)
+                                        }
+                                        onClick={() => handleColorSelect(color)}
                                     />
                                 ))}
                             </div>
-                            <div className={styles.contentDividerCompact}></div>
-
+                            <div className={styles.contentDividerCompact} />
                         </>
                     )
                 )}
@@ -286,13 +290,13 @@ const ProductPage = () => {
                 <div className={styles.infoSection}>
                     {loading ? (
                         <>
-                            <CustomSkeleton className={styles.detailRowSkeleton}/>
-                            <CustomSkeleton className={styles.detailRowSkeleton}/>
+                            <CustomSkeleton className={styles.detailRowSkeleton} />
+                            <CustomSkeleton className={styles.detailRowSkeleton} />
                             <CustomSkeleton className={styles.detailRowSkeleton} />
                         </>
                     ) : (
-                        product?.details && Object.entries(product.details).map(([label, value], index) => (
-                            <div key={index} className={styles.infoRow}>
+                        product?.details && Object.entries(product.details).map(([label, value]) => (
+                            <div key={label} className={styles.infoRow}>
                                 <span className={styles.infoLabel}>{label}</span>
                                 <span className={styles.infoValue}>{String(value ?? '')}</span>
                             </div>
@@ -300,41 +304,44 @@ const ProductPage = () => {
                     )}
                 </div>
             </div>
+
             <SaveToCollectionModal
                 isOpen={isSaveModalOpen}
-                onClose={handleCloseSaveModal}
+                onClose={() => setIsSaveModalOpen(false)}
                 productId={product?.id}
                 productName={product?.name}
                 productInCollection={product?.is_contained_in_user_collections}
-                onSaveSuccess={(isSaved) => {
-                    setProduct(prev => ({
-                        ...prev,
-                        is_contained_in_user_collections: isSaved
-                    }));
-                }}
+                onSaveSuccess={setProductSavedState}
             />
-            <Sidebar/>
+            <Sidebar />
         </div>
     );
 };
 
 export default ProductPage;
 
-const ColorSwatch = ({ colorCode, isSelected, onClick, className = '' }: any) => {
-    const colorCircleRef = useRef<any>(null);
-
-    useEffect(() => {
-        if (colorCircleRef.current) {
-            colorCircleRef.current.style.backgroundColor = colorCode;
-        }
-    }, [colorCode]);
-
-    return (
-        <div className={className} onClick={onClick}>
-            <div
-                ref={colorCircleRef}
-                className={`${styles.colorCircle} ${isSelected ? styles.selected : ''}`.trim()}
-            />
-        </div>
-    );
+type ColorSwatchProps = {
+    colorCode?: string;
+    isSelected: boolean;
+    onClick: () => void;
+    className?: string;
 };
+
+const ColorSwatch = ({
+    colorCode,
+    isSelected,
+    onClick,
+    className = '',
+}: ColorSwatchProps) => (
+    <button
+        type="button"
+        className={className}
+        onClick={onClick}
+        aria-label="Выбрать цвет"
+    >
+        <span
+            className={`${styles.colorCircle} ${isSelected ? styles.selected : ''}`.trim()}
+            style={{ backgroundColor: colorCode || 'transparent' }}
+        />
+    </button>
+);

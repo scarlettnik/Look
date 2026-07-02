@@ -1,22 +1,33 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { useStore } from '../../../app/providers/storeContext';
 import {
     INITIAL_CARDS_COUNT,
     SWIPE_CONFIG,
-    VERTICAL_SWIPE_THRESHOLD_RATIO,
 } from '../../../constants';
 import useVisualViewportMetrics from '../../../hooks/useVisualViewportMetrics';
 import { apiSendJson } from '../../../lib/apiClient';
+import {
+    DEFAULT_SWIPE_FEEDBACK,
+    getSimulatedSwipeParams,
+    getSwipeAnimationDuration,
+    getSwipeFeedback,
+    getSwipeFlyoutTransform,
+    getSwipeInteractionType,
+    getViewportSize,
+    type SwipeDirection,
+    type SwipeFeedback,
+    type SwipeGestureDirection,
+} from '../../../lib/swipeMotion';
 import type { ProductCard } from '../../../types/domain';
 
 import SaveToCollectionModal from '../../collections/saveToCollectionsModal';
 import Sidebar from '../../navigation/sidebar';
 import { FilterBar } from '../filters/filterBar';
 import {
-    createEmptyLocalCatalogFilters,
-    LocalCatalogFilters,
+    toLocalCatalogFilters,
+    type LocalCatalogFilters,
 } from '../filters/filterTypes';
 import styles from '../../ui/catalog/cards/tinderCards.module.css';
 
@@ -25,16 +36,17 @@ import CardsStage from './cardsStage';
 import { Onboarding } from './onboarding';
 import SearchHeaderMain from './searchHeaderMain';
 
-type SwipeFeedback = {
-    direction: 'left' | 'right' | 'up' | null;
-    opacity: number;
-};
-
-type SwipeDirection = 'left' | 'right' | 'up' | 'down';
-
-const DEFAULT_SWIPE_FEEDBACK: SwipeFeedback = {
-    direction: null,
-    opacity: 0,
+const sendProductInteraction = async (
+    productId: ProductCard['id'],
+    direction: SwipeDirection,
+) => {
+    try {
+        await apiSendJson(`/v1/interaction/product/${productId}`, 'PUT', {
+            interaction_type: getSwipeInteractionType(direction),
+        });
+    } catch (error) {
+        console.error('Error sending interaction:', error);
+    }
 };
 
 const TinderCards = observer(() => {
@@ -53,26 +65,16 @@ const TinderCards = observer(() => {
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<ProductCard | null>(null);
-    const [filters, setFilters] = useState<LocalCatalogFilters>(() => ({
-        ...createEmptyLocalCatalogFilters(),
-        size: currentFilters.sizes || [],
-        brand: currentFilters.brands || [],
-        price: {
-            min: currentFilters.min_price || null,
-            max: currentFilters.max_price || null,
-        },
-        type: currentFilters.categories || [],
-        color: currentFilters.colors || [],
-    }));
+    const [filters, setFilters] = useState<LocalCatalogFilters>(() => (
+        toLocalCatalogFilters(currentFilters)
+    ));
 
     const showOnboarding = authStore.hasLoaded && !authStore.preferences?.complete_onboarding;
-    const swipeConfigMemo = useMemo(() => SWIPE_CONFIG, []);
-    const nonTopSwipeProgress = useMemo<SwipeFeedback>(() => DEFAULT_SWIPE_FEEDBACK, []);
+    const nonTopSwipeProgress = DEFAULT_SWIPE_FEEDBACK;
     const cardRefs = useRef<Record<string, HTMLElement>>({});
     const cardsRef = useRef<ProductCard[]>(catalogStore.cards || []);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const stableViewportHeightRef = useRef(0);
-    const expandedCardId = null;
     const viewportMetrics = useVisualViewportMetrics();
 
     useEffect(() => {
@@ -254,53 +256,24 @@ const TinderCards = observer(() => {
         setSelectedProduct(null);
     }, []);
 
-    const sendInteraction = async (
-        productId: ProductCard['id'],
-        action: 'like' | 'dislike',
-    ) => {
-        try {
-            await apiSendJson(`/v1/interaction/product/${productId}`, 'PUT', {
-                interaction_type: action,
-            });
-        } catch (error) {
-            console.error('Error sending interaction:', error);
-        }
-    };
-
-    const handleSwipe = useCallback((direction: SwipeDirection, card: ProductCard) => {
+    const handleSwipe = useCallback((direction: SwipeGestureDirection, card: ProductCard) => {
         if (direction === 'down') {
             return;
         }
 
-        const action = direction === 'right' ? 'like' : 'dislike';
-        void sendInteraction(card.id, action);
+        void sendProductInteraction(card.id, direction);
 
-        const duration = direction === 'up'
-            ? SWIPE_CONFIG.verticalUp.animationDuration
-            : SWIPE_CONFIG.horizontal.animationDuration;
-
+        const duration = getSwipeAnimationDuration(direction);
         const cardElement = document.getElementById(String(card.id));
-        if (cardElement) {
-            const rotation = direction === 'right'
-                ? SWIPE_CONFIG.horizontal.rotationAngle
-                : -SWIPE_CONFIG.horizontal.rotationAngle;
 
+        if (cardElement) {
             cardElement.style.transition = `transform ${duration}ms linear`;
             cardElement.style.willChange = 'transform';
-
-            switch (direction) {
-                case 'left':
-                    cardElement.style.transform = `translate3d(-${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
-                    break;
-                case 'right':
-                    cardElement.style.transform = `translate3d(${window.innerWidth * 2}px, 0, 0) rotate(${rotation}deg)`;
-                    break;
-                case 'up':
-                    cardElement.style.transform = `translate3d(0, -${window.innerHeight * 2}px, 0) rotate(0deg)`;
-                    break;
-                default:
-                    break;
-            }
+            cardElement.style.transform = getSwipeFlyoutTransform(
+                direction,
+                getViewportSize(),
+                SWIPE_CONFIG,
+            );
         }
 
         setSwipeProgress(DEFAULT_SWIPE_FEEDBACK);
@@ -310,20 +283,7 @@ const TinderCards = observer(() => {
     }, [catalogStore]);
 
     const updateSwipeFeedback = useCallback((dx: number, dy: number) => {
-        const verticalThreshold = window.innerHeight * VERTICAL_SWIPE_THRESHOLD_RATIO;
-
-        let direction: SwipeFeedback['direction'] = null;
-        let opacity = 0;
-
-        if (Math.abs(dx) > Math.abs(dy * 1.5)) {
-            direction = dx > 0 ? 'right' : 'left';
-            opacity = 1;
-        } else if (dy < -verticalThreshold) {
-            direction = 'up';
-            opacity = 1;
-        }
-
-        setSwipeProgress({ direction, opacity });
+        setSwipeProgress(getSwipeFeedback(dx, dy, getViewportSize()));
         setTopCardPosition({ x: dx, y: dy });
     }, []);
 
@@ -346,7 +306,7 @@ const TinderCards = observer(() => {
         }
     };
 
-    const simulateSwipe = useCallback((direction: SwipeDirection) => {
+    const simulateSwipe = useCallback((direction: SwipeGestureDirection) => {
         if (!catalogStore.cards?.length || isAnimating) {
             return;
         }
@@ -358,29 +318,11 @@ const TinderCards = observer(() => {
         }
 
         setIsAnimating(true);
-
-        const swipeParams = {
-            left: {
-                x: -window.innerWidth * 0.7,
-                y: 0,
-                rotation: -SWIPE_CONFIG.horizontal.rotationAngle,
-            },
-            right: {
-                x: window.innerWidth * 0.7,
-                y: 0,
-                rotation: SWIPE_CONFIG.horizontal.rotationAngle,
-            },
-            up: {
-                x: window.innerWidth * 0.3,
-                y: -window.innerHeight * 0.4,
-                rotation: 5,
-            },
-            down: {
-                x: 0,
-                y: 0,
-                rotation: 0,
-            },
-        }[direction];
+        const swipeParams = getSimulatedSwipeParams(
+            direction,
+            getViewportSize(),
+            SWIPE_CONFIG,
+        );
 
         const originalTransition = cardRef.style.transition;
         const originalZIndex = cardRef.style.zIndex;
@@ -426,8 +368,7 @@ const TinderCards = observer(() => {
                     <CardsStage
                         cards={catalogStore.cards || []}
                         isLoading={catalogStore.isLoading}
-                        expandedCardId={expandedCardId}
-                        swipeConfig={swipeConfigMemo}
+                        swipeConfig={SWIPE_CONFIG}
                         swipeProgress={swipeProgress}
                         nonTopSwipeProgress={nonTopSwipeProgress}
                         topCardPosition={topCardPosition}
@@ -455,11 +396,8 @@ const TinderCards = observer(() => {
                     simulateSwipe={simulateSwipe}
                     isAnimating={isAnimating}
                     handleSaveChanges={handleSaveChanges}
-                    undoButtonHighlight={undoButtonHighlight}
                     setUndoButtonHighlight={setUndoButtonHighlight}
-                    saveHighlight={saveHighlight}
                     setSaveHighlight={setSaveHighlight}
-                    popularHighlight={popularHighlight}
                     setPopularHighlight={setPopularHighlight}
                 />
             </div>

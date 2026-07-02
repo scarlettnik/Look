@@ -1,4 +1,9 @@
 import { SKELETON_COUNT, SWIPE_CONFIG } from '../../../constants';
+import type {
+    Point,
+    SwipeFeedback,
+    SwipeGestureDirection,
+} from '../../../lib/swipeMotion';
 import type { ProductCard } from '../../../types/domain';
 
 import CustomSkeleton from '../../shared/customSkeleton';
@@ -6,20 +11,14 @@ import styles from '../../ui/catalog/cards/tinderCards.module.css';
 
 import TinderCard from './tinderCard';
 
-type SwipeFeedback = {
-    direction: 'left' | 'right' | 'up' | null;
-    opacity: number;
-};
-
 type CardsStageProps = {
     cards: ProductCard[];
     isLoading: boolean;
-    expandedCardId: ProductCard['id'] | null;
     swipeConfig: typeof SWIPE_CONFIG;
     swipeProgress: SwipeFeedback;
     nonTopSwipeProgress: SwipeFeedback;
-    topCardPosition: { x: number; y: number };
-    handleSwipe: (direction: 'left' | 'right' | 'up' | 'down', card: ProductCard) => void;
+    topCardPosition: Point;
+    handleSwipe: (direction: SwipeGestureDirection, card: ProductCard) => void;
     updateSwipeFeedback: (dx: number, dy: number) => void;
     setCardRef: (id: ProductCard['id'], ref: HTMLElement | null) => void;
     showOnboarding: boolean;
@@ -29,7 +28,6 @@ type CardsStageProps = {
 const CardsStage = ({
     cards,
     isLoading,
-    expandedCardId,
     swipeConfig,
     swipeProgress,
     nonTopSwipeProgress,
@@ -62,7 +60,6 @@ const CardsStage = ({
                     zIndex={10000 - index}
                     offset={index}
                     swipeConfig={swipeConfig}
-                    isExpanded={expandedCardId === card.id}
                     swipeProgress={index === 0 ? swipeProgress : nonTopSwipeProgress}
                     isTopCard={index === 0}
                     setCardRef={setCardRef}

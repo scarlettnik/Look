@@ -4,6 +4,7 @@ import {
   isFilterActive,
   normalizeSelectedSizes,
   toApiCatalogFilters,
+  toLocalCatalogFilters,
 } from '../filterTypes';
 
 describe('filterTypes', () => {
@@ -43,6 +44,25 @@ describe('filterTypes', () => {
       colors: ['black'],
       min_price: 1000,
       max_price: 5000,
+    });
+  });
+
+  it('maps API filters back to local filter state', () => {
+    expect(
+      toLocalCatalogFilters({
+        sizes: ['M'],
+        brands: ['Zara'],
+        categories: ['dress'],
+        colors: ['black'],
+        min_price: 1000,
+        max_price: null,
+      }),
+    ).toEqual({
+      size: ['M'],
+      brand: ['Zara'],
+      price: { min: 1000, max: null },
+      type: ['dress'],
+      color: ['black'],
     });
   });
 

@@ -14,7 +14,12 @@ import { StoreProvider } from './providers/storeProvider';
 import OnboardingModal from "../components/onboarding/onboardingModal";
 import AccountDeleted from "../components/account/accountDeleted";
 import PopularCollection from "../components/catalog/trends/popularCollection";
-import { getTelegramStartParam, getTelegramWebApp, isTelegramEnvironment } from '../lib/telegramWebApp';
+import {
+    getTelegramStartParam,
+    getTelegramWebApp,
+    isTelegramBackButtonSupported,
+    isTelegramEnvironment,
+} from '../lib/telegramWebApp';
 
 function App() {
     return (
@@ -34,6 +39,8 @@ function AppContent() {
 
     const isTWA = isTelegramEnvironment();
     const startParamFromInitData = getTelegramStartParam();
+    const showTelegramBackButton =
+        window.history.state?.idx > 0 && isTelegramBackButtonSupported();
 
     useEffect(() => {
         if (!isTWA) return;
@@ -62,7 +69,7 @@ function AppContent() {
 
     return (
         <div>
-            {window.history.state?.idx > 0 && <BackButton onClick={() => navigate(-1)} />}
+            {showTelegramBackButton && <BackButton onClick={() => navigate(-1)} />}
             <Routes>
                 <Route path="/add" element={<AddList/>}/>
                 <Route path="/cards" element={<TinderCards/>}/>

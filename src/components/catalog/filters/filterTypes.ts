@@ -50,6 +50,17 @@ export const toApiCatalogFilters = (filters: LocalCatalogFilters): CatalogFilter
     max_price: filters.price.max,
 });
 
+export const toLocalCatalogFilters = (filters: CatalogFilters): LocalCatalogFilters => ({
+    size: filters.sizes,
+    brand: filters.brands,
+    price: {
+        min: filters.min_price,
+        max: filters.max_price,
+    },
+    type: filters.categories,
+    color: filters.colors,
+});
+
 export const isFilterActive = (
     filters: LocalCatalogFilters,
     filterKey: keyof LocalCatalogFilters,

@@ -13,10 +13,13 @@ import {
     isSystemCollection,
 } from '../../../lib/systemCollections';
 import type { EntityId, ProductCollection } from '../../../types/domain';
+import {
+    normalizeSelectedCollectionIds,
+    toggleCollectionSelection,
+    type CollectionId,
+} from '../model/collectionSelection';
 import CollectionForm from './collectionForm';
 import styles from './saveToCollectionSheet.module.css';
-
-type CollectionId = ProductCollection['id'];
 
 type SaveToCollectionSheetProps = {
     isOpen: boolean;
@@ -25,61 +28,6 @@ type SaveToCollectionSheetProps = {
     productName?: string;
     productInCollection?: boolean;
     onSaveSuccess?: (isSaved: boolean) => void;
-};
-
-const normalizeSelectedCollectionIds = (
-    collectionIds: CollectionId[],
-    primaryCollectionId: CollectionId | null,
-) => {
-    const uniqueCollectionIds = Array.from(new Set(collectionIds));
-
-    if (primaryCollectionId == null) {
-        return uniqueCollectionIds;
-    }
-
-    const hasCustomSelection = uniqueCollectionIds.some(
-        (collectionId) => collectionId !== primaryCollectionId,
-    );
-
-    if (!hasCustomSelection) {
-        return uniqueCollectionIds.filter(
-            (collectionId) => collectionId !== primaryCollectionId,
-        );
-    }
-
-    if (!uniqueCollectionIds.includes(primaryCollectionId)) {
-        return [...uniqueCollectionIds, primaryCollectionId];
-    }
-
-    return uniqueCollectionIds;
-};
-
-const toggleCollectionSelection = (
-    currentSelectedCollectionIds: CollectionId[],
-    collectionId: CollectionId,
-    primaryCollectionId: CollectionId | null,
-) => {
-    const nextSelectedCollectionIds = currentSelectedCollectionIds.includes(collectionId)
-        ? currentSelectedCollectionIds.filter(
-            (selectedCollectionId) => selectedCollectionId !== collectionId,
-        )
-        : [...currentSelectedCollectionIds, collectionId];
-
-    if (collectionId === primaryCollectionId) {
-        return currentSelectedCollectionIds.includes(collectionId)
-            ? currentSelectedCollectionIds.filter(
-                (selectedCollectionId) => selectedCollectionId !== collectionId,
-            )
-            : normalizeSelectedCollectionIds(
-                nextSelectedCollectionIds,
-                primaryCollectionId,
-            );
-    }
-
-    return normalizeSelectedCollectionIds(
-        nextSelectedCollectionIds,
-        primaryCollectionId,
-    );
 };
 
 const SaveToCollectionSheet = observer(({

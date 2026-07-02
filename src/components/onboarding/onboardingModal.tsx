@@ -105,7 +105,6 @@ const OnboardingModal = observer(() => {
           src={ONBOARDING_ASSETS.backgroundImage}
           alt=""
           loading="eager"
-          fetchPriority="high"
           decoding="async"
         />
         <div className={styles.onboardingBackGroundOverlay} />
@@ -115,7 +114,6 @@ const OnboardingModal = observer(() => {
         src={BRAND_ASSETS.logo}
         alt="Look"
         loading="eager"
-        fetchPriority="high"
         decoding="async"
       />
       <div className={styles.onboardingContent}>

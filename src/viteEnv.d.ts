@@ -47,12 +47,14 @@ interface TelegramWebAppInitDataUnsafe {
 }
 
 interface TelegramWebApp {
+  version?: string;
   initData?: string;
   initDataUnsafe?: TelegramWebAppInitDataUnsafe;
   ready: () => void;
   expand: () => void;
   disableVerticalSwipes: () => void;
   openLink?: (url: string) => void;
+  isVersionAtLeast?: (version: string) => boolean;
 }
 
 interface Window {

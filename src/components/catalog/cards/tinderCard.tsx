@@ -1,113 +1,165 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import {
+    getBoundedRotation,
+    getGestureVelocity,
+    getStackedDragTransform,
+    getSwipeDirectionFromGesture,
+    getSwipeReleaseTransform,
+    getViewportSize,
+    type DragPosition,
+    type Point,
+    type SwipeConfig,
+    type SwipeDirection,
+    type SwipeFeedback,
+} from '../../../lib/swipeMotion';
+import { UI_ICON_ASSETS } from '../../../lib/assets';
+import type { ProductCard } from '../../../types/domain';
+
+import CustomSkeleton from '../../shared/customSkeleton';
 import styles from '../../ui/catalog/cards/tinderCard.module.css';
-import CustomSkeleton from "../../shared/customSkeleton";
-import { UI_ICON_ASSETS } from "../../../lib/assets";
+
+type TinderCardProps = {
+    card: ProductCard;
+    onSwipe: (direction: SwipeDirection, card: ProductCard) => void;
+    updateSwipeFeedback: (dx: number, dy: number) => void;
+    zIndex: number;
+    offset: number;
+    isTopCard: boolean;
+    topCardPosition?: Point | null;
+    swipeProgress: SwipeFeedback;
+    setCardRef: (id: ProductCard['id'], ref: HTMLElement | null) => void;
+    isOnboardingActive: boolean;
+    swipeConfig: SwipeConfig;
+    onSaveClick: (card: ProductCard) => void;
+    isDimmed?: boolean;
+};
+
+const INITIAL_POSITION: DragPosition = {
+    x: 0,
+    y: 0,
+    rotate: 0,
+};
+
+const INITIAL_CARD_STYLE: CSSProperties = {
+    transform: 'translate(0,0) rotate(0deg)',
+    opacity: 1,
+};
+
+const ENTERING_CARD_STYLE: CSSProperties = {
+    transform: 'translate(0,20px) rotate(0deg)',
+    opacity: 0,
+};
+
+const ACTIVE_CARD_STYLE: CSSProperties = {
+    transform: 'translate(0,0) rotate(0deg)',
+    opacity: 1,
+    transition: 'all 300ms ease-out',
+};
+
+const RESET_CARD_TRANSFORM = 'translate3d(0, 0, 0) rotate(0deg)';
+
+const applyDomStyle = (
+    element: HTMLElement,
+    style: CSSProperties | undefined,
+) => {
+    if (!style) {
+        return;
+    }
+
+    Object.entries(style).forEach(([styleKey, styleValue]) => {
+        if (styleValue == null) {
+            return;
+        }
+
+        (element.style as unknown as Record<string, string>)[styleKey] = String(styleValue);
+    });
+};
 
 const TinderCard = ({
-                        card,
-                        onSwipe,
-                        updateSwipeFeedback,
-                        zIndex,
-                        offset,
-                        isTopCard,
-                        topCardPosition,
-                        swipeProgress,
-                        isExpanded,
-                        setCardRef,
-                        isOnboardingActive,
-                        swipeConfig,
-                        onSaveClick,
-                        isDimmed
-                    }: any) => {
-    const [position, setPosition] = useState({ x: 0, y: 0, rotate: 0 });
+    card,
+    onSwipe,
+    updateSwipeFeedback,
+    zIndex,
+    offset,
+    isTopCard,
+    topCardPosition,
+    swipeProgress,
+    setCardRef,
+    isOnboardingActive,
+    swipeConfig,
+    onSaveClick,
+    isDimmed = false,
+}: TinderCardProps) => {
     const [isDragging, setIsDragging] = useState(false);
-    const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-
-    const cardRef = useRef<any>(null);
-    const likeFeedbackRef = useRef<any>(null);
-    const dislikeFeedbackRef = useRef<any>(null);
-    const animationFrame = useRef<any>(null);
-    const startTime = useRef(0);
-    const navigate = useNavigate();
-    const imageRef = useRef<HTMLImageElement | null>(null);
-
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [localStyle, setLocalStyle] = useState<{
-        transform: string;
-        opacity: number;
-        transition?: string;
-    }>({
-        transform: 'translate(0,0) rotate(0deg)',
-        opacity: 1,
-    });
+    const [localStyle, setLocalStyle] = useState<CSSProperties>(INITIAL_CARD_STYLE);
 
-    // const [isInteractive, setIsInteractive] = useState(false);
-    // const timeoutRef = useRef(null);
-    //
-    // useEffect(() => {
-    //     if (isTopCard) {
-    //         if (timeoutRef.current) {
-    //             clearTimeout(timeoutRef.current);
-    //         }
-    //         timeoutRef.current = setTimeout(() => {
-    //             setIsInteractive(true);
-    //         }, 200);
-    //     } else {
-    //         setIsInteractive(false);
-    //         if (timeoutRef.current) {
-    //             clearTimeout(timeoutRef.current);
-    //         }
-    //     }
-    //     return () => {
-    //         if (timeoutRef.current) {
-    //             clearTimeout(timeoutRef.current);
-    //         }
-    //     };
-    // }, [isTopCard]);
+    const cardRef = useRef<HTMLDivElement | null>(null);
+    const likeFeedbackRef = useRef<HTMLDivElement | null>(null);
+    const dislikeFeedbackRef = useRef<HTMLDivElement | null>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
+    const animationFrame = useRef<number | null>(null);
+    const releaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const startTime = useRef(0);
+    const startPosition = useRef<Point>({ x: 0, y: 0 });
+    const currentPosition = useRef<DragPosition>(INITIAL_POSITION);
+
+    const navigate = useNavigate();
+    const primaryImageUrl = card.image_urls?.[0] ?? '';
+    const displayPrice = card.discount_price ?? card.price;
 
     useEffect(() => {
-        if (card._pending) {
-            setLocalStyle({
-                transform: 'translate(0,20px) rotate(0deg)',
-                opacity: 0,
-            });
+        return () => {
+            if (animationFrame.current != null) {
+                window.cancelAnimationFrame(animationFrame.current);
+            }
 
-            requestAnimationFrame(() => {
-                setLocalStyle({
-                    transform: 'translate(0,0) rotate(0deg)',
-                    opacity: 1,
-                    transition: 'all 300ms ease-out',
-                });
-            });
+            if (releaseTimer.current != null) {
+                window.clearTimeout(releaseTimer.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!card._pending) {
+            return;
         }
+
+        setLocalStyle(ENTERING_CARD_STYLE);
+
+        const animationFrameId = window.requestAnimationFrame(() => {
+            setLocalStyle(ACTIVE_CARD_STYLE);
+        });
+
+        return () => {
+            window.cancelAnimationFrame(animationFrameId);
+        };
     }, [card._key, card._pending]);
 
     useEffect(() => {
         if (cardRef.current) {
             setCardRef(card.id, cardRef.current);
         }
+
         return () => setCardRef(card.id, null);
     }, [card.id, setCardRef]);
 
     useEffect(() => {
         if (cardRef.current) {
-            cardRef.current.style.zIndex = zIndex;
+            cardRef.current.style.zIndex = String(zIndex);
         }
     }, [zIndex]);
 
     useEffect(() => {
         setImageLoaded(Boolean(imageRef.current?.complete));
-    }, [card.image_urls?.[0]]);
+    }, [primaryImageUrl]);
 
     useEffect(() => {
-        if (!cardRef.current) {
-            return;
+        if (cardRef.current) {
+            applyDomStyle(cardRef.current, localStyle);
         }
-
-        Object.entries(localStyle).forEach(([styleKey, styleValue]) => {
-            cardRef.current.style[styleKey] = styleValue;
-        });
     }, [localStyle]);
 
     useEffect(() => {
@@ -115,154 +167,15 @@ const TinderCard = ({
             return;
         }
 
-        cardRef.current.style.opacity = isDimmed ? '0' : localStyle.opacity ?? '1';
+        cardRef.current.style.opacity = isDimmed
+            ? '0'
+            : String(localStyle.opacity ?? 1);
         cardRef.current.style.pointerEvents = isDimmed ? 'none' : 'auto';
     }, [isDimmed, localStyle.opacity]);
 
-    const handleStart = (clientX, clientY) => {
-        // if (!isInteractive || isExpanded) {
-        //     return false;
-        // }
-
-        if (isExpanded) {
-            return false;
-        }
-
-        setStartPos({ x: clientX, y: clientY });
-        setIsDragging(true);
-        startTime.current = Date.now();
-
-        if (cardRef.current) {
-            cardRef.current.style.transition = 'none';
-        }
-        return true;
-    };
-
-    const handleMove = (clientX, clientY) => {
-        if (!isDragging) return;
-
-        cancelAnimationFrame(animationFrame.current);
-        animationFrame.current = requestAnimationFrame(() => {
-            const deltaX = clientX - startPos.x;
-            const deltaY = clientY - startPos.y;
-
-            const rotate = Math.min(
-                Math.max(deltaX * 0.1, -swipeConfig.horizontal.rotationAngle),
-                swipeConfig.horizontal.rotationAngle
-            );
-
-            setPosition({ x: deltaX, y: deltaY, rotate });
-
-            if (cardRef.current) {
-                let scale = 1 - Math.max(0, offset) * 0.03;
-                let translateY = 0;
-                let translateX = 0;
-
-                if (offset > 0 && topCardPosition) {
-                    const progress = Math.min(
-                        1,
-                        Math.max(
-                            Math.abs(topCardPosition.x) / (window.innerWidth * 0.5),
-                            Math.abs(topCardPosition.y) / (window.innerHeight * 0.5)
-                        )
-                    );
-                    const influenceFactor = 1 - (offset - 1) * 0.3;
-                    if (influenceFactor > 0) {
-                        scale += 0.03 * progress * influenceFactor;
-                        translateY += -5 * progress * influenceFactor;
-                        if (topCardPosition.x !== 0) {
-                            const direction = topCardPosition.x > 0 ? 1 : -1;
-                            translateX = direction * 5 * progress * influenceFactor;
-                        }
-                    }
-                }
-
-                cardRef.current.style.transform = `translate3d(${deltaX + translateX}px, ${deltaY + translateY}px, 0) rotate(${rotate}deg) scale(${scale})`;
-            }
-
-            if (isTopCard) {
-                updateSwipeFeedback(deltaX, deltaY);
-            }
-        });
-    };
-
-    const handleEnd = () => {
-        if (!isDragging) return;
-
-        setIsDragging(false);
-        cancelAnimationFrame(animationFrame.current);
-
-        const { innerWidth, innerHeight } = window;
-        const deltaTime = Date.now() - startTime.current;
-
-        const velocity = {
-            x: (position.x / (deltaTime || 1)) * swipeConfig.physics.power * swipeConfig.horizontal.speedMultiplier,
-            y: (position.y / (deltaTime || 1)) * swipeConfig.physics.power *
-                (position.y < 0 ? swipeConfig.verticalUp.speedMultiplier : 0)
-        };
-
-        const direction = getSwipeDirection(velocity, innerWidth, innerHeight);
-
-        if (direction) {
-            animateSwipe(direction);
-        } else {
-            resetPosition();
-        }
-    };
-
-    const getSwipeDirection = (velocity, screenWidth, screenHeight) => {
-        const isHorizontalFast = Math.abs(velocity.x) > swipeConfig.physics.velocityThreshold;
-
-        if (Math.abs(position.x) > screenWidth * swipeConfig.horizontal.threshold || isHorizontalFast) {
-            return velocity.x > 0 ? 'right' : 'left';
-        }
-
-        if (position.y < -screenHeight * swipeConfig.verticalUp.threshold ||
-            (velocity.y < -swipeConfig.physics.velocityThreshold)) {
-            return 'up';
-        }
-
-        return null;
-    };
-
-
-    const animateSwipe = (direction) => {
-        if (!cardRef.current) return;
-        cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
-
-        if (direction === 'left') {
-            cardRef.current.style.transform = 'translate3d(-100vw, 0, 0) rotate(-30deg)';
-        } else if (direction === 'right') {
-            cardRef.current.style.transform = 'translate3d(100vw, 0, 0) rotate(30deg)';
-        } else if (direction === 'up') {
-            cardRef.current.style.transform = 'translate3d(0, -100vh, 0)';
-        }
-
-        setTimeout(() => {
-            onSwipe(direction, card);
-        }, 50);
-    };
-
-    const resetPosition = () => {
-        if (!cardRef.current) return;
-
-        cardRef.current.style.transition = `transform ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
-        cardRef.current.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
-
-        const onTransitionEnd = () => {
-            cardRef.current?.removeEventListener('transitionend', onTransitionEnd);
-            setPosition({ x: 0, y: 0, rotate: 0 });
-            if (isTopCard) updateSwipeFeedback(0, 0);
-        };
-
-        cardRef.current.addEventListener('transitionend', onTransitionEnd);
-    };
-
     useEffect(() => {
         if (cardRef.current) {
-            Object.entries(card.style || {}).forEach(([key, value]) => {
-                cardRef.current.style[key] = value;
-            });
+            applyDomStyle(cardRef.current, card.style);
         }
     }, [card.style]);
 
@@ -273,31 +186,161 @@ const TinderCard = ({
 
         if (likeFeedbackRef.current) {
             const isLikeVisible = swipeProgress.direction === 'right';
-            likeFeedbackRef.current.style.opacity = isLikeVisible ? String(swipeProgress.opacity) : '0';
+            likeFeedbackRef.current.style.opacity = isLikeVisible
+                ? String(swipeProgress.opacity)
+                : '0';
             likeFeedbackRef.current.style.transform =
                 `translateY(-50%) scale(${isLikeVisible ? 0.8 + swipeProgress.opacity * 0.4 : 1})`;
         }
 
         if (dislikeFeedbackRef.current) {
             const isDislikeVisible = swipeProgress.direction === 'left';
-            dislikeFeedbackRef.current.style.opacity = isDislikeVisible ? String(swipeProgress.opacity) : '0';
+            dislikeFeedbackRef.current.style.opacity = isDislikeVisible
+                ? String(swipeProgress.opacity)
+                : '0';
             dislikeFeedbackRef.current.style.transform =
                 `translateY(-50%) scale(${isDislikeVisible ? 0.8 + swipeProgress.opacity * 0.4 : 1})`;
         }
     }, [isTopCard, swipeProgress]);
 
+    const handleStart = (clientX: number, clientY: number) => {
+        startPosition.current = { x: clientX, y: clientY };
+        startTime.current = Date.now();
+        currentPosition.current = INITIAL_POSITION;
+        setIsDragging(true);
+
+        if (cardRef.current) {
+            cardRef.current.style.transition = 'none';
+        }
+    };
+
+    const handleMove = (clientX: number, clientY: number) => {
+        if (!isDragging) {
+            return;
+        }
+
+        if (animationFrame.current != null) {
+            window.cancelAnimationFrame(animationFrame.current);
+        }
+
+        animationFrame.current = window.requestAnimationFrame(() => {
+            const delta = {
+                x: clientX - startPosition.current.x,
+                y: clientY - startPosition.current.y,
+            };
+            const rotate = getBoundedRotation(delta.x, swipeConfig);
+            currentPosition.current = {
+                ...delta,
+                rotate,
+            };
+
+            if (cardRef.current) {
+                cardRef.current.style.transform = getStackedDragTransform({
+                    delta,
+                    rotate,
+                    offset,
+                    topCardPosition,
+                    viewport: getViewportSize(),
+                });
+            }
+
+            if (isTopCard) {
+                updateSwipeFeedback(delta.x, delta.y);
+            }
+        });
+    };
+
+    const resetPosition = () => {
+        if (!cardRef.current) {
+            return;
+        }
+
+        cardRef.current.style.transition =
+            `transform ${swipeConfig.horizontal.animationDuration}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+        cardRef.current.style.transform = RESET_CARD_TRANSFORM;
+
+        const onTransitionEnd = () => {
+            cardRef.current?.removeEventListener('transitionend', onTransitionEnd);
+            currentPosition.current = INITIAL_POSITION;
+
+            if (isTopCard) {
+                updateSwipeFeedback(0, 0);
+            }
+        };
+
+        cardRef.current.addEventListener('transitionend', onTransitionEnd);
+    };
+
+    const animateSwipe = (direction: SwipeDirection) => {
+        if (!cardRef.current) {
+            return;
+        }
+
+        cardRef.current.style.transition = 'transform 300ms ease-out, opacity 300ms ease-out';
+        cardRef.current.style.transform = getSwipeReleaseTransform(direction);
+
+        releaseTimer.current = window.setTimeout(() => {
+            onSwipe(direction, card);
+        }, 50);
+    };
+
+    const handleEnd = () => {
+        if (!isDragging) {
+            return;
+        }
+
+        setIsDragging(false);
+
+        if (animationFrame.current != null) {
+            window.cancelAnimationFrame(animationFrame.current);
+            animationFrame.current = null;
+        }
+
+        const position = currentPosition.current;
+        const velocity = getGestureVelocity(
+            position,
+            Date.now() - startTime.current,
+            swipeConfig,
+        );
+        const direction = getSwipeDirectionFromGesture(
+            position,
+            velocity,
+            getViewportSize(),
+            swipeConfig,
+        );
+
+        if (direction) {
+            animateSwipe(direction);
+            return;
+        }
+
+        resetPosition();
+    };
+
     return (
         <div
             ref={cardRef}
-            id={card.id}
+            id={String(card.id)}
             className={`${styles.card} 
             ${isDragging ? styles.moving : ''} 
             ${isOnboardingActive ? styles['card-onboarding'] : ''}`}
-            onTouchStart={(e) => handleStart(e.touches[0].clientX, e.touches[0].clientY)}
-            onTouchMove={(e) => handleMove(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchStart={(event) => {
+                const touch = event.touches[0];
+
+                if (touch) {
+                    handleStart(touch.clientX, touch.clientY);
+                }
+            }}
+            onTouchMove={(event) => {
+                const touch = event.touches[0];
+
+                if (touch) {
+                    handleMove(touch.clientX, touch.clientY);
+                }
+            }}
             onTouchEnd={handleEnd}
-            onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
-            onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
+            onMouseDown={(event) => handleStart(event.clientX, event.clientY)}
+            onMouseMove={(event) => handleMove(event.clientX, event.clientY)}
             onMouseUp={handleEnd}
             onMouseLeave={handleEnd}
         >
@@ -307,45 +350,51 @@ const TinderCard = ({
                         className={styles.cardImageSkeleton}
                     />
                 )}
-                <img onLoad={() => setImageLoaded(true)}
-                     onError={() => setImageLoaded(true)}
-                     ref={imageRef}
-                     data-card-layer
-                     className={`${styles.cardImage} tinder-card-image`} src={card.image_urls[0]} alt={card.name} />
+                <img
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(true)}
+                    ref={imageRef}
+                    data-card-layer
+                    className={`${styles.cardImage} tinder-card-image`}
+                    src={primaryImageUrl}
+                    alt={card.name ?? ''}
+                />
             </div>
             <div className={styles.cardOverlay} data-card-layer />
 
             {isTopCard && (
                 <>
-                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}/>
-                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}/>
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`} />
+                    <div className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`} />
                     <div
                         ref={likeFeedbackRef}
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackLeft}`}
                     >
-                        <img src={UI_ICON_ASSETS.likeDark} alt="Save" className={styles.feedbackIcon}/>
+                        <img src={UI_ICON_ASSETS.likeDark} alt="Save" className={styles.feedbackIcon} />
                     </div>
                     <div
                         ref={dislikeFeedbackRef}
                         className={`${styles.swipeFeedback} ${styles.swipeFeedbackRight}`}
                     >
-                        <img src={UI_ICON_ASSETS.dislikeDark} alt="Close" className={styles.feedbackIcon}/>
+                        <img src={UI_ICON_ASSETS.dislikeDark} alt="Close" className={styles.feedbackIcon} />
                     </div>
                 </>
             )}
             <div className={styles.cardContent} data-card-layer>
                 <div className={styles.cardBottom}>
                     <div className={styles.cardInfo}>
-                        <div className={styles.productName}>{card?.name}</div>
-                        <div className={styles.manufacturer}>{card?.brand}</div>
+                        <div className={styles.productName}>{card.name}</div>
+                        <div className={styles.manufacturer}>{card.brand}</div>
                         <div className={styles.priceRow}>
-                            <div className={styles.price}>{card?.discount_price || card?.price} ₽</div>
+                            <div className={styles.price}>
+                                {displayPrice != null ? `${displayPrice} ₽` : ''}
+                            </div>
                             <button
                                 type="button"
                                 className={styles.saveButton}
                                 data-card-layer
-                                onClick={(e) => {
-                                    e.stopPropagation();
+                                onClick={(event) => {
+                                    event.stopPropagation();
                                     onSaveClick(card);
                                 }}
                             >
@@ -353,7 +402,7 @@ const TinderCard = ({
                                     src={card.is_contained_in_user_collections
                                         ? UI_ICON_ASSETS.bookmarkWhiteFilled
                                         : UI_ICON_ASSETS.bookmarkWhite}
-                                    alt={card.is_contained_in_user_collections ? "Сохранено" : "Сохранить"}
+                                    alt={card.is_contained_in_user_collections ? 'Сохранено' : 'Сохранить'}
                                 />
                             </button>
                         </div>

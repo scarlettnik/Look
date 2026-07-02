@@ -150,7 +150,6 @@ const WelcomeStep = ({ userName, userSername, onNext }: any) => {
                             alt={`Card ${index + 1}`}
                             className={welcomeStyle.cardImage}
                             loading="eager"
-                            fetchPriority={index === 0 ? 'high' : 'auto'}
                             decoding="async"
                         />
                     </div>

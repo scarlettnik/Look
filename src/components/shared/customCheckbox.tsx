@@ -1,8 +1,26 @@
-import { useId } from 'react';
+import {
+    useId,
+    type ChangeEventHandler,
+    type MouseEventHandler,
+} from 'react';
 
 import styles from '../ui/shared/customCheckbox.module.css';
 
-const CustomCheckbox = ({ id, checked, onChange, onClick, className = '' }: any) => {
+type CustomCheckboxProps = {
+    id?: string | number;
+    checked: boolean;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
+    onClick?: MouseEventHandler<HTMLElement>;
+    className?: string;
+};
+
+const CustomCheckbox = ({
+    id,
+    checked,
+    onChange,
+    onClick,
+    className = '',
+}: CustomCheckboxProps) => {
     const generatedId = useId();
     const inputId = String(id ?? generatedId);
 

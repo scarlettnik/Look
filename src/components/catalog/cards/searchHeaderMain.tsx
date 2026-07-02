@@ -63,7 +63,7 @@ const SearchHeaderMain = ({
                 'POST',
                 { query },
             );
-            setSuggestions(data ?? []);
+            setSuggestions(Array.from(new Set(data ?? [])));
         } catch (error) {
             console.error('Error fetching suggestions:', error);
             setSuggestions([]);
